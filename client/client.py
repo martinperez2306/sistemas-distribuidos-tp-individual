@@ -11,13 +11,9 @@ CHUNKSIZE = 1
 def main():
     initialize_log("INFO")
     logging.info("Hi! Im am the client")
-    print (os.getcwd())
-    initial_count = 0
-    for path in pathlib.Path(VIDEOS).iterdir():
-        if path.is_file():
-            initial_count += 1
-    logging.info("Files count = {}".format(initial_count))
-    process_videos()
+    total_countries = get_total_countries()
+    logging.info("Total Countries = {}".format(total_countries))
+    process_videos(total_countries)
 
 def initialize_log(logging_level):
     """
@@ -32,8 +28,14 @@ def initialize_log(logging_level):
         datefmt='%Y-%m-%d %H:%M:%S',
     )
     
+def get_total_countries():
+    countries = 0
+    for path in pathlib.Path(VIDEOS).iterdir():
+        if path.is_file():
+            countries += 1
+    return countries
 
-def process_videos():
+def process_videos(total_countries):
     logging.info("Processing Videos")
     for path in pathlib.Path(VIDEOS).iterdir():
         if path.is_file():
