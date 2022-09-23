@@ -6,3 +6,5 @@ services:
       dockerfile: client.dockerfile
     environment:
       - PYTHONUNBUFFERED=1
+    volumes:
+      - "./client/videos:/root/videos"
