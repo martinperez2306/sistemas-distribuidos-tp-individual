@@ -7,7 +7,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - "./client/videos:/root/videos"
+      - "./client/videos_dev:/root/videos"
 
   middleware:
     build:
