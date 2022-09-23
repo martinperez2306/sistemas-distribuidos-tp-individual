@@ -1,5 +1,5 @@
 FROM python-rabbitmq
 
-COPY client.py /root/client.py
+COPY middleware.py /root/middleware.py
 WORKDIR /root/
-ENTRYPOINT ["python3", "/root/client.py"]
+ENTRYPOINT ["python3", "/root/middleware.py"]

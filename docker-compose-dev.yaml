@@ -8,3 +8,10 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - "./client/videos:/root/videos"
+
+  middleware:
+    build:
+      context: ./middleware
+      dockerfile: middleware.dockerfile
+    environment:
+      - PYTHONUNBUFFERED=1
