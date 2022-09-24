@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import constants
+from .message import Message
+from .constants import *
 import logging
-from message import Message
 import uuid
 import pika
 
@@ -36,19 +36,19 @@ class MiddlewareClient:
             self.response = body
 
     def call_start_data_process(self):
-        request = Message(constants.CLIENT_MESSAGE_ID, 0, self.client_id, constants.START_PROCESS_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_ID, "")
         return self.__request(request)
 
     def call_process_data(self, request_id, data):
-        request = Message(constants.CLIENT_MESSAGE_ID, request_id, self.client_id, constants.PROCESS_DATA_ID, data)
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_ID, data)
         return self.__request(request)
 
     def call_end_data_process(self, request_id):
-        request = Message(constants.CLIENT_MESSAGE_ID, request_id, self.client_id, constants.END_PROCESS_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_ID, "")
         return self.__request(request)
 
     def call_get_results(self, request_id):
-        request = Message(constants.CLIENT_MESSAGE_ID, request_id, self.client_id, constants.GET_RESULTS_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, GET_RESULTS_ID, "")
         return self.__request(request)
 
     def __request(self, message):
