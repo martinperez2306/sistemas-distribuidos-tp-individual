@@ -4,8 +4,10 @@ services:
     build:
       context: ./rabbitmq
       dockerfile: rabbitmq.dockerfile
+    image: rabbitmq
     ports:
       - 15672:15672
+    container_name: rabbitmq
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:15672"]
         interval: 10s
@@ -16,6 +18,8 @@ services:
     build:
       context: ./client
       dockerfile: client.dockerfile
+    image: client
+    container_name: client
     restart: on-failure
     depends_on:
       - rabbitmq
@@ -30,6 +34,8 @@ services:
     build:
       context: ./middleware
       dockerfile: middleware.dockerfile
+    image: middleware
+    container_name: middleware
     restart: on-failure
     depends_on:
       - rabbitmq
