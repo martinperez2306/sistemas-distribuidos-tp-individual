@@ -18,5 +18,5 @@ class MiddlewareClient:
         self.connection.close()
 
     def send(self, message):
-        logging.info("Send message:".format(message))
+        logging.info("Send message: {}".format(message))
         self.channel.basic_publish(exchange='', routing_key=self.queue_id, body=message)
