@@ -38,5 +38,7 @@ class MessageHandler:
             logging.info("Processing data")
         elif (message.operation_id == constants.END_PROCESS_ID):
             logging.info("End data process")
+        elif (message.operation_id == constants.GET_RESULTS_ID):
+            logging.info("Returning Results!")
         else:
-            logging.info("No Processing")
+            logging.info("Method not found!")
