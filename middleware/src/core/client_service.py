@@ -1,4 +1,4 @@
-import constants
+from .constants import *
 import logging
 import pika
 from .message import Message
@@ -10,17 +10,17 @@ class ClientService:
     def start_data_process(self, ch, method, props, message: Message):
         logging.info("Starting data process")
         self.request_count += 1
-        response = Message(constants.MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, self.request_count)
+        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, self.request_count)
         self.__respond(response)
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
-        response = Message(constants.MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
+        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
         self.__respond(response)
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
-        response = Message(constants.MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
+        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
         self.__respond(response)
 
     def __respond(self, ch, method, props, request: Message, response: Message):

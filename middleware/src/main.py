@@ -2,7 +2,7 @@
 
 import logging
 
-from .middleware import Middleware
+from core.middleware import Middleware
 
 def main():
     initialize_log("INFO")

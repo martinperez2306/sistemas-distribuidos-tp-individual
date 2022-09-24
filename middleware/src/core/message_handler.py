@@ -2,8 +2,7 @@ import re
 import logging
 
 from .client_service import ClientService
-
-import constants
+from .constants import *
 from .message import Message
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
@@ -31,14 +30,14 @@ class MessageHandler:
         return Message(message_id, request_id, client_id, operation_id, body)
     
     def __process_message(self, ch, method, props, message: Message):
-        if (message.operation_id == constants.START_PROCESS_ID):
+        if (message.operation_id == START_PROCESS_ID):
             logging.info("Init data process")
             self.client_service.start_data_process(ch, method, props, message)
-        elif (message.operation_id == constants.PROCESS_DATA_ID):
+        elif (message.operation_id == PROCESS_DATA_ID):
             logging.info("Processing data")
-        elif (message.operation_id == constants.END_PROCESS_ID):
+        elif (message.operation_id == END_PROCESS_ID):
             logging.info("End data process")
-        elif (message.operation_id == constants.GET_RESULTS_ID):
+        elif (message.operation_id == GET_RESULTS_ID):
             logging.info("Returning Results!")
         else:
             logging.info("Method not found!")
