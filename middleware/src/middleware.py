@@ -4,6 +4,8 @@ import logging
 import pika
 import signal
 
+from .message_handler import MessageHandler
+
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
 
@@ -12,6 +14,7 @@ class Middleware:
     def __init__(self):
         self.connection = None
         self.channel = None
+        self.message_handler = MessageHandler()
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
 
@@ -27,11 +30,12 @@ class Middleware:
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=MIDDLEWARE_QUEUE)   
 
-        def handle_message(body):
+        def handle_message(ch, method, props, body):
             logging.info("Received {}".format(body))
+            self.message_handler.handle_message(ch, method, props, body)
 
         self.channel.basic_consume(
-            queue=MIDDLEWARE_QUEUE, on_message_callback=handle_message, auto_ack=True)
+            queue=MIDDLEWARE_QUEUE, on_message_callback=handle_message)
 
         logging.info('Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
