@@ -1,5 +1,6 @@
 FROM python-rabbitmq
 
-COPY middleware.py /root/middleware.py
-WORKDIR /root/
-ENTRYPOINT ["python3", "/root/middleware.py"]
+RUN mkdir -p /root/middleware
+WORKDIR /root/middleware
+COPY . .
+ENTRYPOINT ["python3", "/root/middleware/src/main.py"]
