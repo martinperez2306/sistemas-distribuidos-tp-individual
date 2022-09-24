@@ -18,6 +18,7 @@ def main():
     total_countries = get_total_countries()
     logging.info("Total Countries = {}".format(total_countries))
     process_videos(middleware_client, total_countries)
+    middleware_client.close()
 
 def initialize_log(logging_level):
     """
@@ -60,7 +61,7 @@ def process_in_chunks(path, chunk_size, middleware_client):
 
 def process_video(video, middleware_client):
     logging.info("Processing Video: {}".format(video))
-    middleware_client.send(video)
+    middleware_client.request(video)
 
 if __name__ == "__main__":
     main()
