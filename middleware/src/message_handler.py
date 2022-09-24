@@ -33,6 +33,7 @@ class MessageHandler:
     def __process_message(self, ch, method, props, message: Message):
         if (message.operation_id == constants.START_PROCESS_ID):
             logging.info("Init data process")
+            self.client_service.start_data_process(ch, method, props, message)
         elif (message.operation_id == constants.PROCESS_DATA_ID):
             logging.info("Processing data")
         elif (message.operation_id == constants.END_PROCESS_ID):
