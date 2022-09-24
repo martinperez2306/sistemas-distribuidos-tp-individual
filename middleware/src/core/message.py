@@ -1,5 +1,5 @@
 class Message:
-    def __init__(self, id, request_id, client_id, operation_id, body):
+    def __init__(self, id: str, request_id: str, client_id: str, operation_id: int, body: str):
         self.id = id
         self.request_id = request_id
         self.client_id = client_id
