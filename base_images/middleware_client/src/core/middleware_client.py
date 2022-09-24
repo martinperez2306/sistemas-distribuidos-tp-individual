@@ -33,7 +33,9 @@ class MiddlewareClient:
 
     def __on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
-            self.response = body
+            response = str(body)
+            logging.info("Response recieved: {}".format(response))
+            self.response = response
 
     def call_start_data_process(self):
         request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_ID, "")
@@ -51,8 +53,8 @@ class MiddlewareClient:
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, GET_RESULTS_ID, "")
         return self.__request(request)
 
-    def __request(self, message):
-        logging.info("Send message: {}".format(message))
+    def __request(self, message: Message):
+        logging.info("Send request message: {}".format(message.to_string()))
         self.response = None
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange='', 
@@ -61,7 +63,7 @@ class MiddlewareClient:
                 reply_to=self.callback_queue,
                 correlation_id=self.corr_id,
             ),
-            body=message)
+            body=message.to_string())
         self.connection.process_data_events(time_limit=None)
         return self.response
 
