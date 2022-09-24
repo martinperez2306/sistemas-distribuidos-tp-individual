@@ -1,6 +1,8 @@
 import re
 import logging
 
+from .client_service import ClientService
+
 import constants
 from .message import Message
 
@@ -13,14 +15,14 @@ MESSAGE_BODY_REGEX=r'BODY\[(.*?)\]'
 
 class MessageHandler:
     def __init__(self):
-        self.request_count = 0
+        self.client_service = ClientService()
 
-    def handle_message(self, message: str) -> str:
-        logging.info("Handling client message {}".format(message))
-        message_parsed = self.__parse_message(message)
-        self.__process_message(message_parsed)
+    def handle_message(self, ch, method, props, body):
+        logging.info("Handling client message {}".format(body))
+        message_parsed = self.__parse_message(body)
+        self.__process_message(ch, method, props, message_parsed)
 
-    def __parse_message(self, request: str):
+    def __parse_message(self, request: str) -> Message:
         message_id = re.search(MESSAGE_ID_REGEX,request).group(1)
         request_id = re.search(MESSAGE_REQUEST_ID_REGEX,request).group(1)
         client_id = re.search(MESSAGE_CLIENT_ID_REGEX,request).group(1)
@@ -28,7 +30,7 @@ class MessageHandler:
         body = re.search(MESSAGE_BODY_REGEX,request).group(1)
         return Message(message_id, request_id, client_id, operation_id, body)
     
-    def __process_message(self, message: Message):
+    def __process_message(self, ch, method, props, message: Message):
         if (message.operation_id == constants.START_PROCESS_ID):
             logging.info("Init data process")
         elif (message.operation_id == constants.PROCESS_DATA_ID):
