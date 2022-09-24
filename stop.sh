@@ -1,3 +1,3 @@
 #!/bin/bash
-docker compose -f docker-compose-dev.yaml stop
-docker compose -f docker-compose-dev.yaml down
+docker compose -f docker-compose-system.yaml stop
+docker compose -f docker-compose-system.yaml down

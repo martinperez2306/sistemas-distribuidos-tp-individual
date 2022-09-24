@@ -1,0 +1,18 @@
+version: '3'
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: client.dockerfile
+    image: client
+    container_name: client
+    restart: on-failure
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - "./client/videos_dev:/root/videos"
+
+networks:
+  default:
+    name: sistemas-distribuidos-tp-individual_testing_net
+    external: true
