@@ -3,8 +3,9 @@
 import pathlib
 import logging
 from itertools import islice
-from middleware_client.src.core.middleware_client import MiddlewareClient
-#from ..base_images.middleware_client.src.core.middleware_client import MiddlewareClient
+
+from middleware_client.src.core.middleware_client import MiddlewareClient, Message
+#from ..base_images.middleware_client.src.core.middleware_client import MiddlewareClient, Message
 
 VIDEOS = "./videos"
 CHUNKSIZE = 1
@@ -19,7 +20,6 @@ def main():
     total_countries = get_total_countries()
     logging.info("Total Countries = {}".format(total_countries))
     process_videos(middleware_client, total_countries)
-    middleware_client.close()
 
 def initialize_log(logging_level):
     """
@@ -44,25 +44,28 @@ def get_total_countries():
             countries += 1
     return countries
 
-def process_videos(middleware_client, total_countries):
+def process_videos(middleware_client: MiddlewareClient, total_countries):
     logging.info("Processing Videos")
     middleware_client.connect()
+    message: Message = middleware_client.call_start_data_process()
     for path in pathlib.Path(VIDEOS).iterdir():
         if path.is_file():
-            process_in_chunks(path, CHUNKSIZE, middleware_client)
+            process_in_chunks(path, CHUNKSIZE, middleware_client, message.request_id)
+    middleware_client.call_end_data_process()
+    middleware_client.close()
 
-def process_in_chunks(path, chunk_size, middleware_client):
+def process_in_chunks(path, chunk_size, middleware_client, request_id):
     with open(path, 'r') as file:
         while True:
             lines = list(islice(file, chunk_size))
             for line in lines:
-                process_video(line, middleware_client)
+                process_video(line, middleware_client, request_id)
             if not lines:
                 break
 
-def process_video(video, middleware_client):
-    logging.info("Processing Video: {}".format(video))
-    middleware_client.request(video)
+def process_video(video, middleware_client: MiddlewareClient, request_id):
+    logging.info("Processing Video: [{}] in Request with ID [{}]".format(video, request_id))
+    middleware_client.call_process_data(request_id, video)
 
 if __name__ == "__main__":
     main()
