@@ -4,5 +4,5 @@ FROM middlewaresys_client
 RUN mkdir -p /root/ingestion_service
 WORKDIR /root/ingestion_service
 COPY . .
-RUN mv /root/middlewaresys_client /root/ingestion_service/middlewaresys_client
-ENTRYPOINT ["python3", "/root/ingestion_service/main.py"]
+RUN mv /root/middlewaresys_client /root/ingestion_service/src/middlewaresys_client
+ENTRYPOINT ["python3", "/root/ingestion_service/src/main.py"]

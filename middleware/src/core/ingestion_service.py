@@ -13,7 +13,7 @@ class IngestionService:
         self.channel.queue_declare(queue=INGESTION_QUEUE_NAME, durable=True)
 
     def ingest_data(self, data):
-        self.channel.channel.basic_publish(
+        self.channel.basic_publish(
             exchange='',
             routing_key=INGESTION_QUEUE_NAME,
             body=str(data),

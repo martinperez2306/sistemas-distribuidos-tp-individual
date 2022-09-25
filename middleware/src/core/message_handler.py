@@ -16,6 +16,7 @@ MESSAGE_BODY_REGEX=r'BODY\[(.*?)\]'
 class MessageHandler:
     def __init__(self):
         ingestion_service = IngestionService()
+        ingestion_service.run()
         self.client_service = ClientService(ingestion_service)
 
     def handle_message(self, ch, method, props, body):

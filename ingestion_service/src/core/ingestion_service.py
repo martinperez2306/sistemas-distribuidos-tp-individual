@@ -1,6 +1,7 @@
 import logging
 import pika
 
+RABBITMQ_HOST = "rabbitmq"
 INGESTION_QUEUE_NAME = "ingestion_service_queue"
 
 class IngestionService:
@@ -9,7 +10,7 @@ class IngestionService:
         self.channel = None
 
     def run(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=INGESTION_QUEUE_NAME, durable=True)
 
