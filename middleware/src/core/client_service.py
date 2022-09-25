@@ -23,6 +23,11 @@ class ClientService:
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
         self.__respond(ch, method, props, message, response)
 
+    def send_results(self, ch, method, props, message: Message):
+        logging.info("Sending results")
+        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "OK")
+        self.__respond(ch, method, props, message, response)
+
     def __respond(self, ch, method, props, request: Message, response: Message):
         logging.info("Respond to client [{}] with [{}]".format(request.client_id, response.to_string()))
         ch.basic_publish(exchange='',

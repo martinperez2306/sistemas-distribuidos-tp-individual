@@ -13,13 +13,18 @@ CHUNKSIZE = 1
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
 
+RESULTS_PENDING = "PENDING"
+
 def main():
     initialize_log("INFO")
     middleware_client = initialize_middleware_client()
-    logging.info("Hi! Im am the client")
     total_countries = get_total_countries()
-    logging.info("Total Countries = {}".format(total_countries))
-    process_videos(middleware_client, total_countries)
+    request_id = process_videos(middleware_client, total_countries)
+    results: Message = get_results(middleware_client, request_id)
+    while RESULTS_PENDING == results.body:
+        results = get_results(middleware_client, request_id)
+    shutdown_middleware_client(middleware_client)
+    show_results(results)
 
 def initialize_log(logging_level):
     """
@@ -35,13 +40,16 @@ def initialize_log(logging_level):
     )
 
 def initialize_middleware_client():
+    logging.info("Initializing Middleware Client")
     return MiddlewareClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE)
     
 def get_total_countries():
+    logging.info("Getting total countries")
     countries = 0
     for path in pathlib.Path(VIDEOS).iterdir():
         if path.is_file():
             countries += 1
+    logging.info("Total Countries = {}".format(countries))
     return countries
 
 def process_videos(middleware_client: MiddlewareClient, total_countries):
@@ -52,7 +60,8 @@ def process_videos(middleware_client: MiddlewareClient, total_countries):
         if path.is_file():
             process_in_chunks(path, CHUNKSIZE, middleware_client, message.request_id)
     middleware_client.call_end_data_process(message.request_id)
-    middleware_client.close()
+    return message.request_id
+    
 
 def process_in_chunks(path, chunk_size, middleware_client, request_id):
     with open(path, 'r') as file:
@@ -66,6 +75,18 @@ def process_in_chunks(path, chunk_size, middleware_client, request_id):
 def process_video(video, middleware_client: MiddlewareClient, request_id):
     logging.info("Processing Video: [{}] in Request with ID [{}]".format(video, request_id))
     middleware_client.call_process_data(request_id, video)
+
+def get_results(middleware_client: MiddlewareClient, request_id):
+    logging.info("Getting Results for Request with ID [{}]".format(request_id))
+    results_message: Message = middleware_client.call_get_results(request_id)
+    logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))
+    return results_message
+
+def show_results(results):
+    print(results.to_string())
+
+def shutdown_middleware_client(middleware_client: MiddlewareClient):
+    middleware_client.close()
 
 if __name__ == "__main__":
     main()

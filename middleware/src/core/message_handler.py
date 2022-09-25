@@ -48,5 +48,6 @@ class MessageHandler:
             self.client_service.end_data_process(ch, method, props, message)
         elif (message.operation_id == GET_RESULTS_ID):
             logging.info("Returning Results!")
+            self.client_service.send_results(ch, method, props, message)
         else:
             logging.info("Method not found!")
