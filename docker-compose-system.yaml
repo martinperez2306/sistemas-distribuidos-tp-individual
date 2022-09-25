@@ -30,5 +30,19 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  ingestion_service:
+    build:
+      context: ./ingestion_service
+      dockerfile: ingestion_service.dockerfile
+    image: ingestion_service
+    container_name: ingestion_service
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
 networks:
   testing_net:
