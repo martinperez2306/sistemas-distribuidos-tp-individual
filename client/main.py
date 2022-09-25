@@ -56,11 +56,12 @@ def process_videos(middleware_client: MiddlewareClient, total_countries):
     logging.info("Processing Videos")
     middleware_client.connect()
     message: Message = middleware_client.call_start_data_process()
+    request_id = message.body
     for path in pathlib.Path(VIDEOS).iterdir():
         if path.is_file():
-            process_in_chunks(path, CHUNKSIZE, middleware_client, message.request_id)
-    middleware_client.call_end_data_process(message.request_id)
-    return message.request_id
+            process_in_chunks(path, CHUNKSIZE, middleware_client, request_id)
+    middleware_client.call_end_data_process(request_id)
+    return request_id
     
 
 def process_in_chunks(path, chunk_size, middleware_client, request_id):
@@ -72,7 +73,7 @@ def process_in_chunks(path, chunk_size, middleware_client, request_id):
             if not lines:
                 break
 
-def process_video(video, middleware_client: MiddlewareClient, request_id):
+def process_video(video: str, middleware_client: MiddlewareClient, request_id:int ):
     logging.info("Processing Video: [{}] in Request with ID [{}]".format(video, request_id))
     middleware_client.call_process_data(request_id, video)
 

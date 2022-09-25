@@ -24,6 +24,7 @@ class MiddlewareClient:
         self.corr_id = None
 
     def connect(self):
+        logging.info("Connecting to Middleware ")
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.middleware_queue_id)
