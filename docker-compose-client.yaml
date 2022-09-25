@@ -10,7 +10,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
-      - "./client/videos_dev:/root/videos"
+      - "./client/videos_dev:/root/client/videos"
 
 networks:
   default:

@@ -1,5 +1,6 @@
 FROM python-rabbitmq
 
+# Install Middleware
 RUN mkdir -p /root/middleware
 WORKDIR /root/middleware
 COPY . .
