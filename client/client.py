@@ -51,7 +51,7 @@ def process_videos(middleware_client: MiddlewareClient, total_countries):
     for path in pathlib.Path(VIDEOS).iterdir():
         if path.is_file():
             process_in_chunks(path, CHUNKSIZE, middleware_client, message.request_id)
-    middleware_client.call_end_data_process()
+    middleware_client.call_end_data_process(message.request_id)
     middleware_client.close()
 
 def process_in_chunks(path, chunk_size, middleware_client, request_id):

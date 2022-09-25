@@ -42,8 +42,10 @@ class MessageHandler:
             self.client_service.start_data_process(ch, method, props, message)
         elif (message.operation_id == PROCESS_DATA_ID):
             logging.info("Processing data")
+            self.client_service.process_data(ch, method, props, message)
         elif (message.operation_id == END_PROCESS_ID):
             logging.info("End data process")
+            self.client_service.end_data_process(ch, method, props, message)
         elif (message.operation_id == GET_RESULTS_ID):
             logging.info("Returning Results!")
         else:
