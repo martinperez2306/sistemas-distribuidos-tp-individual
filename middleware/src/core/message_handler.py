@@ -3,6 +3,7 @@ import logging
 
 from .client_service import ClientService
 from .constants import *
+from .ingestion_service import IngestionService
 from .message import Message
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
@@ -14,7 +15,8 @@ MESSAGE_BODY_REGEX=r'BODY\[(.*?)\]'
 
 class MessageHandler:
     def __init__(self):
-        self.client_service = ClientService()
+        ingestion_service = IngestionService()
+        self.client_service = ClientService(ingestion_service)
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling client message {}".format(body))

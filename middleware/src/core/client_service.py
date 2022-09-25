@@ -1,15 +1,18 @@
-from .constants import *
 import logging
 import pika
+from .constants import *
+from .ingestion_service import IngestionService
 from .message import Message
 
 class ClientService:
-    def __init__(self):
+    def __init__(self, ingestion_service: IngestionService):
         self.request_count = 0
+        self.ingestion_service = ingestion_service
 
     def start_data_process(self, ch, method, props, message: Message):
         logging.info("Starting data process")
         self.request_count += 1
+        self.ingestion_service.ingest_data(message.to_string())
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, self.request_count)
         self.__respond(ch, method, props, message, response)
 

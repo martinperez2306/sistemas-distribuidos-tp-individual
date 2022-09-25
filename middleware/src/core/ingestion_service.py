@@ -1,8 +1,6 @@
 import pika
 from .constants import *
 
-INGESTION_QUEUE_NAME = "ingestion_service_queue"
-
 class IngestionService:
     def __init__(self):
         self.connection = None
