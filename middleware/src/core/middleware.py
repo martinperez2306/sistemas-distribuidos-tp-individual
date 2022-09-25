@@ -4,10 +4,9 @@ import logging
 import pika
 import signal
 
-from .message_handler import MessageHandler
+from .constants import *
 
-RABBITMQ_HOST = "rabbitmq"
-MIDDLEWARE_QUEUE = "middleware"
+from .message_handler import MessageHandler
 
 class Middleware:
 
