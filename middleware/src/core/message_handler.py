@@ -52,5 +52,7 @@ class MessageHandler:
         elif (message.operation_id == GET_RESULTS_ID):
             logging.info("Returning Results!")
             self.client_service.send_results(ch, method, props, message)
+        elif (message.operation_id == LIKE_FILTER_ID):
+            logging.info("Filtering by Likes")
         else:
             logging.info("Method not found!")
