@@ -17,8 +17,7 @@ class ClientService:
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
-        ingest_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, INGEST_DATA_ID, message.body)
-        self.ingestion_service.ingest_data(ingest_message.to_string())
+        self.ingestion_service.ingest_data(message)
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
         self.__respond(ch, method, props, message, response)
 
