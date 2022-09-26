@@ -4,8 +4,11 @@ import pathlib
 import logging
 from itertools import islice
 
-from middleware_client.src.core.middleware_client import MiddlewareClient, Message
-#from ..base_images.middleware_client.src.core.middleware_client import MiddlewareClient, Message
+from middleware_client.src.core.middleware_client import MiddlewareClient
+from middleware_client.src.core.message import Message
+#Dev import
+#from ..base_images.middleware_client.src.core.middleware_client import MiddlewareClient
+#from ..base_images.middleware_client.src.core.message import Message
 
 VIDEOS = "./videos"
 CHUNKSIZE = 1
