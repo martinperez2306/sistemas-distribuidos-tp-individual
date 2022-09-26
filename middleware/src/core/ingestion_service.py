@@ -1,25 +1,11 @@
-import pika
+from .base_service import BaseService
 from .constants import *
+from .message import Message
 
-class IngestionService:
+class IngestionService(BaseService):
     def __init__(self):
-        self.connection = None
-        self.channel = None
-        self.queue_name = INGESTION_QUEUE
+        BaseService.__init__(self, INGESTION_SERVICE_QUEUE)
     
-    def run(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=INGESTION_QUEUE, durable=True)
-
-    def ingest_data(self, data):
-        self.channel.basic_publish(
-            exchange='',
-            routing_key=INGESTION_QUEUE,
-            body=str(data),
-            properties=pika.BasicProperties(
-                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
-            ))
-
-    def shutdown(self):
-        self.connection.close()
+    def ingest_data(self, message: Message):
+        ingest_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, INGEST_DATA_ID, message.body)
+        self.publish_data(ingest_message.to_string())
