@@ -3,7 +3,8 @@ RABBITMQ_HOST = "rabbitmq"
 
 #QUEUES
 MIDDLEWARE_QUEUE = "middleware"
-INGESTION_QUEUE = "ingestion_service_queue"
+INGESTION_SERVICE_QUEUE = "ingestion_service_queue"
+LIKE_FILTER_QUEUE = "like_filter_queue"
 
 #MESSAGE IDS
 CLIENT_MESSAGE_ID = 0

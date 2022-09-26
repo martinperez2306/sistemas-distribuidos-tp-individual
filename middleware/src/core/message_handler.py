@@ -4,6 +4,7 @@ import logging
 from .client_service import ClientService
 from .constants import *
 from .ingestion_service import IngestionService
+from .like_filter_service import LikeFilterService
 from .message import Message
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
@@ -17,10 +18,12 @@ class MessageHandler:
     def __init__(self):
         ingestion_service = IngestionService()
         ingestion_service.run()
+        self.like_filter_service = LikeFilterService()
+        self.like_filter_service.run()
         self.client_service = ClientService(ingestion_service)
 
     def handle_message(self, ch, method, props, body):
-        logging.info("Handling client message {}".format(body))
+        logging.info("Handling message {}".format(body))
         message_parsed = self.__parse_message(str(body))
         self.__process_message(ch, method, props, message_parsed)
 
@@ -54,5 +57,6 @@ class MessageHandler:
             self.client_service.send_results(ch, method, props, message)
         elif (message.operation_id == LIKE_FILTER_ID):
             logging.info("Filtering by Likes")
+            self.like_filter_service.filter_by_likes(message)
         else:
             logging.info("Method not found!")
