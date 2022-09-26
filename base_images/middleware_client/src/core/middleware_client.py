@@ -49,15 +49,15 @@ class MiddlewareClient:
         request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_ID, "")
         return self.__request(request)
 
-    def call_process_data(self, request_id, data):
+    def call_process_data(self, request_id: int, data: str):
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_ID, data)
         return self.__request(request)
 
-    def call_end_data_process(self, request_id):
+    def call_end_data_process(self, request_id: int):
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_ID, "")
         return self.__request(request)
 
-    def call_get_results(self, request_id):
+    def call_get_results(self, request_id: int):
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, GET_RESULTS_ID, "")
         return self.__request(request)
 
