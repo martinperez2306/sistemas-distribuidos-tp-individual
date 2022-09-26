@@ -2,13 +2,13 @@
 
 import logging
 
-from core.ingestion_service import IngestionService
+from core.reporting_service import ReportingService
 
 def main():
     initialize_log("INFO")
     logging.info("Initializing Ingestion Service")
-    ingestion_service = IngestionService()
-    ingestion_service.run()
+    reporting_service = ReportingService()
+    reporting_service.run()
 
 def initialize_log(logging_level):
     """
