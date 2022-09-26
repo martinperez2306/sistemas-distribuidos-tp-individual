@@ -1,5 +1,6 @@
 import logging
 import pika
+from like_filter.src.core.video import Video
 
 from middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
 from middlewaresys_client.src.core.constants import *
@@ -9,31 +10,32 @@ from middlewaresys_client.src.core.constants import *
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
-REPORTING_SERVICE_QUEUE = "reporting_service_queue"
-REPORTING_SERVICE_ID="reporting_service" ##TODO: Obtener de configuracion
+LIKE_FILTER_QUEUE = "like_filter_queue"
+LIKE_FILTER_ID = "like_filter" ##TODO: Obtener de configuracion
 
 class ReportingService:
     def __init__(self):
         self.connection = None
         self.channel = None
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, REPORTING_SERVICE_ID)
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, LIKE_FILTER_ID)
 
     def run(self):
         self.middleware_system_client.connect()
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=REPORTING_SERVICE_QUEUE, durable=True)
+        self.channel.queue_declare(queue=LIKE_FILTER_QUEUE, durable=True)
 
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
-            reporting_message = self.middleware_system_client.parse_message(str(body))
-            ##TODO: Here recieves "add report data". Storage information.
+            like_filter_message = self.middleware_system_client.parse_message(str(body))
+            video = Video(like_filter_message.body)
+            logging.info("Video {}".format(str(video)))
+            ##TODO: Call add report only if video matchs filter
+            self.middleware_system_client.call_add_report(like_filter_message.request_id, like_filter_message.body)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(queue=REPORTING_SERVICE_QUEUE, on_message_callback=handle_message)
+        self.channel.basic_consume(queue=LIKE_FILTER_QUEUE, on_message_callback=handle_message)
 
         logging.info('Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
-    
-    
