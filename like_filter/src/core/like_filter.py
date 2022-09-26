@@ -1,6 +1,6 @@
 import logging
 import pika
-from like_filter.src.core.video import Video
+from .video import Video
 
 from middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
 from middlewaresys_client.src.core.constants import *
@@ -13,7 +13,7 @@ MIDDLEWARE_QUEUE = "middleware"
 LIKE_FILTER_QUEUE = "like_filter_queue"
 LIKE_FILTER_ID = "like_filter" ##TODO: Obtener de configuracion
 
-class ReportingService:
+class LikeFilter:
     def __init__(self):
         self.connection = None
         self.channel = None

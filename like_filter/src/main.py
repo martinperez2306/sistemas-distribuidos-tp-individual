@@ -2,13 +2,13 @@
 
 import logging
 
-from like_filter.src.core.like_filter import ReportingService
+from core.like_filter import LikeFilter
 
 def main():
     initialize_log("INFO")
-    logging.info("Initializing Ingestion Service")
-    reporting_service = ReportingService()
-    reporting_service.run()
+    logging.info("Initializing Like Filter")
+    like_filter = LikeFilter()
+    like_filter.run()
 
 def initialize_log(logging_level):
     """

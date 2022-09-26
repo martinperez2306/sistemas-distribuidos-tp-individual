@@ -44,5 +44,19 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  like_filter:
+    build:
+      context: ./like_filter
+      dockerfile: like_filter.dockerfile
+    image: like_filter
+    container_name: like_filter
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
 networks:
   testing_net:
