@@ -9,8 +9,8 @@ from middlewaresys_client.src.core.constants import *
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
-REPORTING_SERVICE_QUEUE = "ingestion_service_queue"
-REPORTING_SERVICE_ID="ingestion_service" ##TODO: Obtener de configuracion
+REPORTING_SERVICE_QUEUE = "reporting_service_queue"
+REPORTING_SERVICE_ID="reporting_service" ##TODO: Obtener de configuracion
 
 class ReportingService:
     def __init__(self):
