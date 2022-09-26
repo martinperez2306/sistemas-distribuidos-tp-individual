@@ -3,7 +3,7 @@ RABBITMQ_HOST = "rabbitmq"
 
 #QUEUES
 MIDDLEWARE_QUEUE = "middleware"
-INGESTION_QUEUE_NAME = "ingestion_service_queue"
+INGESTION_QUEUE = "ingestion_service_queue"
 
 #MESSAGE IDS
 CLIENT_MESSAGE_ID = 0
@@ -18,3 +18,4 @@ GET_RESULTS_ID = 3
 
 #SYSTEM OPERATION IDS
 INGEST_DATA_ID = 100
+LIKE_FILTER_ID = 101
