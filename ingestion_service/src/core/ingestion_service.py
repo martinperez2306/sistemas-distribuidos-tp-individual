@@ -5,7 +5,7 @@ from middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemC
 from middlewaresys_client.src.core.message import Message
 from middlewaresys_client.src.core.constants import *
 #Dev import
-#from ....base_images.middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient, Message
+#from ....base_images.middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
 #from ....base_images.middlewaresys_client.src.core.message import Message
 #from ....base_images.middlewaresys_client.src.core.constants import *
 
@@ -29,8 +29,7 @@ class IngestionService:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             ingestion_message = self.middleware_system_client.parse_message(str(body))
-            message = Message(SERVICE_MESSAGE_ID, ingestion_message.request_id, INGESTION_SERVICE_ID, LIKE_FILTER_ID, ingestion_message.body)
-            self.middleware_system_client.call_filter_by_likes(message)
+            self.middleware_system_client.call_filter_by_likes(ingestion_message.request_id, ingestion_message.body)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)

@@ -42,7 +42,8 @@ class MiddlewareSystemClient:
 
 
     def call_filter_by_likes(self, request_id: int, data: str):
-        pass
+        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, LIKE_FILTER_ID, data)
+        self.__request(message)
 
     def __request(self, message: Message):
         logging.info("Send request message: {}".format(message.to_string()))
