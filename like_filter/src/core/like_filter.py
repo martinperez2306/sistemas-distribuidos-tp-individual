@@ -12,6 +12,7 @@ RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
 LIKE_FILTER_QUEUE = "like_filter_queue"
 LIKE_FILTER_ID = "like_filter" ##TODO: Obtener de configuracion
+MIN_LIKES_COUNT = 10000000
 
 class LikeFilter:
     def __init__(self):
@@ -30,8 +31,12 @@ class LikeFilter:
             like_filter_message = self.middleware_system_client.parse_message(str(body))
             video = Video(like_filter_message.body)
             logging.info("Video {}".format(str(video)))
-            ##TODO: Call add report only if video matchs filter
-            self.middleware_system_client.call_add_report(like_filter_message.request_id, like_filter_message.body)
+            try:
+                likes_count = int(video.likes)
+                if likes_count > MIN_LIKES_COUNT:
+                    self.middleware_system_client.call_add_report(like_filter_message.request_id, like_filter_message.body)
+            except ValueError:
+                pass
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)

@@ -1,24 +1,26 @@
-VIDEO_FIELD_PATTERN = r','
+import re
+
+VIDEO_FIELD_PATTERN = r'\"(.+?)\"'
 
 class Video:
     def __init__(self, video_str: str):
-        split = video_str.split(VIDEO_FIELD_PATTERN)
-        self.id = split[0]
-        self.title = split[1]
-        self.published_at = split[2]
-        self.channel_id = split[3]
-        self.channel_title = split[4]
-        self.category_id = split[5]
-        self.trending_date = split[6]
-        self.tags = split[7]
-        self.view_count = split[8]
-        self.likes = split[9]
-        self.dislikes = split[10]
-        self.comment_count = split[11]
-        self.thumbnail_link = split[12]
-        self.comments_disabled = split[13]
-        self.ratings_disabled = split[14]
-        self.description = split[15]
+        matches = re.findall(VIDEO_FIELD_PATTERN, video_str)
+        self.id = matches[0]
+        self.title = matches[1]
+        self.published_at = matches[2]
+        self.channel_id = matches[3]
+        self.channel_title = matches[4]
+        self.category_id = matches[5]
+        self.trending_date = matches[6]
+        self.tags = matches[7]
+        self.view_count = matches[8]
+        self.likes = matches[9]
+        self.dislikes = matches[10]
+        self.comment_count = matches[11]
+        self.thumbnail_link = matches[12]
+        self.comments_disabled = matches[13]
+        self.ratings_disabled = matches[14]
+        self.description = matches[15]
 
     def __str__(self):
         return "ID[{}] TITLE[{}] PUBLISHED_AT[{}] CHANNEL_ID[{}] CHANNEL_TITLE[{}] CATEGORY_ID [{}] TRENDING_DATE[{}] TAGS [{}] VIEW_COUNT [{}] \
