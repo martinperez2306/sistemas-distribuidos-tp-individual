@@ -1,5 +1,5 @@
 import pika
-from .constants import *
+from middleware.constants import *
 
 class BaseService:
     def __init__(self, publish_queue_name):

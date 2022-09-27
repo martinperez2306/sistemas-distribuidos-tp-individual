@@ -4,13 +4,10 @@ import pathlib
 import logging
 from itertools import islice
 
-from middleware_client.src.core.middleware_client import MiddlewareClient
-from middleware_client.src.core.message import Message
-#Dev import
-#from ..base_images.middleware_client.src.core.middleware_client import MiddlewareClient
-#from ..base_images.middleware_client.src.core.message import Message
+from dependencies.commons.message import Message
+from dependencies.middleware_client.middleware_client import MiddlewareClient
 
-VIDEOS = "./videos"
+VIDEOS = "/root/client/videos"
 CHUNKSIZE = 1
 
 RABBITMQ_HOST = "rabbitmq"

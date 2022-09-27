@@ -1,11 +1,11 @@
 import re
 import logging
 
-from .client_service import ClientService
-from .constants import *
-from .ingestion_service import IngestionService
-from .like_filter_service import LikeFilterService
-from .message import Message
+from middleware.client_service import ClientService
+from middleware.constants import *
+from middleware.ingestion_service import IngestionService
+from middleware.like_filter_service import LikeFilterService
+from dependencies.commons.message import Message
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
 MESSAGE_REQUEST_ID_REGEX=r'REQUEST_ID\[(.*?)\]'

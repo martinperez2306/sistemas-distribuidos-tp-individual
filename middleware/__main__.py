@@ -2,13 +2,13 @@
 
 import logging
 
-from core.like_filter import LikeFilter
+from middleware.middleware import Middleware
 
 def main():
     initialize_log("INFO")
-    logging.info("Initializing Like Filter")
-    like_filter = LikeFilter()
-    like_filter.run()
+    logging.info("Initializing Middleware")
+    middleware = Middleware()
+    middleware.run()
 
 def initialize_log(logging_level):
     """

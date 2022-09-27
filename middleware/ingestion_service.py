@@ -1,6 +1,6 @@
-from .base_service import BaseService
-from .constants import *
-from .message import Message
+from middleware.base_service import BaseService
+from middleware.constants import *
+from dependencies.commons.message import Message
 
 class IngestionService(BaseService):
     def __init__(self):

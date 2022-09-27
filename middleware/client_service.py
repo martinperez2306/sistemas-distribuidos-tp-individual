@@ -1,8 +1,9 @@
 import logging
 import pika
-from .constants import *
-from .ingestion_service import IngestionService
-from .message import Message
+
+from middleware.constants import *
+from middleware.ingestion_service import IngestionService
+from dependencies.commons.message import Message
 
 class ClientService:
     def __init__(self, ingestion_service: IngestionService):

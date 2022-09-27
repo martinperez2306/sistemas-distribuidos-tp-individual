@@ -1,12 +1,9 @@
-#!/usr/bin/env python3
-
 import logging
 import pika
 import signal
 
-from .constants import *
-
-from .message_handler import MessageHandler
+from middleware.constants import *
+from middleware.message_handler import MessageHandler
 
 class Middleware:
 

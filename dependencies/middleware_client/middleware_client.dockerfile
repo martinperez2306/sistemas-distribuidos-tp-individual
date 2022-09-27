@@ -1,6 +1,6 @@
 FROM commons
 
 # Install Middleware client library
-RUN mkdir -p /root/middleware_client
-WORKDIR /root/middleware_client
+RUN mkdir -p /root/dependencies/middleware_client
+WORKDIR /root/dependencies/middleware_client
 COPY . .

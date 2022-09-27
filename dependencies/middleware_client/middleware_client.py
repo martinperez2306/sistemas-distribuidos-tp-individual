@@ -4,8 +4,8 @@ import uuid
 import pika
 import re
 
-from ....commons.src.commons.message import Message
-from .constants import *
+from dependencies.commons.message import Message
+from dependencies.middleware_client.constants import *
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
 MESSAGE_REQUEST_ID_REGEX=r'REQUEST_ID\[(.*?)\]'

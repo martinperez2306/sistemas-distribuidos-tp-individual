@@ -2,13 +2,13 @@
 
 import logging
 
-from core.middleware import Middleware
+from ingestion_service.ingestion_service import IngestionService
 
 def main():
     initialize_log("INFO")
-    logging.info("Initializing Middleware")
-    middleware = Middleware()
-    middleware.run()
+    logging.info("Initializing Ingestion Service")
+    ingestion_service = IngestionService()
+    ingestion_service.run()
 
 def initialize_log(logging_level):
     """

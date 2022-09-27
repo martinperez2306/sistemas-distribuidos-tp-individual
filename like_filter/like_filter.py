@@ -1,12 +1,8 @@
 import logging
 import pika
-from .video import Video
 
-from middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
-from middlewaresys_client.src.core.constants import *
-#Dev import
-#from ....base_images.middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
-#from ....base_images.middlewaresys_client.src.core.constants import *
+from dependencies.commons.video import Video
+from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
