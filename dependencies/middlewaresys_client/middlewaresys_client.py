@@ -3,6 +3,7 @@ import logging
 import pika
 import re
 
+from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.middlewaresys_client.constants import *
 
@@ -25,17 +26,18 @@ class MiddlewareSystemClient:
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.middleware_queue_id)
 
-    def parse_message(self, body: str) -> Message:
-        message_id = re.search(MESSAGE_ID_REGEX,body).group(1)
-        request_id = re.search(MESSAGE_REQUEST_ID_REGEX,body).group(1)
-        client_id = re.search(MESSAGE_CLIENT_ID_REGEX,body).group(1)
+    def parse_message(self, body) -> Message:
+        body = body.decode(UTF8_ENCODING)
+        message_id = re.search(MESSAGE_ID_REGEX , body).group(1)
+        request_id = re.search(MESSAGE_REQUEST_ID_REGEX, body).group(1)
+        client_id = re.search(MESSAGE_CLIENT_ID_REGEX, body).group(1)
         operation_id = -1
         try:
-            op_id = int(re.search(MESSAGE_OPERATION_ID_REGEX,body).group(1))
+            op_id = int(re.search(MESSAGE_OPERATION_ID_REGEX, body).group(1))
             operation_id = op_id
         except ValueError:
             pass
-        body = re.search(MESSAGE_BODY_REGEX,body).group(1)
+        body = re.search(MESSAGE_BODY_REGEX, body).group(1)
         message = Message(message_id, request_id, client_id, operation_id, body)
         logging.info("Message: {}".format(message.to_string()))
         return message 
@@ -54,7 +56,7 @@ class MiddlewareSystemClient:
         self.channel.basic_publish(
             exchange='',
             routing_key=self.middleware_queue_id,
-            body=message.to_string(),
+            body=message.to_string().encode(UTF8_ENCODING),
             properties=pika.BasicProperties(
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))

@@ -26,7 +26,7 @@ class ReportingService:
 
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
-            reporting_message = self.middleware_system_client.parse_message(str(body))
+            reporting_message = self.middleware_system_client.parse_message(body)
             video = Video(reporting_message.body)
             request_id = reporting_message.request_id
             self.result_repository.save_filtered_video(request_id, video)
