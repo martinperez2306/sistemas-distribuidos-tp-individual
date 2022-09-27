@@ -45,8 +45,8 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, LIKE_FILTER_ID, data)
         self.__request(message)
 
-    def call_add_report(self, request_id: int, data: str):
-        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, REPORT_DATA_ID, data)
+    def call_storage_data(self, request_id: int, data: str):
+        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, STORAGE_DATA_ID, data)
         self.__request(message)
 
     def __request(self, message: Message):
