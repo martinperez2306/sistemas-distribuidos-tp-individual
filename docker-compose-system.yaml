@@ -58,6 +58,20 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  funny_filter:
+    build:
+      context: ./funny_filter
+      dockerfile: funny_filter.dockerfile
+    image: funny_filter
+    container_name: funny_filter
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
   reporting_service:
     build:
       context: ./reporting_service
