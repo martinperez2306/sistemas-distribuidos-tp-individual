@@ -45,6 +45,10 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, LIKE_FILTER_ID, data)
         self.__request(message)
 
+    def call_filter_by_tag(self, request_id: int, data: str):
+        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, FUNNY_FILTER_ID, data)
+        self.__request(message)
+
     def call_storage_data(self, request_id: int, data: str):
         message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, STORAGE_DATA_ID, data)
         self.__request(message)
