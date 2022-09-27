@@ -30,7 +30,7 @@ class LikeFilter:
             try:
                 likes_count = int(video.likes)
                 if likes_count > MIN_LIKES_COUNT:
-                    self.middleware_system_client.call_add_report(like_filter_message.request_id, like_filter_message.body)
+                    self.middleware_system_client.call_storage_data(like_filter_message.request_id, like_filter_message.body)
             except ValueError:
                 pass
             ch.basic_ack(delivery_tag=method.delivery_tag)
