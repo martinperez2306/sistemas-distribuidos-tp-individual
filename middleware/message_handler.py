@@ -6,6 +6,7 @@ from middleware.constants import *
 from middleware.ingestion_service import IngestionService
 from middleware.like_filter_service import LikeFilterService
 from dependencies.commons.message import Message
+from middleware.storage_service import StorageService
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
 MESSAGE_REQUEST_ID_REGEX=r'REQUEST_ID\[(.*?)\]'
@@ -20,6 +21,8 @@ class MessageHandler:
         ingestion_service.run()
         self.like_filter_service = LikeFilterService()
         self.like_filter_service.run()
+        self.storage_service = StorageService()
+        self.storage_service.run()
         self.client_service = ClientService(ingestion_service)
 
     def handle_message(self, ch, method, props, body):
@@ -58,5 +61,8 @@ class MessageHandler:
         elif (message.operation_id == LIKE_FILTER_ID):
             logging.info("Filtering by Likes")
             self.like_filter_service.filter_by_likes(message)
+        elif (message.operation_id == STORAGE_DATA_ID):
+            logging.info("Storaging data")
+            self.storage_service.storage_data(message)
         else:
             logging.info("Method not found!")
