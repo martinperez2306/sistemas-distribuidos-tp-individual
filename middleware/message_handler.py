@@ -1,12 +1,13 @@
 import re
 import logging
 
+from dependencies.commons.constants import *
+from dependencies.commons.message import Message
 from middleware.client_service import ClientService
 from middleware.constants import *
 from middleware.funny_filter_service import FunnyFilterService
 from middleware.ingestion_service import IngestionService
 from middleware.like_filter_service import LikeFilterService
-from dependencies.commons.message import Message
 from middleware.storage_service import StorageService
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
@@ -30,20 +31,22 @@ class MessageHandler:
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling message {}".format(body))
-        message_parsed = self.__parse_message(str(body))
+        message = body.decode(UTF8_ENCODING)
+        message_parsed = self.__parse_message(message)
         self.__process_message(ch, method, props, message_parsed)
 
     def __parse_message(self, body: str) -> Message:
-        message_id = re.search(MESSAGE_ID_REGEX,body).group(1)
-        request_id = re.search(MESSAGE_REQUEST_ID_REGEX,body).group(1)
-        client_id = re.search(MESSAGE_CLIENT_ID_REGEX,body).group(1)
+        logging.info("Parsing message {}".format(body))
+        message_id = re.search(MESSAGE_ID_REGEX, body).group(1)
+        request_id = re.search(MESSAGE_REQUEST_ID_REGEX, body).group(1)
+        client_id = re.search(MESSAGE_CLIENT_ID_REGEX, body).group(1)
         operation_id = -1
         try:
             op_id = int(re.search(MESSAGE_OPERATION_ID_REGEX,body).group(1))
             operation_id = op_id
         except ValueError:
             pass
-        body = re.search(MESSAGE_BODY_REGEX,body).group(1)
+        body = re.search(MESSAGE_BODY_REGEX, body).group(1)
         message = Message(message_id, request_id, client_id, operation_id, body)
         logging.info("Message: {}".format(message.to_string()))
         return message

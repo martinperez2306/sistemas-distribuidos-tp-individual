@@ -4,6 +4,7 @@ import uuid
 import pika
 import re
 
+from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.middleware_client.constants import *
 
@@ -42,8 +43,8 @@ class MiddlewareClient:
 
     def __on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
-            response = str(body)
-            logging.info("Response recieved: {}".format(response))
+            logging.info("Recieved: {}".format(body))
+            response = body.decode(UTF8_ENCODING)
             self.response = self.__parse_message(response)
 
     def call_start_data_process(self):
@@ -51,7 +52,8 @@ class MiddlewareClient:
         return self.__request(request)
 
     def call_process_data(self, request_id: int, data: str):
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_ID, data)
+        data_striped = data.strip()
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_ID, data_striped)
         return self.__request(request)
 
     def call_end_data_process(self, request_id: int):
@@ -72,7 +74,7 @@ class MiddlewareClient:
                 reply_to=self.callback_queue,
                 correlation_id=self.corr_id,
             ),
-            body=message.to_string())
+            body=message.to_string().encode(UTF8_ENCODING))
         self.connection.process_data_events(time_limit=None)
         return self.response
 

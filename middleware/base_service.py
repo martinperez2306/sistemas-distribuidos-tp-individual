@@ -1,4 +1,5 @@
 import pika
+from dependencies.commons.constants import *
 from middleware.constants import *
 
 class BaseService:
@@ -16,7 +17,7 @@ class BaseService:
         self.channel.basic_publish(
             exchange='',
             routing_key=self.publish_queue_name,
-            body=str(data),
+            body=data.encode(UTF8_ENCODING),
             properties=pika.BasicProperties(
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))
