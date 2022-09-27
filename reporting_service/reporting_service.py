@@ -3,6 +3,8 @@ import pika
 
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 from dependencies.middlewaresys_client.constants import *
+from dependencies.commons.video import Video
+from reporting_service.result_repository import ResultRepository
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
@@ -14,6 +16,7 @@ class ReportingService:
         self.connection = None
         self.channel = None
         self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, REPORTING_SERVICE_ID)
+        self.result_repository = ResultRepository()
 
     def run(self):
         self.middleware_system_client.connect()
@@ -24,7 +27,9 @@ class ReportingService:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             reporting_message = self.middleware_system_client.parse_message(str(body))
-            ##TODO: Here recieves "add report data". Storage information.
+            video = Video(reporting_message.body)
+            request_id = reporting_message.request_id
+            self.result_repository.save_filtered_video(request_id, video)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)
