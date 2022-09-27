@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-from .message import Message
-from .constants import *
 import logging
 import uuid
 import pika
 import re
+
+from ....commons.src.commons.message import Message
+from .constants import *
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
 MESSAGE_REQUEST_ID_REGEX=r'REQUEST_ID\[(.*?)\]'
