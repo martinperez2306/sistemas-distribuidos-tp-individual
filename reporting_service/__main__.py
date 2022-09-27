@@ -2,7 +2,7 @@
 
 import logging
 
-from core.reporting_service import ReportingService
+from reporting_service.reporting_service import ReportingService
 
 def main():
     initialize_log("INFO")

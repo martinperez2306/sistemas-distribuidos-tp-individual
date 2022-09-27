@@ -1,11 +1,8 @@
 import logging
 import pika
 
-from middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
-from middlewaresys_client.src.core.constants import *
-#Dev import
-#from ....base_images.middlewaresys_client.src.core.middlewaresys_client import MiddlewareSystemClient
-#from ....base_images.middlewaresys_client.src.core.constants import *
+from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
+from dependencies.middlewaresys_client.constants import *
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
