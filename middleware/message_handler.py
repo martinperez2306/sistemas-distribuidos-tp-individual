@@ -3,6 +3,7 @@ import logging
 
 from middleware.client_service import ClientService
 from middleware.constants import *
+from middleware.funny_filter_service import FunnyFilterService
 from middleware.ingestion_service import IngestionService
 from middleware.like_filter_service import LikeFilterService
 from dependencies.commons.message import Message
@@ -21,6 +22,8 @@ class MessageHandler:
         ingestion_service.run()
         self.like_filter_service = LikeFilterService()
         self.like_filter_service.run()
+        self.funny_filter_service = FunnyFilterService()
+        self.funny_filter_service.run()
         self.storage_service = StorageService()
         self.storage_service.run()
         self.client_service = ClientService(ingestion_service)
@@ -61,6 +64,9 @@ class MessageHandler:
         elif (message.operation_id == LIKE_FILTER_ID):
             logging.info("Filtering by Likes")
             self.like_filter_service.filter_by_likes(message)
+        elif (message.operation_id == FUNNY_FILTER_ID):
+            logging.info("Filtering by Tag Funny")
+            self.funny_filter_service.filter_by_funny_tag(message)
         elif (message.operation_id == STORAGE_DATA_ID):
             logging.info("Storaging data")
             self.storage_service.storage_data(message)
