@@ -8,6 +8,7 @@ from middleware.constants import *
 from middleware.funny_filter_service import FunnyFilterService
 from middleware.ingestion_service import IngestionService
 from middleware.like_filter_service import LikeFilterService
+from middleware.request_repository import RequestRepository
 from middleware.storage_service import StorageService
 
 MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
@@ -21,13 +22,14 @@ class MessageHandler:
     def __init__(self):
         ingestion_service = IngestionService()
         ingestion_service.run()
+        request_repository = RequestRepository()
         self.like_filter_service = LikeFilterService()
         self.like_filter_service.run()
         self.funny_filter_service = FunnyFilterService()
         self.funny_filter_service.run()
         self.storage_service = StorageService()
         self.storage_service.run()
-        self.client_service = ClientService(ingestion_service)
+        self.client_service = ClientService(ingestion_service, request_repository)
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling message {}".format(body))
@@ -61,8 +63,8 @@ class MessageHandler:
         elif (message.operation_id == END_PROCESS_OP_ID):
             logging.info("End data process")
             self.client_service.end_data_process(ch, method, props, message)
-        elif (message.operation_id == GET_RESULTS_OP_ID):
-            logging.info("Returning Results!")
+        elif (message.operation_id == SEND_RESULTS_OP_ID):
+            logging.info("Sending Results!")
             self.client_service.send_results(ch, method, props, message)
         elif (message.operation_id == LIKE_FILTER_OP_ID):
             logging.info("Filtering by Likes")
