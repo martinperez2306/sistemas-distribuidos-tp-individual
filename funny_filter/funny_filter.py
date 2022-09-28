@@ -24,7 +24,7 @@ class LikeFilter:
 
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
-            like_filter_message = self.middleware_system_client.parse_message(str(body))
+            like_filter_message = self.middleware_system_client.parse_message(body)
             video = Video(like_filter_message.body)
             logging.info("Video {}".format(str(video)))
             tags = video.tags.split("|")
