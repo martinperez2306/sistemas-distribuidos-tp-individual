@@ -79,7 +79,7 @@ def process_video(video: str, middleware_client: MiddlewareClient, request_id:in
 
 def get_results(middleware_client: MiddlewareClient, request_id):
     logging.info("Getting Results for Request with ID [{}]".format(request_id))
-    results_message: Message = middleware_client.call_get_results(request_id)
+    results_message: Message = middleware_client.wait_get_results(request_id)
     logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))
     return results_message
 

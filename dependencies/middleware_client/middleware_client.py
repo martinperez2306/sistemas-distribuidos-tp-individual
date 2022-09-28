@@ -26,7 +26,7 @@ class MiddlewareClient:
         self.corr_id = None
 
     def connect(self):
-        logging.info("Connecting to Middleware ")
+        logging.info("Connecting to Middleware")
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.middleware_queue_id)
@@ -48,21 +48,25 @@ class MiddlewareClient:
             self.response = self.__parse_message(response)
 
     def call_start_data_process(self):
+        logging.info("Calling start data process")
         request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, "")
         return self.__request(request)
 
     def call_process_data(self, request_id: int, data: str):
+        logging.info("Calling process data")
         data_striped = data.strip()
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, data_striped)
         return self.__request(request)
 
     def call_end_data_process(self, request_id: int):
+        logging.info("Calling end data process")
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, "")
         return self.__request(request)
 
-    def call_get_results(self, request_id: int):
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, GET_RESULTS_OP_ID, "")
-        return self.__request(request)
+    def wait_get_results(self, request_id: int):
+        logging.info("Waiting for results")
+        self.channel.start_consuming()
+        return self.response
 
     def __request(self, message: Message):
         logging.info("Send request message: {}".format(message.to_string()))
@@ -79,6 +83,7 @@ class MiddlewareClient:
         return self.response
 
     def __parse_message(self, body: str) -> Message:
+        logging.info("Parsing message: {}".format(body))
         message_id = re.search(MESSAGE_ID_REGEX,body).group(1)
         request_id = re.search(MESSAGE_REQUEST_ID_REGEX,body).group(1)
         client_id = re.search(MESSAGE_CLIENT_ID_REGEX,body).group(1)
@@ -94,4 +99,5 @@ class MiddlewareClient:
         return message
 
     def close(self):
+        logging.info("Closing connection to Middleware")
         self.connection.close()
