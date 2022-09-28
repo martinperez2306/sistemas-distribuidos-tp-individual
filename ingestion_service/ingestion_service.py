@@ -24,7 +24,7 @@ class IngestionService:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             ingestion_message = self.middleware_system_client.parse_message(body)
-            self.middleware_system_client.call_filter_by_likes(ingestion_message.request_id, ingestion_message.body)
+            self.middleware_system_client.call_filter_by_likes(ingestion_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)

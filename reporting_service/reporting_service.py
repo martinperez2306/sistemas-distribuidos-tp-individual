@@ -28,7 +28,7 @@ class ReportingService:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             reporting_message = self.middleware_system_client.parse_message(body)
-            if STORAGE_DATA_OP_ID == reporting_message.operation_id:
+            if PROCESS_DATA_OP_ID == reporting_message.operation_id:
                 self.__storage_video(ch, method, properties, body, reporting_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 

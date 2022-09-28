@@ -3,7 +3,7 @@ import pika
 
 from dependencies.commons.message import Message
 from dependencies.commons.video import Video
-from dependencies.middlewaresys_client.constants import LIKE_FILTER_OP_ID
+from dependencies.middlewaresys_client.constants import *
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"
@@ -27,7 +27,7 @@ class LikeFilter:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             like_filter_message = self.middleware_system_client.parse_message(body)
-            if LIKE_FILTER_OP_ID == like_filter_message.operation_id:
+            if PROCESS_DATA_OP_ID == like_filter_message.operation_id:
                 self.__process_filter_by_like(ch, method, properties, body, like_filter_message)
             else:
                 self.__propagate_message(ch, method, properties, body, like_filter_message)
@@ -45,9 +45,9 @@ class LikeFilter:
         try:
             likes_count = int(video.likes)
             if likes_count > MIN_LIKES_COUNT:
-                self.middleware_system_client.call_filter_by_tag(like_filter_message.request_id, like_filter_message.body)
+                self.middleware_system_client.call_filter_by_tag(like_filter_message)
         except ValueError:
             pass
 
     def __propagate_message(self, ch, method, properties, body, like_filter_message: Message):
-        self.middleware_system_client.call_filter_by_tag(like_filter_message.request_id, like_filter_message.body)
+        self.middleware_system_client.call_filter_by_tag(like_filter_message)
