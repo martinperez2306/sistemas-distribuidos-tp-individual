@@ -2,17 +2,13 @@
 import logging
 import uuid
 import pika
-import re
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.utils import parse_message
 from dependencies.middleware_client.constants import *
 
-MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
-MESSAGE_REQUEST_ID_REGEX=r'REQUEST_ID\[(.*?)\]'
-MESSAGE_CLIENT_ID_REGEX=r'CLIENT_ID\[(.*?)\]'
-MESSAGE_OPERATION_ID_REGEX=r'OPERATION_ID\[(.*?)\]'
-MESSAGE_BODY_REGEX=r'BODY(?:\[+)(.*)(?:\]+)'
+MIDDLEWARE_ID = "middleware"
 
 class MiddlewareClient:
     def __init__(self, host, middleware_queue_id):
@@ -45,22 +41,22 @@ class MiddlewareClient:
         if self.corr_id == props.correlation_id:
             logging.info("Recieved: {}".format(body))
             response = body.decode(UTF8_ENCODING)
-            self.response = self.__parse_message(response)
+            self.response = parse_message(response)
 
     def call_start_data_process(self):
         logging.info("Calling start data process")
-        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, "")
         return self.__request(request)
 
     def call_process_data(self, request_id: int, data: str):
         logging.info("Calling process data")
         data_striped = data.strip()
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, data_striped)
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, data_striped)
         return self.__request(request)
 
     def call_end_data_process(self, request_id: int):
         logging.info("Calling end data process")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, MIDDLEWARE_ID, "")
         return self.__request(request)
 
     def wait_get_results(self, request_id: int):
@@ -81,22 +77,6 @@ class MiddlewareClient:
             body=message.to_string().encode(UTF8_ENCODING))
         self.connection.process_data_events(time_limit=None)
         return self.response
-
-    def __parse_message(self, body: str) -> Message:
-        logging.info("Parsing message: {}".format(body))
-        message_id = re.search(MESSAGE_ID_REGEX,body).group(1)
-        request_id = re.search(MESSAGE_REQUEST_ID_REGEX,body).group(1)
-        client_id = re.search(MESSAGE_CLIENT_ID_REGEX,body).group(1)
-        operation_id = -1
-        try:
-            op_id = int(re.search(MESSAGE_OPERATION_ID_REGEX,body).group(1))
-            operation_id = op_id
-        except ValueError:
-            pass
-        body = re.search(MESSAGE_BODY_REGEX,body).group(1)
-        message = Message(message_id, request_id, client_id, operation_id, body)
-        logging.info("Message: {}".format(message.to_string()))
-        return message
 
     def close(self):
         logging.info("Closing connection to Middleware")
