@@ -52,7 +52,6 @@ class ClientService:
     def __respond(self, ch, method, props, request: Message, response: Message):
         logging.info("Respond to client [{}] with [{}]".format(request.client_id, response.to_string()))
         self.__send(ch, method, props, response)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def __send(self, ch, method, props, message: Message):
         ch.basic_publish(exchange='',

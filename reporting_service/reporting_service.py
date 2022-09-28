@@ -30,6 +30,9 @@ class ReportingService:
             reporting_message = self.middleware_system_client.parse_message(body)
             if PROCESS_DATA_OP_ID == reporting_message.operation_id:
                 self.__storage_video(ch, method, properties, body, reporting_message)
+            if END_PROCESS_OP_ID == reporting_message.operation_id:
+                results = str(self.result_repository.get_filtered_videos(reporting_message.request_id))
+                self.middleware_system_client.call_send_results(reporting_message.request_id, results)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)

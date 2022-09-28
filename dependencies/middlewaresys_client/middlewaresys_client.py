@@ -38,6 +38,10 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.client_id, request_message.operation_id, STORAGE_DATA_WORKER_ID, request_message.body)
         self.__request(message)
 
+    def call_send_results(self, request_id: int, results: str):
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, SEND_RESULTS_OP_ID, MIDDLEWARE_ID, results)
+        self.__request(message)
+
     def __request(self, message: Message):
         logging.info("Send request message: {}".format(message.to_string()))
         self.channel.basic_publish(

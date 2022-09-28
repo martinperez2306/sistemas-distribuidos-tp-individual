@@ -30,6 +30,7 @@ class MessageHandler:
         message = body.decode(UTF8_ENCODING)
         message_parsed = parse_message(message)
         self.__process_message(ch, method, props, message_parsed)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
     
     def __process_message(self, ch, method, props, message: Message):
         if CLIENT_MESSAGE_ID == message.id:
