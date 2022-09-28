@@ -8,21 +8,21 @@ from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSys
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
-LIKE_FILTER_QUEUE = "funny_filter_queue"
-LIKE_FILTER_ID = "funny_filter" ##TODO: Obtener de configuracion
+FUNNY_FILTER_QUEUE = "funny_filter_queue"
+FUNNY_FILTER_ID = "funny_filter" ##TODO: Obtener de configuracion
 FUNNY_TAG = "funny"
 
 class LikeFilter:
     def __init__(self):
         self.connection = None
         self.channel = None
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, LIKE_FILTER_ID)
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, FUNNY_FILTER_ID)
 
     def run(self):
         self.middleware_system_client.connect()
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=LIKE_FILTER_QUEUE, durable=True)
+        self.channel.queue_declare(queue=FUNNY_FILTER_QUEUE, durable=True)
 
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
@@ -30,11 +30,11 @@ class LikeFilter:
             if FUNNY_FILTER_OP_ID == funny_filter_message.operation_id:
                 self.__process_filter_by_funny_tag(ch, method, properties, body, funny_filter_message)
             else:
-                self.__propagate_message(ch, method, properties, body, funny_filter_message)
+                self.middleware_system_client.call_propagate_data(ch, method, properties, body, funny_filter_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
             
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(queue=LIKE_FILTER_QUEUE, on_message_callback=handle_message)
+        self.channel.basic_consume(queue=FUNNY_FILTER_QUEUE, on_message_callback=handle_message)
 
         logging.info('Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
