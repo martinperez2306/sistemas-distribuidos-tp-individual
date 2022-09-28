@@ -2,8 +2,8 @@ import logging
 import pika
 
 from middleware.constants import *
-from middleware.ingestion_service import IngestionService
 from dependencies.commons.message import Message
+from middleware.ingestion_service import IngestionService
 
 class ClientService:
     def __init__(self, ingestion_service: IngestionService):
@@ -14,16 +14,21 @@ class ClientService:
         logging.info("Starting data process")
         self.request_count += 1
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, self.request_count)
+        #Propagate start process data with Request ID
+        self.ingestion_service.ingest_data(response)
         self.__respond(ch, method, props, message, response)
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
+        #Propagate data with Request ID
         self.ingestion_service.ingest_data(message)
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
         self.__respond(ch, method, props, message, response)
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
+        #Propagate end process data with Request ID
+        self.ingestion_service.ingest_data(message)
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, "ACK")
         self.__respond(ch, method, props, message, response)
 
