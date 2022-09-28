@@ -7,5 +7,5 @@ class IngestionService(BaseService):
         BaseService.__init__(self, INGESTION_SERVICE_QUEUE)
     
     def ingest_data(self, message: Message):
-        ingest_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, INGEST_DATA_ID, message.body)
+        ingest_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, INGEST_DATA_OP_ID, message.body)
         self.publish_data(ingest_message.to_string())

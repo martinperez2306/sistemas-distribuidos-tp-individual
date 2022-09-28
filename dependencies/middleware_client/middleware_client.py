@@ -48,20 +48,20 @@ class MiddlewareClient:
             self.response = self.__parse_message(response)
 
     def call_start_data_process(self):
-        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, "")
         return self.__request(request)
 
     def call_process_data(self, request_id: int, data: str):
         data_striped = data.strip()
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_ID, data_striped)
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, data_striped)
         return self.__request(request)
 
     def call_end_data_process(self, request_id: int):
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, "")
         return self.__request(request)
 
     def call_get_results(self, request_id: int):
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, GET_RESULTS_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, GET_RESULTS_OP_ID, "")
         return self.__request(request)
 
     def __request(self, message: Message):
