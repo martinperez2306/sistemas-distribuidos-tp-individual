@@ -52,25 +52,25 @@ class MessageHandler:
         return message
     
     def __process_message(self, ch, method, props, message: Message):
-        if (message.operation_id == START_PROCESS_ID):
+        if (message.operation_id == START_PROCESS_OP_ID):
             logging.info("Init data process")
             self.client_service.start_data_process(ch, method, props, message)
-        elif (message.operation_id == PROCESS_DATA_ID):
+        elif (message.operation_id == PROCESS_DATA_OP_ID):
             logging.info("Processing data")
             self.client_service.process_data(ch, method, props, message)
-        elif (message.operation_id == END_PROCESS_ID):
+        elif (message.operation_id == END_PROCESS_OP_ID):
             logging.info("End data process")
             self.client_service.end_data_process(ch, method, props, message)
-        elif (message.operation_id == GET_RESULTS_ID):
+        elif (message.operation_id == GET_RESULTS_OP_ID):
             logging.info("Returning Results!")
             self.client_service.send_results(ch, method, props, message)
-        elif (message.operation_id == LIKE_FILTER_ID):
+        elif (message.operation_id == LIKE_FILTER_OP_ID):
             logging.info("Filtering by Likes")
             self.like_filter_service.filter_by_likes(message)
-        elif (message.operation_id == FUNNY_FILTER_ID):
+        elif (message.operation_id == FUNNY_FILTER_OP_ID):
             logging.info("Filtering by Tag Funny")
             self.funny_filter_service.filter_by_funny_tag(message)
-        elif (message.operation_id == STORAGE_DATA_ID):
+        elif (message.operation_id == STORAGE_DATA_OP_ID):
             logging.info("Storaging data")
             self.storage_service.storage_data(message)
         else:

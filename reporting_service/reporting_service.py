@@ -1,5 +1,6 @@
 import logging
 import pika
+from dependencies.commons.message import Message
 
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 from dependencies.middlewaresys_client.constants import *
@@ -27,9 +28,8 @@ class ReportingService:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             reporting_message = self.middleware_system_client.parse_message(body)
-            video = Video(reporting_message.body)
-            request_id = reporting_message.request_id
-            self.result_repository.save_filtered_video(request_id, video)
+            if STORAGE_DATA_OP_ID == reporting_message.operation_id:
+                self.__storage_video(ch, method, properties, body, reporting_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)
@@ -37,5 +37,10 @@ class ReportingService:
 
         logging.info('Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
+
+    def __storage_video(self, ch, method, properties, body, reporting_message: Message):
+        video = Video(reporting_message.body)
+        request_id = reporting_message.request_id
+        self.result_repository.save_filtered_video(request_id, video)
     
     

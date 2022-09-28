@@ -1,7 +1,9 @@
 import logging
 import pika
 
+from dependencies.commons.message import Message
 from dependencies.commons.video import Video
+from dependencies.middlewaresys_client.constants import LIKE_FILTER_OP_ID
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"
@@ -25,14 +27,10 @@ class LikeFilter:
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
             like_filter_message = self.middleware_system_client.parse_message(body)
-            video = Video(like_filter_message.body)
-            logging.info("Video {}".format(str(video)))
-            try:
-                likes_count = int(video.likes)
-                if likes_count > MIN_LIKES_COUNT:
-                    self.middleware_system_client.call_filter_by_tag(like_filter_message.request_id, like_filter_message.body)
-            except ValueError:
-                pass
+            if LIKE_FILTER_OP_ID == like_filter_message.operation_id:
+                self.__process_filter_by_like(ch, method, properties, body, like_filter_message)
+            else:
+                self.__propagate_message(ch, method, properties, body, like_filter_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_qos(prefetch_count=1)
@@ -40,3 +38,16 @@ class LikeFilter:
 
         logging.info('Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
+
+    def __process_filter_by_like(self, ch, method, properties, body, like_filter_message: Message):
+        video = Video(like_filter_message.body)
+        logging.info("Video {}".format(str(video)))
+        try:
+            likes_count = int(video.likes)
+            if likes_count > MIN_LIKES_COUNT:
+                self.middleware_system_client.call_filter_by_tag(like_filter_message.request_id, like_filter_message.body)
+        except ValueError:
+            pass
+
+    def __propagate_message(self, ch, method, properties, body, like_filter_message: Message):
+        self.middleware_system_client.call_filter_by_tag(like_filter_message.request_id, like_filter_message.body)

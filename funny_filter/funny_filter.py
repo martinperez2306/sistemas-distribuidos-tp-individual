@@ -1,7 +1,9 @@
 import logging
 import pika
 
+from dependencies.commons.message import Message
 from dependencies.commons.video import Video
+from dependencies.middlewaresys_client.constants import FUNNY_FILTER_OP_ID
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"
@@ -24,16 +26,25 @@ class LikeFilter:
 
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
-            like_filter_message = self.middleware_system_client.parse_message(body)
-            video = Video(like_filter_message.body)
-            logging.info("Video {}".format(str(video)))
-            tags = video.tags.split("|")
-            if FUNNY_TAG in tags:
-                self.middleware_system_client.call_storage_data(like_filter_message.request_id, like_filter_message.body)
+            funny_filter_message = self.middleware_system_client.parse_message(body)
+            if FUNNY_FILTER_OP_ID == funny_filter_message.operation_id:
+                self.__process_filter_by_funny_tag(ch, method, properties, body, funny_filter_message)
+            else:
+                self.__propagate_message(ch, method, properties, body, funny_filter_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
-
+            
         self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(queue=LIKE_FILTER_QUEUE, on_message_callback=handle_message)
 
         logging.info('Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
+
+    def __process_filter_by_funny_tag(self, ch, method, properties, body, funny_filter_message: Message):
+        video = Video(funny_filter_message.body)
+        logging.info("Video {}".format(str(video)))
+        tags = video.tags.split("|")
+        if FUNNY_TAG in tags:
+            self.middleware_system_client.call_storage_data(funny_filter_message.request_id, funny_filter_message.body)
+
+    def __propagate_message(self, ch, method, properties, body, funny_filter_message: Message):
+        self.middleware_system_client.call_storage_data(funny_filter_message.request_id, funny_filter_message.body)
