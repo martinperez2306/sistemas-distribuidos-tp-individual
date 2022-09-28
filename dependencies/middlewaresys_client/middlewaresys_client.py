@@ -5,13 +5,8 @@ import re
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.utils import parse_message
 from dependencies.middlewaresys_client.constants import *
-
-MESSAGE_ID_REGEX = r'MESSAGE_ID\[(.*?)\]'
-MESSAGE_REQUEST_ID_REGEX=r'REQUEST_ID\[(.*?)\]'
-MESSAGE_CLIENT_ID_REGEX=r'CLIENT_ID\[(.*?)\]'
-MESSAGE_OPERATION_ID_REGEX=r'OPERATION_ID\[(.*?)\]'
-MESSAGE_BODY_REGEX=r'BODY(?:\[+)(.*)(?:\]+)'
 
 class MiddlewareSystemClient:
     def __init__(self, host, middleware_queue_id, client_id):
@@ -28,31 +23,19 @@ class MiddlewareSystemClient:
 
     def parse_message(self, body) -> Message:
         body = body.decode(UTF8_ENCODING)
-        message_id = re.search(MESSAGE_ID_REGEX , body).group(1)
-        request_id = re.search(MESSAGE_REQUEST_ID_REGEX, body).group(1)
-        client_id = re.search(MESSAGE_CLIENT_ID_REGEX, body).group(1)
-        operation_id = -1
-        try:
-            op_id = int(re.search(MESSAGE_OPERATION_ID_REGEX, body).group(1))
-            operation_id = op_id
-        except ValueError:
-            pass
-        body = re.search(MESSAGE_BODY_REGEX, body).group(1)
-        message = Message(message_id, request_id, client_id, operation_id, body)
-        logging.info("Message: {}".format(message.to_string()))
-        return message 
+        return parse_message(body)
 
 
-    def call_filter_by_likes(self, request_id: int, data: str):
-        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, LIKE_FILTER_OP_ID, data)
+    def call_filter_by_likes(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.client_id, request_message.operation_id, LIKE_FILTER_WORKER_ID, request_message.body)
         self.__request(message)
 
-    def call_filter_by_tag(self, request_id: int, data: str):
-        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, FUNNY_FILTER_OP_ID, data)
+    def call_filter_by_tag(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.client_id, request_message.operation_id, FUNNY_FILTER_WORKER_ID, request_message.body)
         self.__request(message)
 
-    def call_storage_data(self, request_id: int, data: str):
-        message = Message(SERVICE_MESSAGE_ID, request_id, self.client_id, STORAGE_DATA_OP_ID, data)
+    def call_storage_data(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.client_id, request_message.operation_id, STORAGE_DATA_WORKER_ID, request_message.body)
         self.__request(message)
 
     def __request(self, message: Message):
