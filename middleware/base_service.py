@@ -23,9 +23,5 @@ class BaseService:
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))
 
-    def propagate_message(self, message: Message):
-        propagate_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, message.body)
-        self.publish_data(propagate_message.to_string()) 
-
     def shutdown(self):
         self.connection.close()
