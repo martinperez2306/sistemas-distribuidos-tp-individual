@@ -1,7 +1,5 @@
 import pika
 from dependencies.commons.constants import *
-from dependencies.commons.message import Message
-from middleware.constants import *
 
 class BaseCaller:
     def __init__(self, publish_queue_name):

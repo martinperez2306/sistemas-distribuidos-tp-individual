@@ -5,7 +5,6 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
 from middleware.client_service import ClientService
-from middleware.constants import *
 from middleware.funny_filter_caller import FunnyFilterCaller
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.like_filter_caller import LikeFilterCaller

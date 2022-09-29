@@ -2,7 +2,7 @@ import logging
 import pika
 import signal
 
-from middleware.constants import *
+from dependencies.commons.constants import *
 from middleware.message_handler import MessageHandler
 
 class Middleware:

@@ -6,7 +6,6 @@ import pika
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
-from dependencies.middleware_client.constants import *
 
 MIDDLEWARE_ID = "middleware"
 

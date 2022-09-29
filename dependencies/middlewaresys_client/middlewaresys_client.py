@@ -6,7 +6,6 @@ import re
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
-from dependencies.middlewaresys_client.constants import *
 
 class MiddlewareSystemClient:
     def __init__(self, host, middleware_queue_id, service_id):
