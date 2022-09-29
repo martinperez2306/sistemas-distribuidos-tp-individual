@@ -3,7 +3,7 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from middleware.constants import *
 
-class BaseService:
+class BaseCaller:
     def __init__(self, publish_queue_name):
         self.connection = None
         self.channel = None
