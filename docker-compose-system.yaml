@@ -72,6 +72,20 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  day_grouper:
+    build:
+      context: ./day_grouper
+      dockerfile: day_grouper.dockerfile
+    image: day_grouper
+    container_name: day_grouper
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
   reporting_service:
     build:
       context: ./reporting_service
