@@ -2,7 +2,7 @@ from middleware.base_caller import BaseCaller
 from middleware.constants import *
 from dependencies.commons.message import Message
 
-class StorageService(BaseCaller):
+class StorageServiceCaller(BaseCaller):
     def __init__(self):
         BaseCaller.__init__(self, REPORTING_SERVICE_QUEUE)
     

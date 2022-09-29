@@ -6,11 +6,11 @@ from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
 from middleware.client_service import ClientService
 from middleware.constants import *
-from middleware.funny_filter_service import FunnyFilterCaller
+from middleware.funny_filter_caller import FunnyFilterCaller
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.like_filter_caller import LikeFilterCaller
 from middleware.request_repository import RequestRepository
-from middleware.storage_service import StorageService
+from middleware.storage_service_caller import StorageServiceCaller
 
 class MessageHandler:
     def __init__(self):
@@ -19,10 +19,10 @@ class MessageHandler:
         request_repository = RequestRepository()
         self.like_filter_caller = LikeFilterCaller()
         self.like_filter_caller.run()
-        self.funny_filter_service = FunnyFilterCaller()
-        self.funny_filter_service.run()
-        self.storage_service = StorageService()
-        self.storage_service.run()
+        self.funny_filter_caller = FunnyFilterCaller()
+        self.funny_filter_caller.run()
+        self.storage_service_caller = StorageServiceCaller()
+        self.storage_service_caller.run()
         self.client_service = ClientService(ingestion_service_caller, request_repository)
 
     def handle_message(self, ch, method, props, body):
@@ -54,10 +54,10 @@ class MessageHandler:
                 self.like_filter_caller.filter_by_likes(message)
             elif FUNNY_FILTER_WORKER_ID == message.destination_id:
                 logging.info("Filtering by Tag Funny")
-                self.funny_filter_service.filter_by_funny_tag(message)
+                self.funny_filter_caller.filter_by_funny_tag(message)
             elif STORAGE_DATA_WORKER_ID == message.destination_id:
                 logging.info("Storaging data")
-                self.storage_service.storage_data(message)
+                self.storage_service_caller.storage_data(message)
             else:
                 logging.info("Service method not found!")
         else:
