@@ -2,7 +2,7 @@ from middleware.base_caller import BaseCaller
 from middleware.constants import *
 from dependencies.commons.message import Message
 
-class FunnyFilterService(BaseCaller):
+class FunnyFilterCaller(BaseCaller):
     def __init__(self):
         BaseCaller.__init__(self, FUNNY_FILTER_QUEUE)
     

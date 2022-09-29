@@ -6,7 +6,7 @@ from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
 from middleware.client_service import ClientService
 from middleware.constants import *
-from middleware.funny_filter_service import FunnyFilterService
+from middleware.funny_filter_service import FunnyFilterCaller
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.like_filter_caller import LikeFilterCaller
 from middleware.request_repository import RequestRepository
@@ -19,7 +19,7 @@ class MessageHandler:
         request_repository = RequestRepository()
         self.like_filter_caller = LikeFilterCaller()
         self.like_filter_caller.run()
-        self.funny_filter_service = FunnyFilterService()
+        self.funny_filter_service = FunnyFilterCaller()
         self.funny_filter_service.run()
         self.storage_service = StorageService()
         self.storage_service.run()
