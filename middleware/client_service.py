@@ -19,6 +19,8 @@ class ClientService:
         logging.info("Starting data process")
         self.request_count += 1
         request_id = self.request_count
+        logging.info("Saving request with ID [{}] CLIENT_ID [{}] CORRELATION_ID[{}] CLIENT_QUEUE [{}]"\
+            .format(request_id, message.client_id, props.correlation_id, props.reply_to))
         request = Request(request_id, message.client_id, props.correlation_id, props.reply_to)
         self.request_repository.add(request_id, request)
         propagate = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
@@ -44,8 +46,9 @@ class ClientService:
     def send_results(self, ch, method, props, message: Message):
         logging.info("Sending results")
         request: Request = self.request_repository.get(message.request_id)
+        logging.info("Sending results to request [{}]".format(request))
         properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.correlation_id,)
-        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.client_id, message.operation_id, message.body)
+        response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.client_id, message.operation_id, request.client_id, message.body)
         self.__send(ch, method, properties, response)
         self.request_repository.delete(message.request_id)
 
@@ -54,8 +57,9 @@ class ClientService:
         self.__send(ch, method, props, response)
 
     def __send(self, ch, method, props, message: Message):
+        logging.info("Send to [{}] with correlation [{}] message [{}]".format(props.reply_to, props.correlation_id, message.to_string()))
         ch.basic_publish(exchange='',
                         routing_key=props.reply_to,
                         properties=pika.BasicProperties(correlation_id = props.correlation_id),
-                        body=str(message.to_string()))
+                        body=message.to_string())
         

@@ -77,7 +77,7 @@ def process_video(video: str, middleware_client: MiddlewareClient, request_id:in
     logging.info("Processing Video: [{}] in Request with ID [{}]".format(video, request_id))
     middleware_client.call_process_data(request_id, video)
 
-def get_results(middleware_client: MiddlewareClient, request_id):
+def get_results(middleware_client: MiddlewareClient, request_id: str):
     logging.info("Getting Results for Request with ID [{}]".format(request_id))
     results_message: Message = middleware_client.wait_get_results(request_id)
     logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))

@@ -19,7 +19,8 @@ class MiddlewareClient:
         self.channel = None
         self.callback_queue = None
         self.response = None
-        self.corr_id = None
+        self.corr_id = str(uuid.uuid4())
+        self.waiting_results = False
 
     def connect(self):
         logging.info("Connecting to Middleware")
@@ -28,20 +29,22 @@ class MiddlewareClient:
         self.channel.queue_declare(queue=self.middleware_queue_id)
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
+        self.corr_id = None
+        self.response = None
 
         self.channel.basic_consume(
             queue=self.callback_queue,
             on_message_callback=self.__on_response,
             auto_ack=True)
 
-        self.response = None
-        self.corr_id = None
-
     def __on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
             logging.info("Recieved: {}".format(body))
             response = body.decode(UTF8_ENCODING)
             self.response = parse_message(response)
+            if self.waiting_results:
+                logging.info("Results Recieved. Stop consuming.")
+                self.channel.stop_consuming()
 
     def call_start_data_process(self):
         logging.info("Calling start data process")
@@ -59,15 +62,15 @@ class MiddlewareClient:
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, MIDDLEWARE_ID, "")
         return self.__request(request)
 
-    def wait_get_results(self, request_id: int):
-        logging.info("Waiting for results")
+    def wait_get_results(self, request_id: str):
+        logging.info("Waiting for results of request_id [{}]".format(request_id))
+        self.waiting_results = True
         self.channel.start_consuming()
         return self.response
 
     def __request(self, message: Message):
         logging.info("Send request message: {}".format(message.to_string()))
         self.response = None
-        self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange='', 
             routing_key=self.middleware_queue_id, 
             properties=pika.BasicProperties(
