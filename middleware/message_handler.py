@@ -7,15 +7,15 @@ from dependencies.commons.utils import parse_message
 from middleware.client_service import ClientService
 from middleware.constants import *
 from middleware.funny_filter_service import FunnyFilterService
-from middleware.ingestion_service import IngestionService
+from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.like_filter_service import LikeFilterService
 from middleware.request_repository import RequestRepository
 from middleware.storage_service import StorageService
 
 class MessageHandler:
     def __init__(self):
-        ingestion_service = IngestionService()
-        ingestion_service.run()
+        ingestion_service_caller = IngestionServiceCaller()
+        ingestion_service_caller.run()
         request_repository = RequestRepository()
         self.like_filter_service = LikeFilterService()
         self.like_filter_service.run()
@@ -23,7 +23,7 @@ class MessageHandler:
         self.funny_filter_service.run()
         self.storage_service = StorageService()
         self.storage_service.run()
-        self.client_service = ClientService(ingestion_service, request_repository)
+        self.client_service = ClientService(ingestion_service_caller, request_repository)
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling message {}".format(body))

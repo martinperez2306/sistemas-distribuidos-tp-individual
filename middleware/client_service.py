@@ -3,16 +3,16 @@ import pika
 
 from middleware.constants import *
 from dependencies.commons.message import Message
-from middleware.ingestion_service import IngestionService
+from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.request import Request
 from middleware.request_repository import RequestRepository
 
 ACK_MESSAGE = "ACK"
 
 class ClientService:
-    def __init__(self, ingestion_service: IngestionService, request_repository: RequestRepository):
+    def __init__(self, ingestion_service_caller: IngestionServiceCaller, request_repository: RequestRepository):
         self.request_count = 0
-        self.ingestion_service = ingestion_service
+        self.ingestion_service = ingestion_service_caller
         self.request_repository = request_repository
 
     def start_data_process(self, ch, method, props, message: Message):
