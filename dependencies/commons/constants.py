@@ -19,6 +19,9 @@ LIKE_FILTER_QUEUE = "like_filter_queue"
 FUNNY_FILTER_QUEUE = "funny_filter_queue"
 REPORTING_SERVICE_QUEUE = "reporting_service_queue"
 
+#EXCHANGUES
+DAY_GROUPER_EXCHANGE = "day_group"
+
 #MESSAGE IDS
 CLIENT_MESSAGE_ID = 0
 SERVICE_MESSAGE_ID = 1
