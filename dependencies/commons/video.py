@@ -13,10 +13,22 @@ class Video:
         self.category_id = matches[5]
         self.trending_date = matches[6]
         self.tags = matches[7]
-        self.view_count = matches[8]
-        self.likes = matches[9]
-        self.dislikes = matches[10]
-        self.comment_count = matches[11]
+        try:
+            self.view_count = int(matches[8])
+        except ValueError:
+            self.view_count = 0
+        try:
+            self.likes = int(matches[9])
+        except ValueError:
+            self.likes = 0
+        try:
+            self.dislikes = int(matches[10])
+        except ValueError:
+            self.dislikes = 0
+        try:
+            self.comment_count = matches[11]
+        except ValueError:
+            self.comment_count = 0
         self.thumbnail_link = matches[12]
         self.comments_disabled = matches[13]
         self.ratings_disabled = matches[14]
@@ -26,5 +38,5 @@ class Video:
         return "ID[{}] TITLE[{}] PUBLISHED_AT[{}] CHANNEL_ID[{}] CHANNEL_TITLE[{}] CATEGORY_ID [{}] TRENDING_DATE[{}] TAGS [{}] VIEW_COUNT [{}] \
                 LIKE[{}] DISLIKES[{}] COMMENT_COUNT[{}] THUMBNAIL_LINK[{}] COMMNETS_DISABLED[{}] RATINGS_DISABLED[{}] DESCRIPTION[{}]"\
                     .format(self.id, self.title, self.published_at, self.channel_id, self.channel_title, self.category_id, \
-                        self.trending_date, self.tags, self.view_count, self.likes, self.dislikes, self.comment_count, \
+                        self.trending_date, self.tags, str(self.view_count), str(self.likes), str(self.dislikes), str(self.comment_count), \
                             self.thumbnail_link, self.comments_disabled, self.ratings_disabled, self.description)
