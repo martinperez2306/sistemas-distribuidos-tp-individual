@@ -1,7 +1,7 @@
 import logging
 import pika
 
-from dependencies.middlewaresys_client.constants import *
+from dependencies.commons.constants import *
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"

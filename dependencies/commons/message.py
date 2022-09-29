@@ -1,8 +1,8 @@
 class Message:
-    def __init__(self, id: int, request_id: str, client_id: str, operation_id: int, destination_id :str, body: str):
+    def __init__(self, id: int, request_id: str, source_id: str, operation_id: int, destination_id :str, body: str):
         self.id = id
         self.request_id = request_id
-        self.client_id = client_id
+        self.client_id = source_id
         self.operation_id = operation_id
         self.destination_id = destination_id
         self.body = body

@@ -1,5 +1,5 @@
+from dependencies.commons.constants import *
 from middleware.base_caller import BaseCaller
-from middleware.constants import *
 from dependencies.commons.message import Message
 
 class LikeFilterCaller(BaseCaller):

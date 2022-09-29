@@ -4,14 +4,12 @@ import pathlib
 import logging
 from itertools import islice
 
+from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.middleware_client.middleware_client import MiddlewareClient
 
 VIDEOS = "/root/client/videos"
 CHUNKSIZE = 1
-
-RABBITMQ_HOST = "rabbitmq"
-MIDDLEWARE_QUEUE = "middleware"
 
 RESULTS_PENDING = "PENDING"
 

@@ -2,10 +2,10 @@ import logging
 import pika
 from dependencies.commons.message import Message
 
-from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
-from dependencies.middlewaresys_client.constants import *
+from dependencies.commons.constants import *
 from dependencies.commons.video import Video
 from reporting_service.result_repository import ResultRepository
+from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
