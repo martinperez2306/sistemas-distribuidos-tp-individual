@@ -41,4 +41,4 @@ FUNNY_FILTER_WORKER_ID = "funny_filter"
 STORAGE_DATA_WORKER_ID = "reporting_service"
 
 #SYSTEM ROUTERS IDS
-DAY_GROUPER_ROUTER_ID = "day_group"
+DAY_GROUPER_ROUTER_ID = "day_grouper"
