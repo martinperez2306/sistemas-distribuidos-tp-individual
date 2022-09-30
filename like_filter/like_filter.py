@@ -46,8 +46,10 @@ class LikeFilter:
             likes_count = int(video.likes)
             if likes_count > MIN_LIKES_COUNT:
                 self.middleware_system_client.call_filter_by_tag(like_filter_message)
+                self.middleware_system_client.call_group_by_day(like_filter_message)
         except ValueError:
             pass
 
     def __propagate_message(self, ch, method, properties, body, like_filter_message: Message):
         self.middleware_system_client.call_filter_by_tag(like_filter_message)
+        self.middleware_system_client.call_group_by_day(like_filter_message)
