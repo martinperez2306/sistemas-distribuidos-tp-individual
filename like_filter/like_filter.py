@@ -10,7 +10,7 @@ RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
 LIKE_FILTER_QUEUE = "like_filter_queue"
 LIKE_FILTER_ID = "like_filter" ##TODO: Obtener de configuracion
-MIN_LIKES_COUNT = 10000000
+MIN_LIKES_COUNT = 5000000
 
 class LikeFilter:
     def __init__(self):
