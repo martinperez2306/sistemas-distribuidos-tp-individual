@@ -1,6 +1,5 @@
 import re
 import logging
-from day_grouper.day_grouper import DayGrouper
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message

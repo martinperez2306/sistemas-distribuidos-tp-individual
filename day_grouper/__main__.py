@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
 import logging
-
-from ingestion_service.ingestion_service import IngestionService
+from day_grouper.day_grouper import DayGrouper
 
 def main():
     initialize_log("INFO")
     logging.info("Initializing Ingestion Service")
-    ingestion_service = IngestionService()
-    ingestion_service.run()
+    day_grouper = DayGrouper()
+    day_grouper.run()
 
 def initialize_log(logging_level):
     """
