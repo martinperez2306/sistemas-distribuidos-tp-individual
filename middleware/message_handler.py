@@ -58,7 +58,7 @@ class MessageHandler:
             elif FUNNY_FILTER_WORKER_ID == message.destination_id:
                 logging.info("Filtering by Tag Funny")
                 self.funny_filter_caller.filter_by_funny_tag(message)
-            elif DAY_GROUPER_WORKER_ID == message.destination_id:
+            elif DAY_GROUPER_ROUTER_ID == message.destination_id:
                 logging.info("Grouping by day")
                 self.day_grouper_caller.group_by_day(message)
             elif STORAGE_DATA_WORKER_ID == message.destination_id:
