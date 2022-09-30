@@ -1,10 +1,12 @@
 import re
 import logging
+from day_grouper.day_grouper import DayGrouper
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
 from middleware.client_service import ClientService
+from middleware.day_grouper_caller import DayGrouperCaller
 from middleware.funny_filter_caller import FunnyFilterCaller
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.like_filter_caller import LikeFilterCaller
@@ -20,6 +22,8 @@ class MessageHandler:
         self.like_filter_caller.run()
         self.funny_filter_caller = FunnyFilterCaller()
         self.funny_filter_caller.run()
+        self.day_grouper_caller = DayGrouperCaller(1)#TODO: Aca en vez de pasar 1 deberia sacarlo de la config (el Middle ya sabe cuantos servicios de agurpadores hay)
+        self.day_grouper_caller.run()
         self.storage_service_caller = StorageServiceCaller()
         self.storage_service_caller.run()
         self.client_service = ClientService(ingestion_service_caller, request_repository)
@@ -54,6 +58,9 @@ class MessageHandler:
             elif FUNNY_FILTER_WORKER_ID == message.destination_id:
                 logging.info("Filtering by Tag Funny")
                 self.funny_filter_caller.filter_by_funny_tag(message)
+            elif DAY_GROUPER_WORKER_ID == message.destination_id:
+                logging.info("Grouping by day")
+                self.day_grouper_caller.group_by_day(message)
             elif STORAGE_DATA_WORKER_ID == message.destination_id:
                 logging.info("Storaging data")
                 self.storage_service_caller.storage_data(message)
