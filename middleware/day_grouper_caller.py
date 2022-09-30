@@ -1,3 +1,5 @@
+import logging
+
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.video import Video
@@ -13,7 +15,7 @@ class DayGrouperCaller(RoutingCaller):
         if PROCESS_DATA_OP_ID == message.operation_id:
             video = Video(group_by_day_message.body)
             trending_date = video.trending_date
-            routing_key = (hash(trending_date) % self.total_routes)
+            routing_key = (hash(trending_date) % self.total_routes) + 1
             self.publish_data(group_by_day_message.to_string(), str(routing_key))
         else:
             for route in range(self.total_routes):
