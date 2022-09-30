@@ -3,6 +3,7 @@ from dependencies.commons.video import Video
 class ResultRepository:
     def __init__(self):
         self.filtered_videos = dict()
+        self.most_viewed_day = None
 
     def save_filtered_video(self, request_id: int, video: Video):
         if self.filtered_videos.get(str(request_id)):
@@ -16,4 +17,10 @@ class ResultRepository:
 
     def get_filtered_videos(self, request_id: int):
         return self.filtered_videos.get(str(request_id))
+
+    def save_most_viewed_day(self, most_viewed_day):
+        self.most_viewed_day = most_viewed_day
+
+    def get_most_viewed_day(self):
+        return self.most_viewed_day
         

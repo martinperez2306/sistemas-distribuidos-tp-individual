@@ -1,6 +1,7 @@
 import datetime
 import logging
 import pika
+from dependencies.commons import message
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
@@ -29,11 +30,22 @@ class DayGrouper:
 
         def handle_message(ch, method, properties, body):
             logging.info("Received {}".format(body))
-            gruping_message = self.middleware_system_client.parse_message(body)
-            if PROCESS_DATA_OP_ID == gruping_message.operation_id:
-                self.__save_by_group(gruping_message)
+            grouping_message = self.middleware_system_client.parse_message(body)
+            if PROCESS_DATA_OP_ID == grouping_message.operation_id:
+                self.__save_by_group(grouping_message)
+            elif END_PROCESS_OP_ID == grouping_message.operation_id:#TODO: Esto lo deberia hacer el max!
+                max = 0
+                max_trend_date = None
+                for trending_date in self.days_grouped:
+                    if max < self.days_grouped[trending_date]:
+                        max = self.days_grouped[trending_date]
+                        max_trend_date = trending_date
+                result_message: Message = Message(grouping_message.id, grouping_message.request_id, 
+                                                    grouping_message.source_id, grouping_message.operation_id,
+                                                    grouping_message.destination_id, max_trend_date)
+                self.__propagate_message(ch, method, properties, body, result_message)
             else:
-                self.__propagate_message(ch, method, properties, body, gruping_message)
+                self.__propagate_message(ch, method, properties, body, grouping_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
         self.channel.basic_consume(queue=queue_name, on_message_callback=handle_message)
