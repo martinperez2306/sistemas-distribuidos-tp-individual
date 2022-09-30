@@ -46,11 +46,14 @@ class ClientService:
     def send_results(self, ch, method, props, message: Message):
         logging.info("Sending results")
         request: Request = self.request_repository.get(message.request_id)
-        logging.info("Sending results to request [{}]".format(request))
-        properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.correlation_id,)
-        response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.source_id, message.operation_id, request.client_id, message.body)
-        self.__send(ch, method, properties, response)
-        self.request_repository.delete(message.request_id)
+        if request:
+            logging.info("Sending results to request[{}]".format(request))
+            properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.correlation_id,)
+            response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.source_id, message.operation_id, request.client_id, message.body)
+            self.__send(ch, method, properties, response)
+            self.request_repository.delete(message.request_id)
+        else:
+            logging.info("Request with ID[{}] not found".format(message.request_id))
 
     def __respond(self, ch, method, props, request: Message, response: Message):
         logging.info("Respond to client [{}] with [{}]".format(request.source_id, response.to_string()))
