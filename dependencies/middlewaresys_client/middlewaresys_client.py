@@ -33,6 +33,10 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.service_id, request_message.operation_id, FUNNY_FILTER_WORKER_ID, request_message.body)
         self.__request(message)
 
+    def call_group_by_day(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.service_id, request_message.operation_id, DAY_GROUPER_ROUTER_ID, request_message.body)
+        self.__request(message)
+
     def call_storage_data(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.service_id, request_message.operation_id, STORAGE_DATA_WORKER_ID, request_message.body)
         self.__request(message)
