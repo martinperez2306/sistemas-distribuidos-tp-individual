@@ -9,6 +9,7 @@ from middleware.day_grouper_caller import DayGrouperCaller
 from middleware.funny_filter_caller import FunnyFilterCaller
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.like_filter_caller import LikeFilterCaller
+from middleware.max_caller import MaxCaller
 from middleware.request_repository import RequestRepository
 from middleware.storage_service_caller import StorageServiceCaller
 
@@ -23,6 +24,8 @@ class MessageHandler:
         self.funny_filter_caller.run()
         self.day_grouper_caller = DayGrouperCaller(1)#TODO: Aca en vez de pasar 1 deberia sacarlo de la config (el Middle ya sabe cuantos servicios de agurpadores hay)
         self.day_grouper_caller.run()
+        self.max_caller = MaxCaller()
+        self.max_caller.run()
         self.storage_service_caller = StorageServiceCaller()
         self.storage_service_caller.run()
         self.client_service = ClientService(ingestion_service_caller, request_repository)
@@ -60,6 +63,9 @@ class MessageHandler:
             elif DAY_GROUPER_ROUTER_ID == message.destination_id:
                 logging.info("Grouping by day")
                 self.day_grouper_caller.group_by_day(message)
+            elif MAX_WORKER_ID == message.destination_id:
+                logging.info("Getting Max")
+                self.max_caller.get_max(message)
             elif STORAGE_DATA_WORKER_ID == message.destination_id:
                 logging.info("Storaging data")
                 self.storage_service_caller.storage_data(message)
