@@ -8,6 +8,7 @@ from reporting_service.reporting_check import ReportingCheck
 from reporting_service.result_repository import ResultRepository
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 from reporting_service.results import Results
+from reporting_service.video_result import VideoResult
 
 RABBITMQ_HOST = "rabbitmq"
 MIDDLEWARE_QUEUE = "middleware"
@@ -45,8 +46,9 @@ class ReportingService:
 
     def __storage_video(self, ch, method, properties, body, reporting_message: Message):
         video = Video(reporting_message.body)
+        videoResult = VideoResult(video.id, video.title, video.category_id)
         request_id = reporting_message.request_id
-        self.result_repository.save_filtered_video(request_id, video)
+        self.result_repository.save_filtered_video(request_id, videoResult)
 
     def __handle_end_process(self, ch, method, properties, body, message: Message):
         if FUNNY_FILTER_WORKER_ID == message.source_id:
@@ -59,7 +61,7 @@ class ReportingService:
         if self.reporting_check.check():
             filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
             most_viewed_day = self.result_repository.get_most_viewed_day()
-            results: Results = Results(filtered_videos, most_viewed_day)
+            results = Results(filtered_videos, most_viewed_day)
             self.middleware_system_client.call_send_results(message.request_id, str(results))
     
     
