@@ -1,38 +1,34 @@
-import re
-
-VIDEO_FIELD_PATTERN = r'\"(.+?)\"'
-
 class Video:
     def __init__(self, video_str: str):
-        matches = re.findall(VIDEO_FIELD_PATTERN, video_str)
-        self.id = matches[0]
-        self.title = matches[1]
-        self.published_at = matches[2]
-        self.channel_id = matches[3]
-        self.channel_title = matches[4]
-        self.category_id = matches[5]
-        self.trending_date = matches[6]
-        self.tags = matches[7]
+        matches = video_str.strip('][').split(', ')
+        self.id = matches[0].strip("''")
+        self.title = matches[1].strip("''")
+        self.published_at = matches[2].strip("''")
+        self.channel_id = matches[3].strip("''")
+        self.channel_title = matches[4].strip("''")
+        self.category_id = matches[5].strip("''")
+        self.trending_date = matches[6].strip("''")
+        self.tags = matches[7].strip("''")
         try:
-            self.view_count = int(matches[8])
+            self.view_count = int(matches[8].strip("''"))
         except ValueError:
             self.view_count = 0
         try:
-            self.likes = int(matches[9])
+            self.likes = int(matches[9].strip("''"))
         except ValueError:
             self.likes = 0
         try:
-            self.dislikes = int(matches[10])
+            self.dislikes = int(matches[10].strip("''"))
         except ValueError:
             self.dislikes = 0
         try:
-            self.comment_count = matches[11]
+            self.comment_count = int(matches[11].strip("''"))
         except ValueError:
             self.comment_count = 0
-        self.thumbnail_link = matches[12]
-        self.comments_disabled = matches[13]
-        self.ratings_disabled = matches[14]
-        self.description = matches[15]
+        self.thumbnail_link = matches[12].strip("''")
+        self.comments_disabled = matches[13].strip("''")
+        self.ratings_disabled = matches[14].strip("''")
+        self.description = matches[15].strip("''")
 
     def __str__(self):
         return "ID[{}] TITLE[{}] PUBLISHED_AT[{}] CHANNEL_ID[{}] CHANNEL_TITLE[{}] CATEGORY_ID [{}] TRENDING_DATE[{}] TAGS [{}] VIEW_COUNT [{}] LIKE[{}] DISLIKES[{}] COMMENT_COUNT[{}] THUMBNAIL_LINK[{}] COMMNETS_DISABLED[{}] RATINGS_DISABLED[{}] DESCRIPTION[{}]"\

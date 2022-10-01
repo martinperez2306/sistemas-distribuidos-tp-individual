@@ -6,6 +6,7 @@ import pika
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message
+from dependencies.commons.video import Video
 
 MIDDLEWARE_ID = "middleware"
 
@@ -50,10 +51,9 @@ class MiddlewareClient:
         request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, "")
         return self.__request(request)
 
-    def call_process_data(self, request_id: int, data: str):
+    def call_process_data(self, request_id: int, data):
         logging.info("Calling process data")
-        data_striped = data.strip()
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, data_striped)
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, data)
         return self.__request(request)
 
     def call_end_data_process(self, request_id: int):
