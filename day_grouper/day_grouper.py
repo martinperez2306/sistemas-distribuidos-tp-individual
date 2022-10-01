@@ -1,7 +1,5 @@
-import datetime
 import logging
 import pika
-from dependencies.commons import message
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
@@ -34,16 +32,10 @@ class DayGrouper:
             if PROCESS_DATA_OP_ID == grouping_message.operation_id:
                 self.__save_by_group(grouping_message)
             elif END_PROCESS_OP_ID == grouping_message.operation_id:#TODO: Esto lo deberia hacer el max!
-                max = 0
-                max_trend_date = None
-                for trending_date in self.days_grouped:
-                    if max < self.days_grouped[trending_date]:
-                        max = self.days_grouped[trending_date]
-                        max_trend_date = trending_date
-                result_message: Message = Message(grouping_message.id, grouping_message.request_id, 
+                max_message: Message = Message(grouping_message.id, grouping_message.request_id, 
                                                     grouping_message.source_id, grouping_message.operation_id,
-                                                    grouping_message.destination_id, max_trend_date)
-                self.__propagate_message(ch, method, properties, body, result_message)
+                                                    grouping_message.destination_id, str(self.days_grouped))
+                self.__propagate_message(ch, method, properties, body, max_message)
             else:
                 self.__propagate_message(ch, method, properties, body, grouping_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -56,7 +48,6 @@ class DayGrouper:
     def __save_by_group(self, gruping_message: Message):
         video = Video(gruping_message.body)
         logging.info("Video {}".format(str(video)))
-        #trending_date = datetime.datetime.strptime(video.trending_date, DATE_FORMAT)
         trending_date = video.trending_date
         logging.info("Trending date {}".format(trending_date))
         if self.days_grouped.get(trending_date):
@@ -66,4 +57,4 @@ class DayGrouper:
         logging.info("View Count for date {} is {}".format(trending_date, self.days_grouped[trending_date]))
 
     def __propagate_message(self, ch, method, properties, body, gruping_message: Message):
-        self.middleware_system_client.call_storage_data(gruping_message)
+        self.middleware_system_client.call_max(gruping_message)
