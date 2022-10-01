@@ -18,6 +18,7 @@ INGESTION_SERVICE_QUEUE = "ingestion_service_queue"
 LIKE_FILTER_QUEUE = "like_filter_queue"
 FUNNY_FILTER_QUEUE = "funny_filter_queue"
 REPORTING_SERVICE_QUEUE = "reporting_service_queue"
+MAX_QUEUE = "max_queue"
 
 #EXCHANGUES
 DAY_GROUPER_EXCHANGE = "day_group"
@@ -39,6 +40,7 @@ INGEST_DATA_WORKER_ID = "ingestion_service"
 LIKE_FILTER_WORKER_ID = "like_filter"
 FUNNY_FILTER_WORKER_ID = "funny_filter"
 STORAGE_DATA_WORKER_ID = "reporting_service"
+MAX_WORKER_ID = "max"
 
 #SYSTEM ROUTERS IDS
 DAY_GROUPER_ROUTER_ID = "day_grouper"
