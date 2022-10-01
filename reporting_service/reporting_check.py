@@ -14,5 +14,5 @@ class ReportingCheck:
         self.grouper_check= True
 
     def check(self):
-        logging.info("Check [{}]".format(self.check_filter and self.check_grouper))
+        logging.info("Check [{}]".format(self.filter_check and self.grouper_check))
         return (self.filter_check and self.grouper_check)

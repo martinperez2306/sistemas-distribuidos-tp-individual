@@ -5,7 +5,7 @@ from day_grouper.day_grouper import DayGrouper
 
 def main():
     initialize_log("INFO")
-    logging.info("Initializing Ingestion Service")
+    logging.info("Initializing Day Grouper")
     day_grouper = DayGrouper()
     day_grouper.run()
 

@@ -51,7 +51,7 @@ class ReportingService:
     def __handle_end_process(self, ch, method, properties, body, message: Message):
         if FUNNY_FILTER_WORKER_ID == message.source_id:
             self.reporting_check.check_filter()
-        elif DAY_GROUPER_ROUTER_ID in message.source_id:
+        elif MAX_WORKER_ID in message.source_id:
             self.result_repository.save_most_viewed_day(message.body)
             self.reporting_check.check_grouper()
         else:
