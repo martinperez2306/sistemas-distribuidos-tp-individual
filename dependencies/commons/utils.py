@@ -24,3 +24,19 @@ def parse_message(body: str) -> Message:
     message = Message(message_id, request_id, client_id, operation_id, destination_id, body)
     logging.info("Message: {}".format(message.to_string()))
     return message
+
+def unique(list):
+    # intilize a null list
+    unique_list = []
+
+    # traverse for all elements
+    for video in list:
+        # check if exists in unique_list or not
+        unique = True
+        for unique_video in unique_list:    
+            if video.id == unique_video.id and video.title == unique_video.title and video.category == unique_video.category:
+                unique = False
+        if unique:
+            unique_list.append(video)
+
+    return unique_list
