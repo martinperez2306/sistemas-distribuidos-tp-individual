@@ -29,14 +29,15 @@ def unique(list):
     # intilize a null list
     unique_list = []
 
-    # traverse for all elements
-    for video in list:
-        # check if exists in unique_list or not
-        unique = True
-        for unique_video in unique_list:    
-            if video.id == unique_video.id and video.title == unique_video.title and video.category == unique_video.category:
-                unique = False
-        if unique:
-            unique_list.append(video)
+    if list:
+        # traverse for all elements
+        for video in list:
+            # check if exists in unique_list or not
+            unique = True
+            for unique_video in unique_list:    
+                if video.id == unique_video.id and video.title == unique_video.title and video.category == unique_video.category:
+                    unique = False
+            if unique:
+                unique_list.append(video)
 
     return unique_list
