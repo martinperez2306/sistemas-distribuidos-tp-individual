@@ -10,16 +10,13 @@ from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSys
 from reporting_service.results import Results
 from reporting_service.video_result import VideoResult
 
-RABBITMQ_HOST = "rabbitmq"
-MIDDLEWARE_QUEUE = "middleware"
-REPORTING_SERVICE_QUEUE = "reporting_service_queue"
-REPORTING_SERVICE_ID="reporting_service" ##TODO: Obtener de configuracion
-
 class ReportingService:
-    def __init__(self):
+    def __init__(self, config_params):
         self.connection = None
         self.channel = None
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, REPORTING_SERVICE_ID)
+        id = config_params["service_id"]
+        group_id = config_params["group_id"]
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
         self.result_repository = ResultRepository()
         self.reporting_check = ReportingCheck()
 

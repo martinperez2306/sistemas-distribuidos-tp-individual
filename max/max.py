@@ -7,10 +7,12 @@ from dependencies.commons.message import Message
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class Max:
-    def __init__(self):
+    def __init__(self, config_params):
         self.connection = None
         self.channel = None
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, MAX_WORKER_ID)
+        id = config_params["service_id"]
+        group_id = config_params["group_id"]
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
 
     def run(self):
         self.middleware_system_client.connect()

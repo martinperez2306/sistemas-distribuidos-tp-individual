@@ -17,6 +17,6 @@ do
     docker logs "like_filter_$i" >& "$LOGS_DIR/like_filter_$i.log"
     docker logs "funny_filter_$i" >& "$LOGS_DIR/funny_filter_$i.log"
     docker logs "day_grouper_$i" >& "$LOGS_DIR/day_grouper_$i.log"
-    docker logs "max_$i" >& "$LOGS_DIR/max.log"
+    docker logs "max_$i" >& "$LOGS_DIR/max$i.log"
     docker logs "reporting_service_$i" >& "$LOGS_DIR/reporting_service_$i.log"
 done

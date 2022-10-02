@@ -6,17 +6,15 @@ from dependencies.commons.message import Message
 from dependencies.commons.utils import json_to_video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
-RABBITMQ_HOST = "rabbitmq"
-MIDDLEWARE_QUEUE = "middleware"
-LIKE_FILTER_QUEUE = "like_filter_queue"
-LIKE_FILTER_ID = "like_filter" ##TODO: Obtener de configuracion
 MIN_LIKES_COUNT = 5000000
 
 class LikeFilter:
-    def __init__(self):
+    def __init__(self, config_params):
         self.connection = None
         self.channel = None
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, LIKE_FILTER_ID)
+        id = config_params["service_id"]
+        group_id = config_params["group_id"]
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
 
     def run(self):
         self.middleware_system_client.connect()

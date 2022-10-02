@@ -13,11 +13,11 @@ def main():
 
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
-    logging.debug("Server configuration: {}".format(config_params))
+    logging.debug("LIke Filter configuration: {}".format(config_params))
 
     # Initialize service
     logging.info("Initializing Like Filter")
-    like_filter = LikeFilter()
+    like_filter = LikeFilter(config_params)
     like_filter.run()
 
 if __name__ == "__main__":

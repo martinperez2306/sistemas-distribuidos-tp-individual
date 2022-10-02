@@ -10,9 +10,10 @@ from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSys
 DAY_GROUPER_ID="day_grouper_1"##TODO: Obtener de configuracion
 
 class DayGrouper(RoutingService):
-    def __init__(self):
-        group_id = DAY_GROUPER_ID.split("_")[2]
-        RoutingService.__init__(self, group_id, DAY_GROUPER_EXCHANGE)
+    def __init__(self, config_params):
+        id = config_params["service_id"]
+        group_id = config_params["group_id"]
+        RoutingService.__init__(self, id, group_id, DAY_GROUPER_EXCHANGE)
         self.days_grouped = dict()
 
     def work(self, ch, method, properties, body):

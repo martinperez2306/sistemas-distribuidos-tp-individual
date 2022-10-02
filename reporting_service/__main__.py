@@ -13,11 +13,11 @@ def main():
 
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
-    logging.debug("Server configuration: {}".format(config_params))
+    logging.debug("Reporting Service configuration: {}".format(config_params))
 
     # Initialize service
-    logging.info("Initializing Ingestion Service")
-    reporting_service = ReportingService()
+    logging.info("Initializing Reporting Service")
+    reporting_service = ReportingService(config_params)
     reporting_service.run()
 
 if __name__ == "__main__":

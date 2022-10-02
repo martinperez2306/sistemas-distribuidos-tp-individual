@@ -5,9 +5,10 @@ from dependencies.commons.constants import MIDDLEWARE_QUEUE, RABBITMQ_HOST
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class RoutingService:
-    def __init__(self, group_id, exchange):
+    def __init__(self, service_id, group_id, exchange):
         self.connection = None
         self.channel = None
+        self.service_id = service_id
         self.group_id = group_id
         self.exchange = exchange
         self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
