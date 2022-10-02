@@ -7,10 +7,10 @@ from middleware.message_handler import MessageHandler
 
 class Middleware:
 
-    def __init__(self):
+    def __init__(self, config_params):
         self.connection = None
         self.channel = None
-        self.message_handler = MessageHandler()
+        self.message_handler = MessageHandler(config_params)
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
 

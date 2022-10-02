@@ -6,9 +6,9 @@ from dependencies.commons.utils import json_to_video
 from middleware.routing_caller import RoutingCaller
 
 class DayGrouperCaller(RoutingCaller):
-    def __init__(self, total_routes: int):
+    def __init__(self, config_params):
         RoutingCaller.__init__(self, DAY_GROUPER_EXCHANGE)
-        self.total_routes = total_routes
+        self.total_routes = config_params["service_instances"]
 
     def group_by_day(self, message: Message):
         group_by_day_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, DAY_GROUPER_ROUTER_ID, message.body)

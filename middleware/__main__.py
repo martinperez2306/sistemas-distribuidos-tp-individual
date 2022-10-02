@@ -17,7 +17,7 @@ def main():
 
     # Initialize service
     logging.info("Initializing Middleware")
-    middleware = Middleware()
+    middleware = Middleware(config_params)
     middleware.run()
 
 if __name__ == "__main__":

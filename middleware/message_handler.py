@@ -14,7 +14,7 @@ from middleware.request_repository import RequestRepository
 from middleware.storage_service_caller import StorageServiceCaller
 
 class MessageHandler:
-    def __init__(self):
+    def __init__(self, config_params):
         ingestion_service_caller = IngestionServiceCaller()
         ingestion_service_caller.run()
         request_repository = RequestRepository()
@@ -22,7 +22,7 @@ class MessageHandler:
         self.like_filter_caller.run()
         self.funny_filter_caller = FunnyFilterCaller()
         self.funny_filter_caller.run()
-        self.day_grouper_caller = DayGrouperCaller(1)#TODO: Aca en vez de pasar 1 deberia sacarlo de la config (el Middle ya sabe cuantos servicios de agurpadores hay)
+        self.day_grouper_caller = DayGrouperCaller(config_params)
         self.day_grouper_caller.run()
         self.max_caller = MaxCaller()
         self.max_caller.run()
