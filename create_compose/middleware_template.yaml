@@ -12,3 +12,5 @@
     environment:
       - PYTHONUNBUFFERED=1
       - SERVICE_INSTANCES=SERV_INSTANCES
+    volumes:
+      - "./config/ingestion_service:/root/ingestion_service/config"
