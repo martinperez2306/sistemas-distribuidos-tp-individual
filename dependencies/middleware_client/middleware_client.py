@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import logging
 import uuid
 import pika
@@ -51,9 +52,9 @@ class MiddlewareClient:
         request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, "")
         return self.__request(request)
 
-    def call_process_data(self, request_id: int, data):
+    def call_process_data(self, request_id: int, data: Video):
         logging.info("Calling process data")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, data)
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, json.dumps(data.__dict__))
         return self.__request(request)
 
     def call_end_data_process(self, request_id: int):
