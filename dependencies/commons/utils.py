@@ -1,7 +1,9 @@
 import re
+import json
 import logging
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.video import Video
 
 def parse_message(body: str) -> Message:
     logging.debug("Parsing message: {}".format(body))
@@ -24,6 +26,13 @@ def parse_message(body: str) -> Message:
     message = Message(message_id, request_id, client_id, operation_id, destination_id, body)
     logging.info("Message: {}".format(message.to_string()))
     return message
+
+def json_to_video(video_json: str):
+    parsed = json.loads(video_json)
+    video = Video(parsed["id"], parsed["title"], parsed["published_at"], parsed["channel_id"], parsed["channel_title"], parsed["category_id"], 
+                    parsed["trending_date"], parsed["tags"], parsed["view_count"], parsed["likes"], parsed["dislikes"], parsed["comment_count"], 
+                    parsed["thumbnail_link"], parsed["comments_disabled"], parsed["ratings_disabled"], parsed["description"])
+    return video
 
 def unique(list):
     # intilize a null list

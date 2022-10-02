@@ -1,34 +1,21 @@
 class Video:
-    def __init__(self, video_str: str):
-        matches = video_str.strip('][').split(', ')
-        self.id = matches[0].strip("''")
-        self.title = matches[1].strip("''")
-        self.published_at = matches[2].strip("''")
-        self.channel_id = matches[3].strip("''")
-        self.channel_title = matches[4].strip("''")
-        self.category_id = matches[5].strip("''")
-        self.trending_date = matches[6].strip("''")
-        self.tags = matches[7].strip("''")
-        try:
-            self.view_count = int(matches[8].strip("''"))
-        except ValueError:
-            self.view_count = 0
-        try:
-            self.likes = int(matches[9].strip("''"))
-        except ValueError:
-            self.likes = 0
-        try:
-            self.dislikes = int(matches[10].strip("''"))
-        except ValueError:
-            self.dislikes = 0
-        try:
-            self.comment_count = int(matches[11].strip("''"))
-        except ValueError:
-            self.comment_count = 0
-        self.thumbnail_link = matches[12].strip("''")
-        self.comments_disabled = matches[13].strip("''")
-        self.ratings_disabled = matches[14].strip("''")
-        self.description = matches[15].strip("''")
+    def __init__(self, id, title, published_at, channel_id, channel_title, category_id, trending_date, tags, view_count, likes, dislikes, comment_count, thumbnail_link, comments_disabled, ratings_disabled, description):
+        self.id = id
+        self.title = title
+        self.published_at = published_at
+        self.channel_id = channel_id
+        self.channel_title = channel_title
+        self.category_id = category_id
+        self.trending_date = trending_date
+        self.tags = tags
+        self.view_count = view_count
+        self.likes = likes
+        self.dislikes = dislikes
+        self.comment_count = comment_count
+        self.thumbnail_link = thumbnail_link
+        self.comments_disabled = comments_disabled
+        self.ratings_disabled = ratings_disabled
+        self.description = description
 
     def __str__(self):
         return "ID[{}] TITLE[{}] PUBLISHED_AT[{}] CHANNEL_ID[{}] CHANNEL_TITLE[{}] CATEGORY_ID [{}] TRENDING_DATE[{}] TAGS [{}] VIEW_COUNT [{}] LIKE[{}] DISLIKES[{}] COMMENT_COUNT[{}] THUMBNAIL_LINK[{}] COMMNETS_DISABLED[{}] RATINGS_DISABLED[{}] DESCRIPTION[{}]"\
