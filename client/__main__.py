@@ -7,6 +7,7 @@ import pathlib
 from itertools import islice
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.video import Video
 from dependencies.middleware_client.middleware_client import MiddlewareClient
 
 VIDEOS = "/root/client/videos"
@@ -15,7 +16,7 @@ CHUNKSIZE = 1
 RESULTS_PENDING = "PENDING"
 
 def main():
-    initialize_log("INFO")
+    initialize_log("DEBUG")
     middleware_client = initialize_middleware_client()
     total_countries = get_total_countries()
     request_id = process_videos(middleware_client, total_countries)
@@ -82,9 +83,46 @@ def process_csv(path, middleware_client, request_id):
         for row in csvreader:
             process_video(row, middleware_client, request_id)
 
-def process_video(video_str: str, middleware_client: MiddlewareClient, request_id:int ):
+def process_video(video_str: 'list[str]', middleware_client: MiddlewareClient, request_id:int ):
     logging.debug("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
-    middleware_client.call_process_data(request_id, video_str)
+    video = __parse_video_from_csv(video_str)
+    middleware_client.call_process_data(request_id, video)
+
+def __parse_video_from_csv(video_str: 'list[str]'):
+    id = video_str[0].strip("''")
+    title = video_str[1].strip("''")
+    published_at = video_str[2].strip("''")
+    channel_id = video_str[3].strip("''")
+    channel_title = video_str[4].strip("''")
+    category_id = video_str[5].strip("''")
+    trending_date = video_str[6].strip("''")
+    tags = video_str[7].strip("''")
+    view_count = 0
+    try:
+        view_count = int(video_str[8].strip("''"))
+    except ValueError:
+        pass
+    likes = 0
+    try:
+        likes = int(video_str[9].strip("''"))
+    except ValueError:
+        pass
+    dislikes = 0
+    try:
+        dislikes = int(video_str[10].strip("''"))
+    except ValueError:
+        pass
+    comment_count = 0
+    try:
+        comment_count = int(video_str[11].strip("''"))
+    except ValueError:
+        pass
+    thumbnail_link = video_str[12].strip("''")
+    comments_disabled = video_str[13].strip("''")
+    ratings_disabled = video_str[14].strip("''")
+    description = video_str[15].strip("''")
+    return Video(id, title, published_at, channel_id, channel_title, category_id, trending_date, tags, view_count, likes, dislikes,
+                    comment_count, thumbnail_link, comments_disabled, ratings_disabled, description)
 
 def get_results(middleware_client: MiddlewareClient, request_id: str):
     logging.info("Getting Results for Request with ID [{}]".format(request_id))
