@@ -14,4 +14,4 @@
       - SERVICE_ID=SERV_ID
       - GROUP_ID=day_grouper
     volumes:
-      - "./config/day_grouper:/config"
+      - "./config/day_grouper:/root/day_grouper/config"

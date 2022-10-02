@@ -14,4 +14,4 @@
       - SERVICE_ID=SERV_ID
       - GROUP_ID=like_filter
     volumes:
-      - "./config/like_filter:/config"
+      - "./config/like_filter:/root/like_filter/config"

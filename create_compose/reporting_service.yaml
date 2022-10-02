@@ -14,4 +14,4 @@
       - SERVICE_ID=SERV_ID
       - GROUP_ID=reporting_service
     volumes:
-      - "./config/reporting_service:/config"
+      - "./config/reporting_service:/root/reporting_service/config"

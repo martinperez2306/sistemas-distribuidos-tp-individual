@@ -14,4 +14,4 @@
       - SERVICE_ID=SERV_ID
       - GROUP_ID=funny_filter
     volumes:
-      - "./config/funny_filter:/config"
+      - "./config/funny_filter:/root/funny_filter/config"

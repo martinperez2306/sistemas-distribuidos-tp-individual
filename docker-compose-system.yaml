@@ -30,12 +30,12 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
-  ingestion_service:
+  ingestion_service_1:
     build:
       context: ./ingestion_service
       dockerfile: ingestion_service.dockerfile
     image: ingestion_service
-    container_name: ingestion_service
+    container_name: ingestion_service_1
     networks:
       - testing_net
     restart: on-failure
@@ -43,13 +43,17 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=1
+      - GROUP_ID=ingestion_service
+    volumes:
+      - "./config/ingestion_service:/root/ingestion_service/config"
 
-  like_filter:
+  like_filter_1:
     build:
       context: ./like_filter
       dockerfile: like_filter.dockerfile
     image: like_filter
-    container_name: like_filter
+    container_name: like_filter_1
     networks:
       - testing_net
     restart: on-failure
@@ -57,13 +61,17 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=1
+      - GROUP_ID=like_filter
+    volumes:
+      - "./config/like_filter:/root/like_filter/config"
 
-  funny_filter:
+  funny_filter_1:
     build:
       context: ./funny_filter
       dockerfile: funny_filter.dockerfile
     image: funny_filter
-    container_name: funny_filter
+    container_name: funny_filter_1
     networks:
       - testing_net
     restart: on-failure
@@ -71,13 +79,17 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=1
+      - GROUP_ID=funny_filter
+    volumes:
+      - "./config/funny_filter:/root/funny_filter/config"
 
-  day_grouper:
+  day_grouper_1:
     build:
       context: ./day_grouper
       dockerfile: day_grouper.dockerfile
     image: day_grouper
-    container_name: day_grouper
+    container_name: day_grouper_1
     networks:
       - testing_net
     restart: on-failure
@@ -85,13 +97,17 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=1
+      - GROUP_ID=day_grouper
+    volumes:
+      - "./config/day_grouper:/root/day_grouper/config"
 
-  max:
+  max_1:
     build:
       context: ./max
       dockerfile: max.dockerfile
     image: max
-    container_name: max
+    container_name: max_1
     networks:
       - testing_net
     restart: on-failure
@@ -99,13 +115,17 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=1
+      - GROUP_ID=max
+    volumes:
+      - "./config/max:/root/max/config"
 
-  reporting_service:
+  reporting_service_1:
     build:
       context: ./reporting_service
       dockerfile: reporting_service.dockerfile
     image: reporting_service
-    container_name: reporting_service
+    container_name: reporting_service_1
     networks:
       - testing_net
     restart: on-failure
@@ -113,6 +133,10 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=1
+      - GROUP_ID=reporting_service
+    volumes:
+      - "./config/reporting_service:/root/reporting_service/config"
 
 networks:
   testing_net:

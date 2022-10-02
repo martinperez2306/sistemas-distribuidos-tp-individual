@@ -12,7 +12,7 @@ FUNNY_FILTER_QUEUE = "funny_filter_queue"
 FUNNY_FILTER_ID = "funny_filter" ##TODO: Obtener de configuracion
 FUNNY_TAG = "funny"
 
-class LikeFilter:
+class FunnyFilter:
     def __init__(self):
         self.connection = None
         self.channel = None

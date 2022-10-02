@@ -1,26 +1,24 @@
 #!/usr/bin/env python3
 
 import logging
+from dependencies.commons.base_app import initialize_config, initialize_log
 from max.max import Max
 
+CONFIG_PATH = "/root/max/config/config.ini"
+
 def main():
-    initialize_log("INFO")
-    logging.info("Initializing Ingestion Service")
+    config_params = initialize_config(CONFIG_PATH)
+    initialize_log(config_params["logging_level"])
+
+    # Log config parameters at the beginning of the program to verify the configuration
+    # of the component
+    logging.debug("Server configuration: {}".format(config_params))
+
+    # Initialize service
+    logging.info("Initializing Max")
+
     max = Max()
     max.run()
-
-def initialize_log(logging_level):
-    """
-    Python custom logging initialization
-
-    Current timestamp is added to be able to identify in docker
-    compose logs the date when the log has arrived
-    """
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level=logging_level,
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
 
 if __name__ == "__main__":
     main()

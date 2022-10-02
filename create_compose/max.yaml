@@ -14,4 +14,4 @@
       - SERVICE_ID=SERV_ID
       - GROUP_ID=max
     volumes:
-      - "./config/max:/config"
+      - "./config/max:/root/max/config"

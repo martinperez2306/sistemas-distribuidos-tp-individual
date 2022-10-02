@@ -14,4 +14,4 @@
       - SERVICE_ID=SERV_ID
       - GROUP_ID=ingestion_service
     volumes:
-      - "./config/ingestion_service:/config"
+      - "./config/ingestion_service:/root/ingestion_service/config"
