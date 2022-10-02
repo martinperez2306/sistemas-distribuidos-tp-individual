@@ -10,6 +10,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
+      - "./config/client:/root/client/config"
       - "./client/videos_dev:/root/client/videos"
 
 networks:

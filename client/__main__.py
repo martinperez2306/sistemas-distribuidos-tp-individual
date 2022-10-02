@@ -5,18 +5,21 @@ import logging
 import pathlib
 
 from itertools import islice
+from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.video import Video
 from dependencies.middleware_client.middleware_client import MiddlewareClient
 
+CONFIG_PATH = "/root/client/config/config.ini"
 VIDEOS = "/root/client/videos"
 CHUNKSIZE = 1
 
 RESULTS_PENDING = "PENDING"
 
 def main():
-    initialize_log("DEBUG")
+    config_params = initialize_config(CONFIG_PATH)
+    initialize_log(config_params["logging_level"])
     middleware_client = initialize_middleware_client()
     total_countries = get_total_countries()
     request_id = process_videos(middleware_client, total_countries)
@@ -25,19 +28,6 @@ def main():
         results = get_results(middleware_client, request_id)
     shutdown_middleware_client(middleware_client)
     show_results(results)
-
-def initialize_log(logging_level):
-    """
-    Python custom logging initialization
-
-    Current timestamp is added to be able to identify in docker
-    compose logs the date when the log has arrived
-    """
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
-        level=logging_level,
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
 
 def initialize_middleware_client():
     logging.info("Initializing Middleware Client")
