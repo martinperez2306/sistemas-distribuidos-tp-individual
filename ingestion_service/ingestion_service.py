@@ -22,7 +22,7 @@ class IngestionService:
         self.channel.queue_declare(queue=INGESTION_SERVICE_QUEUE, durable=True)
 
         def handle_message(ch, method, properties, body):
-            logging.info("Received {}".format(body))
+            logging.debug("Received {}".format(body))
             ingestion_message = self.middleware_system_client.parse_message(body)
             self.middleware_system_client.call_filter_by_likes(ingestion_message)
             ch.basic_ack(delivery_tag=method.delivery_tag)

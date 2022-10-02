@@ -4,7 +4,7 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 
 def parse_message(body: str) -> Message:
-    logging.info("Parsing message: {}".format(body))
+    logging.debug("Parsing message: {}".format(body))
     message_id = -1
     try:
         msg_id = int(re.search(MESSAGE_ID_REGEX, body).group(1))

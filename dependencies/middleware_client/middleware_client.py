@@ -39,7 +39,7 @@ class MiddlewareClient:
 
     def __on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
-            logging.info("Recieved: {}".format(body))
+            logging.debug("Recieved: {}".format(body))
             response = body.decode(UTF8_ENCODING)
             self.response = parse_message(response)
             if self.waiting_results:
@@ -68,7 +68,7 @@ class MiddlewareClient:
         return self.response
 
     def __request(self, message: Message):
-        logging.info("Send request message: {}".format(message.to_string()))
+        logging.debug("Send request message: {}".format(message.to_string()))
         self.response = None
         self.channel.basic_publish(exchange='', 
             routing_key=self.middleware_queue_id, 

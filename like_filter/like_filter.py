@@ -25,7 +25,7 @@ class LikeFilter:
         self.channel.queue_declare(queue=LIKE_FILTER_QUEUE, durable=True)
 
         def handle_message(ch, method, properties, body):
-            logging.info("Received {}".format(body))
+            logging.debug("Received {}".format(body))
             like_filter_message = self.middleware_system_client.parse_message(body)
             if PROCESS_DATA_OP_ID == like_filter_message.operation_id:
                 self.__process_filter_by_like(ch, method, properties, body, like_filter_message)
@@ -41,10 +41,11 @@ class LikeFilter:
 
     def __process_filter_by_like(self, ch, method, properties, body, like_filter_message: Message):
         video = Video(like_filter_message.body)
-        logging.info("Video {}".format(str(video)))
+        logging.debug("Video {}".format(str(video)))
         try:
             likes_count = int(video.likes)
             if likes_count > MIN_LIKES_COUNT:
+                logging.info("Video is popular: [{}]".format(str(video)))
                 self.middleware_system_client.call_filter_by_tag(like_filter_message)
                 self.middleware_system_client.call_group_by_day(like_filter_message)
         except ValueError:

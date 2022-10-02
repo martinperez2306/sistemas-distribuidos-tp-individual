@@ -83,7 +83,7 @@ def process_csv(path, middleware_client, request_id):
             process_video(row, middleware_client, request_id)
 
 def process_video(video_str: str, middleware_client: MiddlewareClient, request_id:int ):
-    logging.info("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
+    logging.debug("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
     middleware_client.call_process_data(request_id, video_str)
 
 def get_results(middleware_client: MiddlewareClient, request_id: str):

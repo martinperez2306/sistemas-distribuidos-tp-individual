@@ -50,7 +50,7 @@ class MiddlewareSystemClient:
         self.__request(message)
 
     def __request(self, message: Message):
-        logging.info("Send request message: {}".format(message.to_string()))
+        logging.debug("Send request message: {}".format(message.to_string()))
         self.channel.basic_publish(
             exchange='',
             routing_key=self.middleware_queue_id,
