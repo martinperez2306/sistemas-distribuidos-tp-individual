@@ -1,0 +1,17 @@
+  DAY_GROUPER:
+    build:
+      context: ./day_grouper
+      dockerfile: day_grouper.dockerfile
+    image: day_grouper
+    container_name: DAY_GROUPER
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=day_grouper
+    volumes:
+      - "./config/day_grouper:/config"

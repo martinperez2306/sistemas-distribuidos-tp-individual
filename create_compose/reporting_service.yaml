@@ -1,0 +1,17 @@
+  REPORTING_SERVICE:
+    build:
+      context: ./reporting_service
+      dockerfile: reporting_service.dockerfile
+    image: reporting_service
+    container_name: REPORTING_SERVICE
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=reporting_service
+    volumes:
+      - "./config/reporting_service:/config"

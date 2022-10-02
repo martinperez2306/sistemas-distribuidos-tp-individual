@@ -1,0 +1,17 @@
+  INGESTION_SERVICE:
+    build:
+      context: ./ingestion_service
+      dockerfile: ingestion_service.dockerfile
+    image: ingestion_service
+    container_name: INGESTION_SERVICE
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=ingestion_service
+    volumes:
+      - "./config/ingestion_service:/config"

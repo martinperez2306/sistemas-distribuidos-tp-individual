@@ -1,0 +1,17 @@
+  LIKE_FILTER:
+    build:
+      context: ./like_filter
+      dockerfile: like_filter.dockerfile
+    image: like_filter
+    container_name: LIKE_FILTER
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=like_filter
+    volumes:
+      - "./config/like_filter:/config"

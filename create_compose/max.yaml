@@ -1,0 +1,17 @@
+  MAX:
+    build:
+      context: ./max
+      dockerfile: max.dockerfile
+    image: max
+    container_name: MAX
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=max
+    volumes:
+      - "./config/max:/config"

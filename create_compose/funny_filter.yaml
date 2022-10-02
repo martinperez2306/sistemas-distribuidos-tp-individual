@@ -1,0 +1,17 @@
+  FUNNY_FILTER:
+    build:
+      context: ./funny_filter
+      dockerfile: funny_filter.dockerfile
+    image: funny_filter
+    container_name: FUNNY_FILTER
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=funny_filter
+    volumes:
+      - "./config/funny_filter:/config"
