@@ -5,12 +5,13 @@ from dependencies.commons.constants import MIDDLEWARE_QUEUE, RABBITMQ_HOST
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class WorkService:
-    def __init__(self, service_id, service_queue):
+    def __init__(self, service_id, group_id, service_queue):
         self.connection = None
         self.channel = None
         self.service_id = service_id
+        self.group_id = group_id
         self.service_queue = service_queue
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, service_id)
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
 
     def run(self):
         self.middleware_system_client.connect()
