@@ -2,11 +2,11 @@ from dependencies.commons.constants import *
 from dependencies.commons.work_service import WorkService
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
-INGESTION_SERVICE_ID="ingestion_service"##TODO: Obtener de configuracion
-
 class IngestionService(WorkService):
-    def __init__(self):
-        WorkService.__init__(self, INGESTION_SERVICE_ID, INGESTION_SERVICE_QUEUE)
+    def __init__(self, config_params):
+        id = config_params["service_id"]
+        group_id = config_params["group_id"]
+        WorkService.__init__(self, id, group_id, INGESTION_SERVICE_QUEUE)
 
     def work(self, ch, method, properties, body):
         ingestion_message = self.middleware_system_client.parse_message(body)

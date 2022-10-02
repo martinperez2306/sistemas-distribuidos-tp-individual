@@ -17,7 +17,7 @@ def main():
 
     # Initialize service
     logging.info("Initializing Ingestion Service")
-    ingestion_service = IngestionService()
+    ingestion_service = IngestionService(config_params)
     ingestion_service.run()
 
 if __name__ == "__main__":
