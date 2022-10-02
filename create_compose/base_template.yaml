@@ -15,17 +15,3 @@ services:
         interval: 10s
         timeout: 5s
         retries: 10
-
-  middleware:
-    build:
-      context: ./middleware
-      dockerfile: middleware.dockerfile
-    image: middleware
-    container_name: middleware
-    networks:
-      - testing_net
-    restart: on-failure
-    depends_on:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1

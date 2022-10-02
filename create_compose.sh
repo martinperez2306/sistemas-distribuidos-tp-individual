@@ -8,6 +8,7 @@ fi
 
 INSTANCES=$1
 BASE_TEMPLATE="create_compose/base_template.yaml"
+MIDDLEWARE_TEMPLATE="create_compose/middleware_template.yaml"
 INGESTION_TEMPLATE="create_compose/ingestion_service.yaml"
 LIKE_TEMPLATE="create_compose/like_filter.yaml"
 FUNNY_TEMPLATE="create_compose/funny_filter.yaml"
@@ -19,6 +20,11 @@ OUTPUT="docker-compose-system.yaml"
 
 cat /dev/null > $OUTPUT
 cat $BASE_TEMPLATE >> $OUTPUT
+echo -e "\n" >> $OUTPUT
+
+SERVICES_INSTANCES="SERV_INSTANCES"
+SERV_INSTANCES="$INSTANCES"
+cat $MIDDLEWARE_TEMPLATE | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
 echo -e "\n" >> $OUTPUT
 
 INGESTION_SERVICE="INGESTION_SERVICE"

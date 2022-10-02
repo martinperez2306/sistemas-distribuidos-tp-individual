@@ -1,0 +1,14 @@
+  middleware:
+    build:
+      context: ./middleware
+      dockerfile: middleware.dockerfile
+    image: middleware
+    container_name: middleware
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_INSTANCES=SERV_INSTANCES

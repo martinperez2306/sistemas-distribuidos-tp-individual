@@ -29,6 +29,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_INSTANCES=1
 
   ingestion_service_1:
     build:
