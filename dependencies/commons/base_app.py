@@ -18,10 +18,10 @@ def initialize_config(config_path):
     config = ConfigParser(os.environ)
     # If config.ini does not exists original config object is not modified
     config.read(config_path)
-
     config_params = {}
     try:
-        config_params["logging_level"] = config["DEFAULT"]["logging_level"]
+        for key in config["DEFAULT"]:  
+            config_params[key] = config["DEFAULT"][key]
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:

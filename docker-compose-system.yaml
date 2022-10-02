@@ -30,6 +30,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - SERVICE_INSTANCES=1
+    volumes:
+      - "./config/middleware:/root/middleware/config"
 
   ingestion_service_1:
     build:

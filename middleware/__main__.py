@@ -13,7 +13,7 @@ def main():
 
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
-    logging.debug("Server configuration: {}".format(config_params))
+    logging.debug("Middleware configuration: {}".format(config_params))
 
     # Initialize service
     logging.info("Initializing Middleware")

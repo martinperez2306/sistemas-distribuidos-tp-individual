@@ -14,7 +14,7 @@ class Middleware:
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
 
-    # graceful shutdown the server
+    # graceful shutdown the middleware
     def __exit_gracefully(self, *args):
         logging.info("Proceed to shutdown middleware gracefully")
         self.connection.close()
