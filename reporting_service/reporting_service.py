@@ -3,7 +3,7 @@ import pika
 from dependencies.commons.message import Message
 
 from dependencies.commons.constants import *
-from dependencies.commons.video import Video
+from dependencies.commons.utils import json_to_video
 from reporting_service.reporting_check import ReportingCheck
 from reporting_service.result_repository import ResultRepository
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
@@ -45,7 +45,7 @@ class ReportingService:
         self.channel.start_consuming()
 
     def __storage_video(self, ch, method, properties, body, reporting_message: Message):
-        video = Video(reporting_message.body)
+        video = json_to_video(reporting_message.body)
         videoResult = VideoResult(video.id, video.title, video.category_id)
         request_id = reporting_message.request_id
         self.result_repository.save_filtered_video(request_id, videoResult)

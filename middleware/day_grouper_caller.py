@@ -2,7 +2,7 @@ import logging
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.video import Video
+from dependencies.commons.utils import json_to_video
 from middleware.routing_caller import RoutingCaller
 
 class DayGrouperCaller(RoutingCaller):
@@ -13,7 +13,7 @@ class DayGrouperCaller(RoutingCaller):
     def group_by_day(self, message: Message):
         group_by_day_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, DAY_GROUPER_ROUTER_ID, message.body)
         if PROCESS_DATA_OP_ID == message.operation_id:
-            video = Video(group_by_day_message.body)
+            video = json_to_video(group_by_day_message.body)
             trending_date = video.trending_date
             routing_key = (hash(trending_date) % self.total_routes) + 1
             self.publish_data(group_by_day_message.to_string(), str(routing_key))

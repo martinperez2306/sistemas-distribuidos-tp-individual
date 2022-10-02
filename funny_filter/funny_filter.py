@@ -3,7 +3,7 @@ import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.video import Video
+from dependencies.commons.utils import json_to_video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 RABBITMQ_HOST = "rabbitmq"
@@ -40,7 +40,7 @@ class LikeFilter:
         self.channel.start_consuming()
 
     def __process_filter_by_funny_tag(self, ch, method, properties, body, funny_filter_message: Message):
-        video = Video(funny_filter_message.body)
+        video = json_to_video(funny_filter_message.body)
         logging.info("Video {}".format(str(video)))
         tags = video.tags.split("|")
         if FUNNY_TAG in tags:

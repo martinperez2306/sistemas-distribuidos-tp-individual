@@ -4,7 +4,6 @@ import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.video import Video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class Max:

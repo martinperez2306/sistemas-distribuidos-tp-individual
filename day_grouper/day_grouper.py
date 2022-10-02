@@ -3,7 +3,7 @@ import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.video import Video
+from dependencies.commons.utils import json_to_video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 DAY_GROUPER_ID="day_grouper_1"##TODO: Obtener de configuracion
@@ -46,7 +46,7 @@ class DayGrouper:
         self.channel.start_consuming()
 
     def __save_by_group(self, gruping_message: Message):
-        video = Video(gruping_message.body)
+        video = json_to_video(gruping_message.body)
         logging.info("Video {}".format(str(video)))
         trending_date = video.trending_date
         logging.info("Trending date {}".format(trending_date))
