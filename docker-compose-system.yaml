@@ -29,7 +29,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_INSTANCES=1
+      - SERVICE_INSTANCES=2
     volumes:
       - "./config/middleware:/root/middleware/config"
 
@@ -84,6 +84,7 @@ services:
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=funny_filter_1
       - GROUP_ID=funny_filter
+      - SERVICE_INSTANCES=2
     volumes:
       - "./config/funny_filter:/root/funny_filter/config"
 
@@ -102,6 +103,63 @@ services:
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=day_grouper_1
       - GROUP_ID=day_grouper
+      - SERVICE_INSTANCES=2
+    volumes:
+      - "./config/day_grouper:/root/day_grouper/config"
+
+  like_filter_2:
+    build:
+      context: ./like_filter
+      dockerfile: like_filter.dockerfile
+    image: like_filter
+    container_name: like_filter_2
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=like_filter_2
+      - GROUP_ID=like_filter
+    volumes:
+      - "./config/like_filter:/root/like_filter/config"
+
+  funny_filter_2:
+    build:
+      context: ./funny_filter
+      dockerfile: funny_filter.dockerfile
+    image: funny_filter
+    container_name: funny_filter_2
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=funny_filter_2
+      - GROUP_ID=funny_filter
+      - SERVICE_INSTANCES=2
+    volumes:
+      - "./config/funny_filter:/root/funny_filter/config"
+
+  day_grouper_2:
+    build:
+      context: ./day_grouper
+      dockerfile: day_grouper.dockerfile
+    image: day_grouper
+    container_name: day_grouper_2
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=day_grouper_2
+      - GROUP_ID=day_grouper
+      - SERVICE_INSTANCES=2
     volumes:
       - "./config/day_grouper:/root/day_grouper/config"
 
@@ -120,7 +178,7 @@ services:
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=max_1
       - GROUP_ID=max
-      - SERVICE_INSTANCES=1
+      - SERVICE_INSTANCES=2
     volumes:
       - "./config/max:/root/max/config"
 
@@ -139,7 +197,7 @@ services:
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=reporting_service_1
       - GROUP_ID=reporting_service
-      - SERVICE_INSTANCES=1
+      - SERVICE_INSTANCES=2
     volumes:
       - "./config/reporting_service:/root/reporting_service/config"
 

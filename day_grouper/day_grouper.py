@@ -3,6 +3,7 @@ import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
 from dependencies.commons.utils import json_to_video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
@@ -13,6 +14,8 @@ class DayGrouper(RoutingService):
     def __init__(self, config_params):
         id = config_params["service_id"]
         group_id = config_params["group_id"]
+        self.total_routes = int(config_params["service_instances"])
+        self.propagations = dict()
         RoutingService.__init__(self, id, group_id, DAY_GROUPER_EXCHANGE)
         self.days_grouped = dict()
 
@@ -40,4 +43,19 @@ class DayGrouper(RoutingService):
         logging.info("View Count for date {} is {}".format(trending_date, self.days_grouped[trending_date]))
 
     def __propagate_message(self, ch, method, properties, body, gruping_message: Message):
-        self.middleware_system_client.call_max(gruping_message)
+        request_id = gruping_message.request_id
+        propagation: Propagation = self.propagations.get(str(request_id))
+        if not propagation:
+            propagation = Propagation()
+        if START_PROCESS_OP_ID == gruping_message.operation_id:
+            propagation.inc_start()
+            if propagation.starts_count == self.total_routes:
+                self.middleware_system_client.call_max(gruping_message)
+        elif END_PROCESS_OP_ID == gruping_message.operation_id:
+            propagation.inc_end()
+            if propagation.ends_count == self.total_routes:
+                self.middleware_system_client.call_max(gruping_message)
+        else:
+            pass
+        self.propagations[str(request_id)] = propagation
+        

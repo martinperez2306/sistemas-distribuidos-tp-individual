@@ -1,6 +1,5 @@
 from dependencies.commons.constants import *
 from dependencies.commons.utils import json_to_video
-from middleware.base_caller import BaseCaller
 from dependencies.commons.message import Message
 from middleware.routing_caller import RoutingCaller
 

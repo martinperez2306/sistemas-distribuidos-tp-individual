@@ -23,7 +23,7 @@ class ClientService:
             .format(request_id, message.source_id, props.correlation_id, props.reply_to))
         request = Request(request_id, message.source_id, props.correlation_id, props.reply_to)
         self.request_repository.add(request_id, request)
-        propagate = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
+        propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
         #Propagate start process data with Request ID
         self.ingestion_service.ingest_data(propagate)

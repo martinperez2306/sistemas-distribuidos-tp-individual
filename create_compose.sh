@@ -47,14 +47,14 @@ do
     CONTAINER_NAME="CONTAINER_NAME"
     FUNNY_NAME="funny_filter_$i"
     SERVICE_ID="SERV_ID"
-    cat $FUNNY_TEMPLATE | sed -r "s/$FUNNY_FILTER/$FUNNY_NAME/g" | sed -r "s/$CONTAINER_NAME/$FUNNY_NAME/g" | sed -r "s/$SERVICE_ID/$FUNNY_NAME/g" >> $OUTPUT
+    cat $FUNNY_TEMPLATE | sed -r "s/$FUNNY_FILTER/$FUNNY_NAME/g" | sed -r "s/$CONTAINER_NAME/$FUNNY_NAME/g" | sed -r "s/$SERVICE_ID/$FUNNY_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
     echo -e "\n" >> $OUTPUT
 
     DAY_GROUPER="DAY_GROUPER"
     CONTAINER_NAME="CONTAINER_NAME"
     DAY_NAME="day_grouper_$i"
     SERVICE_ID="SERV_ID"
-    cat $DAY_TEMPLATE | sed -r "s/$DAY_GROUPER/$DAY_NAME/g" | sed -r "s/$CONTAINER_NAME/$DAY_NAME/g" | sed -r "s/$SERVICE_ID/$DAY_NAME/g" >> $OUTPUT
+    cat $DAY_TEMPLATE | sed -r "s/$DAY_GROUPER/$DAY_NAME/g" | sed -r "s/$CONTAINER_NAME/$DAY_NAME/g" | sed -r "s/$SERVICE_ID/$DAY_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
     echo -e "\n" >> $OUTPUT
 done
 
