@@ -30,7 +30,7 @@ class MiddlewareSystemClient:
         self.__request(message)
 
     def call_filter_by_tag(self, request_message: Message):
-        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, FUNNY_FILTER_WORKER_ID, request_message.body)
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, FUNNY_FILTER_GROUP_ID, request_message.body)
         self.__request(message)
 
     def call_group_by_day(self, request_message: Message):

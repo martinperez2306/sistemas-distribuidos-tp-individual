@@ -20,7 +20,7 @@ class MessageHandler:
         request_repository = RequestRepository()
         self.like_filter_caller = LikeFilterCaller(config_params)
         self.like_filter_caller.run()
-        self.funny_filter_caller = FunnyFilterCaller()
+        self.funny_filter_caller = FunnyFilterCaller(config_params)
         self.funny_filter_caller.run()
         self.day_grouper_caller = DayGrouperCaller(config_params)
         self.day_grouper_caller.run()
@@ -57,7 +57,7 @@ class MessageHandler:
             if LIKE_FILTER_GROUP_ID == message.destination_id:
                 logging.info("Filtering by Likes")
                 self.like_filter_caller.filter_by_likes(message)
-            elif FUNNY_FILTER_WORKER_ID == message.destination_id:
+            elif FUNNY_FILTER_GROUP_ID == message.destination_id:
                 logging.info("Filtering by Tag Funny")
                 self.funny_filter_caller.filter_by_funny_tag(message)
             elif DAY_GROUPER_GROUP_ID == message.destination_id:

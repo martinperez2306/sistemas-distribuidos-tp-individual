@@ -48,7 +48,7 @@ class ReportingService:
         self.result_repository.save_filtered_video(request_id, videoResult)
 
     def __handle_end_process(self, ch, method, properties, body, message: Message):
-        if FUNNY_FILTER_WORKER_ID == message.source_id:
+        if FUNNY_FILTER_GROUP_ID == message.source_id:
             self.reporting_check.check_filter()
         elif MAX_WORKER_ID in message.source_id:
             self.result_repository.save_most_viewed_day(message.body)
