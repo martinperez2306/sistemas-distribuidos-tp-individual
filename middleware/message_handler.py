@@ -18,7 +18,7 @@ class MessageHandler:
         ingestion_service_caller = IngestionServiceCaller()
         ingestion_service_caller.run()
         request_repository = RequestRepository()
-        self.like_filter_caller = LikeFilterCaller()
+        self.like_filter_caller = LikeFilterCaller(config_params)
         self.like_filter_caller.run()
         self.funny_filter_caller = FunnyFilterCaller()
         self.funny_filter_caller.run()
@@ -54,13 +54,13 @@ class MessageHandler:
             else:
                 logging.info("Client method not found!")
         elif SERVICE_MESSAGE_ID == message.id:
-            if LIKE_FILTER_WORKER_ID == message.destination_id:
+            if LIKE_FILTER_GROUP_ID == message.destination_id:
                 logging.info("Filtering by Likes")
                 self.like_filter_caller.filter_by_likes(message)
             elif FUNNY_FILTER_WORKER_ID == message.destination_id:
                 logging.info("Filtering by Tag Funny")
                 self.funny_filter_caller.filter_by_funny_tag(message)
-            elif DAY_GROUPER_ROUTER_ID == message.destination_id:
+            elif DAY_GROUPER_GROUP_ID == message.destination_id:
                 logging.info("Grouping by day")
                 self.day_grouper_caller.group_by_day(message)
             elif MAX_WORKER_ID == message.destination_id:

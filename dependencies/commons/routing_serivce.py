@@ -20,7 +20,7 @@ class RoutingService:
         self.channel.exchange_declare(exchange=self.exchange, exchange_type='direct')
         result = self.channel.queue_declare(queue='', exclusive=True)#TODO: Tal vez definir yo la queue?
         queue_name = result.method.queue
-        self.channel.queue_bind(exchange=self.exchange, queue=queue_name, routing_key=self.group_id)
+        self.channel.queue_bind(exchange=self.exchange, queue=queue_name, routing_key=self.service_id)
 
         def handle_message(ch, method, properties, body):
             logging.debug("Received {}".format(body))

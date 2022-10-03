@@ -8,16 +8,16 @@ from middleware.routing_caller import RoutingCaller
 class DayGrouperCaller(RoutingCaller):
     def __init__(self, config_params):
         RoutingCaller.__init__(self, DAY_GROUPER_EXCHANGE)
-        self.total_routes = config_params["service_instances"]
+        self.total_routes = int(config_params["service_instances"])
 
     def group_by_day(self, message: Message):
-        group_by_day_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, DAY_GROUPER_ROUTER_ID, message.body)
+        group_by_day_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, DAY_GROUPER_GROUP_ID, message.body)
         if PROCESS_DATA_OP_ID == message.operation_id:
             video = json_to_video(group_by_day_message.body)
             trending_date = video.trending_date
-            routing_key = (hash(trending_date) % self.total_routes) + 1
+            routing_key = DAY_GROUPER_GROUP_ID + "_" + str((hash(trending_date) % self.total_routes) + 1)
             self.publish_data(group_by_day_message.to_string(), str(routing_key))
         else:
             for route in range(self.total_routes):
-                routing_key = route + 1
+                routing_key = DAY_GROUPER_GROUP_ID + "_" + str(route + 1)
                 self.publish_data(group_by_day_message.to_string(), str(routing_key))

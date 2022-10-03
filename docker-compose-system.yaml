@@ -46,7 +46,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_ID=1
+      - SERVICE_ID=ingestion_service_1
       - GROUP_ID=ingestion_service
     volumes:
       - "./config/ingestion_service:/root/ingestion_service/config"
@@ -64,7 +64,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_ID=1
+      - SERVICE_ID=like_filter_1
       - GROUP_ID=like_filter
     volumes:
       - "./config/like_filter:/root/like_filter/config"
@@ -82,7 +82,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_ID=1
+      - SERVICE_ID=funny_filter_1
       - GROUP_ID=funny_filter
     volumes:
       - "./config/funny_filter:/root/funny_filter/config"
@@ -100,7 +100,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_ID=1
+      - SERVICE_ID=day_grouper_1
       - GROUP_ID=day_grouper
     volumes:
       - "./config/day_grouper:/root/day_grouper/config"
@@ -118,7 +118,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_ID=1
+      - SERVICE_ID=max_1
       - GROUP_ID=max
     volumes:
       - "./config/max:/root/max/config"
@@ -136,7 +136,7 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_ID=1
+      - SERVICE_ID=reporting_service_1
       - GROUP_ID=reporting_service
     volumes:
       - "./config/reporting_service:/root/reporting_service/config"

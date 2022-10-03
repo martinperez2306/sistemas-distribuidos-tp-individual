@@ -3,39 +3,24 @@ import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.routing_serivce import RoutingService
 from dependencies.commons.utils import json_to_video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 MIN_LIKES_COUNT = 5000000
 
-class LikeFilter:
+class LikeFilter(RoutingService):
     def __init__(self, config_params):
-        self.connection = None
-        self.channel = None
         id = config_params["service_id"]
         group_id = config_params["group_id"]
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
+        RoutingService.__init__(self, id, group_id, LIKE_FILTER_EXCHANGE)
 
-    def run(self):
-        self.middleware_system_client.connect()
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=LIKE_FILTER_QUEUE, durable=True)
-
-        def handle_message(ch, method, properties, body):
-            logging.debug("Received {}".format(body))
-            like_filter_message = self.middleware_system_client.parse_message(body)
-            if PROCESS_DATA_OP_ID == like_filter_message.operation_id:
-                self.__process_filter_by_like(ch, method, properties, body, like_filter_message)
-            else:
-                self.__propagate_message(ch, method, properties, body, like_filter_message)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(queue=LIKE_FILTER_QUEUE, on_message_callback=handle_message)
-
-        logging.info('Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+    def work(self, ch, method, properties, body):
+        like_filter_message = self.middleware_system_client.parse_message(body)
+        if PROCESS_DATA_OP_ID == like_filter_message.operation_id:
+            self.__process_filter_by_like(ch, method, properties, body, like_filter_message)
+        else:
+            self.__propagate_message(ch, method, properties, body, like_filter_message)
 
     def __process_filter_by_like(self, ch, method, properties, body, like_filter_message: Message):
         video = json_to_video(like_filter_message.body)
