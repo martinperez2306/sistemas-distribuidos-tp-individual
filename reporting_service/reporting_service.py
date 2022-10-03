@@ -13,7 +13,7 @@ class ReportingService(WorkService):
         group_id = config_params["group_id"]
         self.total_routes = int(config_params["service_instances"])
         self.result_repository = ResultRepository()
-        self.reporting_check = ReportingCheck()
+        self.reporting_check = ReportingCheck(self.total_routes)
         WorkService.__init__(self, id, group_id, REPORTING_SERVICE_QUEUE)
 
     def work(self, ch, method, properties, body):
