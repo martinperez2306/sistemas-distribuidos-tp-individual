@@ -13,5 +13,6 @@
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=SERV_ID
       - GROUP_ID=reporting_service
+      - SERVICE_INSTANCES=SERV_INSTANCES
     volumes:
       - "./config/reporting_service:/root/reporting_service/config"

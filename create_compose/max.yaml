@@ -13,5 +13,6 @@
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=SERV_ID
       - GROUP_ID=max
+      - SERVICE_INSTANCES=SERV_INSTANCES
     volumes:
       - "./config/max:/root/max/config"

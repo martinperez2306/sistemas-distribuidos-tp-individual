@@ -23,7 +23,7 @@ MAX_QUEUE = "max_queue"
 
 #EXCHANGUES
 LIKE_FILTER_EXCHANGE = "like_filter_exchange"
-FUNNY_FILTER_EXCHANGE = "funny_filter_queue"
+FUNNY_FILTER_EXCHANGE = "funny_filter_exchange"
 DAY_GROUPER_EXCHANGE = "day_group_exchange"
 
 #MESSAGE IDS

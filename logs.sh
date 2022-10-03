@@ -9,6 +9,7 @@ fi
 INSTANCES=$1
 LOGS_DIR="logs"
 
+docker logs client >& "$LOGS_DIR/client.log"
 docker logs middleware >& "$LOGS_DIR/middleware.log"
 
 for i in $( seq 1 $INSTANCES )

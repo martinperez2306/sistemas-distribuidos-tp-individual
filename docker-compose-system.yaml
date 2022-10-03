@@ -120,6 +120,7 @@ services:
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=max_1
       - GROUP_ID=max
+      - SERVICE_INSTANCES=1
     volumes:
       - "./config/max:/root/max/config"
 
@@ -138,6 +139,7 @@ services:
       - PYTHONUNBUFFERED=1
       - SERVICE_ID=reporting_service_1
       - GROUP_ID=reporting_service
+      - SERVICE_INSTANCES=1
     volumes:
       - "./config/reporting_service:/root/reporting_service/config"
 

@@ -1,39 +1,20 @@
-import datetime
-import logging
-import pika
-
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
+from dependencies.commons.work_service import WorkService
 
-class Max:
+class Max(WorkService):
     def __init__(self, config_params):
-        self.connection = None
-        self.channel = None
         id = config_params["service_id"]
         group_id = config_params["group_id"]
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
+        self.total_routes = int(config_params["service_instances"])
+        WorkService.__init__(self, id, group_id, MAX_QUEUE)
 
-    def run(self):
-        self.middleware_system_client.connect()
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=MAX_QUEUE, durable=True)
-
-        def handle_message(ch, method, properties, body):
-            logging.info("Received {}".format(body))
-            max_message = self.middleware_system_client.parse_message(body)
-            if END_PROCESS_OP_ID == max_message.operation_id:
-                self.__process_max(ch, method, properties, body, max_message)
-            else:
-                self.__propagate_message(ch, method, properties, body, max_message)
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(queue=MAX_QUEUE, on_message_callback=handle_message)
-
-        logging.info('Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+    def work(self, ch, method, properties, body):
+        max_message = self.middleware_system_client.parse_message(body)
+        if END_PROCESS_OP_ID == max_message.operation_id:
+            self.__process_max(ch, method, properties, body, max_message)
+        else:
+            self.__propagate_message(ch, method, properties, body, max_message)
 
     def __process_max(self, ch, method, properties, body, max_message: Message):
         days_grouped: dict() = eval(max_message.body)
