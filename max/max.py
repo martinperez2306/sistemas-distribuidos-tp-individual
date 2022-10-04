@@ -9,24 +9,13 @@ class Max(WorkService):
         group_id = config_params["group_id"]
         self.total_routes = int(config_params["service_instances"])
         self.propagations = dict()
+        self.max_views = 0
+        self.trending_date_with_max_views = None
         WorkService.__init__(self, id, group_id, MAX_QUEUE)
 
     def work(self, ch, method, properties, body):
         max_message = self.middleware_system_client.parse_message(body)
         self.__propagate_message(ch, method, properties, body, max_message)
-            
-    def __process_max(self, ch, method, properties, body, max_message: Message):
-        days_grouped: dict() = eval(max_message.body)
-        max = 0
-        max_trend_date = None
-        for trending_date in days_grouped:
-            if max < days_grouped[trending_date]:
-                max = days_grouped[trending_date]
-                max_trend_date = trending_date
-        result_message: Message = Message(max_message.id, max_message.request_id, 
-                                            max_message.source_id, max_message.operation_id,
-                                            max_message.destination_id, max_trend_date)
-        self.middleware_system_client.call_storage_data(result_message)
 
     def __propagate_message(self, ch, method, properties, body, max_message: Message):
         request_id = max_message.request_id
@@ -39,8 +28,20 @@ class Max(WorkService):
                 self.middleware_system_client.call_storage_data(max_message)
         elif END_PROCESS_OP_ID == max_message.operation_id:
             propagation.inc_end()
+            self.__process_max(max_message)
             if propagation.ends_count == self.total_routes:
-                self.__process_max(ch, method, properties, body, max_message)
+                result_message: Message = Message(max_message.id, max_message.request_id, 
+                                            max_message.source_id, max_message.operation_id,
+                                            max_message.destination_id, self.trending_date_with_max_views)
+                self.middleware_system_client.call_storage_data(result_message)
         else:
             pass
         self.propagations[str(request_id)] = propagation
+
+    def __process_max(self, max_message: Message):
+        views_by_date: dict() = eval(max_message.body)
+        for trending_date in views_by_date:
+            if self.max_views < views_by_date[trending_date]:
+                self.max_views = views_by_date[trending_date]
+                self.trending_date_with_max_views = trending_date
+        
