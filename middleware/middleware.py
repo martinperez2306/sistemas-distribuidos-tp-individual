@@ -1,6 +1,7 @@
 import logging
 import pika
 import signal
+import time
 from dependencies.commons.base_app import BaseApp
 
 from dependencies.commons.constants import *
@@ -12,6 +13,7 @@ class Middleware(BaseApp):
         BaseApp.__init__(self, "middleware")
         self.connection = None
         self.channel = None
+        self.first_try = True
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
         self.message_handler = MessageHandler(config_params)
@@ -38,6 +40,10 @@ class Middleware(BaseApp):
                 self.channel.start_consuming()
             except Exception as e:
                 logging.error('Error waiting for message: {}'.format(e))
+                if self.first_try:
+                    logging.debug('First try to connect rabbit. Waiting 5 seconds')
+                    self.first_try = False
+                    time.sleep(WAIT_CONNECTION)
 
     def __exit_gracefully(self, *args):
         super().exit_gracefully(*args)

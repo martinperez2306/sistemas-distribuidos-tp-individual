@@ -1,9 +1,10 @@
 import logging
+import time
 import pika
 import signal
 from dependencies.commons.base_app import BaseApp
 
-from dependencies.commons.constants import MIDDLEWARE_QUEUE, RABBITMQ_HOST
+from dependencies.commons.constants import MIDDLEWARE_QUEUE, RABBITMQ_HOST, WAIT_CONNECTION
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class RoutingService(BaseApp):
@@ -14,6 +15,7 @@ class RoutingService(BaseApp):
         self.service_id = service_id
         self.group_id = group_id
         self.exchange = exchange
+        self.first_try = True
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
         self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
@@ -41,6 +43,10 @@ class RoutingService(BaseApp):
                 self.channel.start_consuming()
             except Exception as e:
                 logging.error('Error waiting for message: {}'.format(e))
+                if self.first_try:
+                    logging.debug('First try to connect rabbit. Waiting 5 seconds')
+                    self.first_try = False
+                    time.sleep(WAIT_CONNECTION)
 
     ##OVERRIDEABLE##
     def work(self, ch, method, properties, body):
