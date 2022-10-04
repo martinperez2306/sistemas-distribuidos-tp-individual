@@ -10,7 +10,7 @@ from middleware.message_handler import MessageHandler
 class Middleware(BaseApp):
 
     def __init__(self, config_params):
-        BaseApp.__init__(self, "middleware")
+        super().__init__("middleware")
         self.connection = None
         self.channel = None
         self.first_try = True
@@ -41,7 +41,7 @@ class Middleware(BaseApp):
             except Exception as e:
                 logging.error('Error waiting for message: {}'.format(e))
                 if self.first_try:
-                    logging.debug('First try to connect rabbit. Waiting 5 seconds')
+                    logging.debug('First try to connect rabbit. Waiting {} seconds'.format(WAIT_CONNECTION))
                     self.first_try = False
                     time.sleep(WAIT_CONNECTION)
 

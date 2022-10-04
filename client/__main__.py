@@ -4,7 +4,6 @@ import csv
 import logging
 import pathlib
 
-from itertools import islice
 from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
@@ -65,7 +64,7 @@ def process_csv(path, middleware_client, request_id):
 def process_video(video_str: 'list[str]', middleware_client: MiddlewareClient, request_id:int ):
     logging.debug("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
     video = __parse_video_from_csv(video_str)
-    #middleware_client.call_process_data(request_id, video)
+    middleware_client.call_process_data(request_id, video)
 
 def __parse_video_from_csv(video_str: 'list[str]'):
     id = video_str[0].strip("''")

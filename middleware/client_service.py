@@ -64,5 +64,5 @@ class ClientService:
         ch.basic_publish(exchange='',
                         routing_key=props.reply_to,
                         properties=pika.BasicProperties(correlation_id = props.correlation_id),
-                        body=message.to_string())
+                        body=message.to_string().encode(UTF8_ENCODING))
         

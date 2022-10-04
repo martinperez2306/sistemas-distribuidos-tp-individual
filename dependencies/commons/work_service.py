@@ -9,7 +9,7 @@ from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSys
 
 class WorkService(BaseApp):
     def __init__(self, service_id, group_id, service_queue):
-        BaseApp.__init__(self, service_id)
+        super().__init__(service_id)
         self.connection = None
         self.channel = None
         self.service_id = service_id
@@ -42,7 +42,7 @@ class WorkService(BaseApp):
             except Exception as e:
                 logging.error('Error waiting for message: {}'.format(e))
                 if self.first_try:
-                    logging.debug('First try to connect rabbit. Waiting 5 seconds')
+                    logging.debug('First try to connect rabbit. Waiting {} seconds'.format(WAIT_CONNECTION))
                     self.first_try = False
                     time.sleep(WAIT_CONNECTION)
 
