@@ -35,8 +35,9 @@ class RoutingService(BaseApp):
                 def handle_message(ch, method, properties, body):
                     logging.debug("Received {}".format(body))
                     self.work(ch, method, properties, body)
+                    ch.basic_ack(delivery_tag=method.delivery_tag)
 
-                self.channel.basic_consume(queue=queue_name, on_message_callback=handle_message, auto_ack=True)
+                self.channel.basic_consume(queue=queue_name, on_message_callback=handle_message)
 
                 logging.info('Waiting for messages. To exit press CTRL+C')
                 self.channel.start_consuming()

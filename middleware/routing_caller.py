@@ -18,7 +18,10 @@ class RoutingCaller:
         self.channel.basic_publish(
             exchange=self.publish_exchange_name, 
             routing_key=routing_key, 
-            body=data.encode(UTF8_ENCODING))
+            body=data.encode(UTF8_ENCODING),
+            properties=pika.BasicProperties(
+                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
+            ))
 
     def shutdown(self):
         self.connection.close()
