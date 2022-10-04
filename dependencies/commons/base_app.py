@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 
 import os
+import signal
 import logging
 from configparser import ConfigParser
+
+class BaseApp:
+    def __init__(self, app_name):
+        self.running = False
+        self.app_name = app_name
+    
+    # graceful shutdown
+    def exit_gracefully(self, *args):
+        logging.info("Proceed to shutdown {} gracefully".format(self.app_name))
+        self.running = False
+
+    def run(self):
+        self.running = True
 
 def initialize_config(config_path):
     """ Parse env variables or config file to find program config params
