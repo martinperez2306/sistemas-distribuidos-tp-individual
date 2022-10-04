@@ -28,16 +28,15 @@ class RoutingService(BaseApp):
                 self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
                 self.channel = self.connection.channel()
                 self.channel.exchange_declare(exchange=self.exchange, exchange_type='direct')
-                result = self.channel.queue_declare(queue='', exclusive=True)#TODO: Tal vez definir yo la queue?
+                result = self.channel.queue_declare(queue=self.service_id + '_queue', durable=True)
                 queue_name = result.method.queue
                 self.channel.queue_bind(exchange=self.exchange, queue=queue_name, routing_key=self.service_id)
 
                 def handle_message(ch, method, properties, body):
                     logging.debug("Received {}".format(body))
                     self.work(ch, method, properties, body)
-                    ch.basic_ack(delivery_tag=method.delivery_tag)
 
-                self.channel.basic_consume(queue=queue_name, on_message_callback=handle_message)
+                self.channel.basic_consume(queue=queue_name, on_message_callback=handle_message, auto_ack=True)
 
                 logging.info('Waiting for messages. To exit press CTRL+C')
                 self.channel.start_consuming()
