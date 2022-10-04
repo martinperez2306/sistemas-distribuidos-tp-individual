@@ -44,26 +44,15 @@ def get_total_countries():
 
 def process_videos(middleware_client: MiddlewareClient, total_countries):
     logging.info("Processing Videos")
+    print("Processing Videos. Please wait...")
     middleware_client.connect()
     message: Message = middleware_client.call_start_data_process()
     request_id = message.body
     for path in pathlib.Path(VIDEOS).iterdir():
         if path.is_file():
-            #process_in_chunks(path, CHUNKSIZE, middleware_client, request_id)
             process_csv(path, middleware_client, request_id)
     middleware_client.call_end_data_process(request_id)
     return request_id
-    
-
-#Deprecated
-def process_in_chunks(path, chunk_size, middleware_client, request_id):
-    with open(path, 'r') as file:
-        while True:
-            lines = list(islice(file, chunk_size))
-            for line in lines:
-                process_video(line, middleware_client, request_id)
-            if not lines:
-                break
 
 def process_csv(path, middleware_client, request_id):
     with open(path, 'r') as file:
@@ -76,7 +65,7 @@ def process_csv(path, middleware_client, request_id):
 def process_video(video_str: 'list[str]', middleware_client: MiddlewareClient, request_id:int ):
     logging.debug("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
     video = __parse_video_from_csv(video_str)
-    middleware_client.call_process_data(request_id, video)
+    #middleware_client.call_process_data(request_id, video)
 
 def __parse_video_from_csv(video_str: 'list[str]'):
     id = video_str[0].strip("''")
@@ -116,11 +105,13 @@ def __parse_video_from_csv(video_str: 'list[str]'):
 
 def get_results(middleware_client: MiddlewareClient, request_id: str):
     logging.info("Getting Results for Request with ID [{}]".format(request_id))
+    print("Waiting for system processing. This may take a few minutes.")
     results_message: Message = middleware_client.wait_get_results(request_id)
     logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))
     return results_message
 
 def show_results(results):
+    print("Processing complete!!")
     print(results.to_string())
 
 def shutdown_middleware_client(middleware_client: MiddlewareClient):
