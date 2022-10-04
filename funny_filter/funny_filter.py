@@ -18,7 +18,7 @@ class FunnyFilter(RoutingService):
         group_id = config_params["group_id"]
         self.total_routes = int(config_params["service_instances"])
         self.propagations = dict()
-        RoutingService.__init__(self, id, group_id, FUNNY_FILTER_EXCHANGE)
+        super().__init__(id, group_id, FUNNY_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         funny_filter_message = self.middleware_system_client.parse_message(body)

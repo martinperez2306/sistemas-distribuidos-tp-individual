@@ -13,7 +13,7 @@ class LikeFilter(RoutingService):
     def __init__(self, config_params):
         id = config_params["service_id"]
         group_id = config_params["group_id"]
-        RoutingService.__init__(self, id, group_id, LIKE_FILTER_EXCHANGE)
+        super().__init__(id, group_id, LIKE_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         like_filter_message = self.middleware_system_client.parse_message(body)

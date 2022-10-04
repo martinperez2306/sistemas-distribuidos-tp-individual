@@ -8,15 +8,13 @@ from dependencies.commons.routing_serivce import RoutingService
 from dependencies.commons.utils import json_to_video
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
-DAY_GROUPER_ID="day_grouper_1"##TODO: Obtener de configuracion
-
 class DayGrouper(RoutingService):
     def __init__(self, config_params):
         id = config_params["service_id"]
         group_id = config_params["group_id"]
         self.total_routes = int(config_params["service_instances"])
         self.propagations = dict()
-        RoutingService.__init__(self, id, group_id, DAY_GROUPER_EXCHANGE)
+        super().__init__(id, group_id, DAY_GROUPER_EXCHANGE)
         self.days_grouped = dict()
 
     def work(self, ch, method, properties, body):
