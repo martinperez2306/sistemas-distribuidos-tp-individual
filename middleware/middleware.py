@@ -27,7 +27,7 @@ class Middleware(BaseApp):
                     pika.ConnectionParameters(host=RABBITMQ_HOST))
 
                 self.channel = self.connection.channel()
-                self.channel.queue_declare(queue=MIDDLEWARE_QUEUE)   
+                self.channel.queue_declare(queue=MIDDLEWARE_QUEUE, durable=True)   
 
                 def handle_message(ch, method, props, body):
                     logging.info("Received {}".format(body))
