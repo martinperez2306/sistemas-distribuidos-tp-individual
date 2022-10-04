@@ -15,20 +15,22 @@ from middleware.storage_service_caller import StorageServiceCaller
 
 class MessageHandler:
     def __init__(self, config_params):
-        ingestion_service_caller = IngestionServiceCaller()
-        ingestion_service_caller.run()
+        self.ingestion_service_caller = IngestionServiceCaller()
         request_repository = RequestRepository()
         self.like_filter_caller = LikeFilterCaller(config_params)
-        self.like_filter_caller.run()
         self.funny_filter_caller = FunnyFilterCaller(config_params)
-        self.funny_filter_caller.run()
         self.day_grouper_caller = DayGrouperCaller(config_params)
-        self.day_grouper_caller.run()
         self.max_caller = MaxCaller()
-        self.max_caller.run()
         self.storage_service_caller = StorageServiceCaller()
+        self.client_service = ClientService(self.ingestion_service_caller, request_repository)
+
+    def run(self):
+        self.ingestion_service_caller.run()
+        self.like_filter_caller.run()
+        self.funny_filter_caller.run()
+        self.day_grouper_caller.run()
+        self.max_caller.run()
         self.storage_service_caller.run()
-        self.client_service = ClientService(ingestion_service_caller, request_repository)
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling message {}".format(body))

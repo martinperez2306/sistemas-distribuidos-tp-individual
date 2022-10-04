@@ -20,6 +20,7 @@ class Middleware(BaseApp):
         super().run()
         while self.running:
             try:
+                self.message_handler.run()
                 self.connection = pika.BlockingConnection(
                     pika.ConnectionParameters(host=RABBITMQ_HOST))
 
