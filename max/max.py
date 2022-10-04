@@ -11,7 +11,7 @@ class Max(WorkService):
         self.propagations = dict()
         self.max_views = 0
         self.trending_date_with_max_views = None
-        WorkService.__init__(self, id, group_id, MAX_QUEUE)
+        super().__init__(id, group_id, MAX_QUEUE)
 
     def work(self, ch, method, properties, body):
         max_message = self.middleware_system_client.parse_message(body)

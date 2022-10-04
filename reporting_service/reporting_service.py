@@ -14,7 +14,7 @@ class ReportingService(WorkService):
         self.total_routes = int(config_params["service_instances"])
         self.result_repository = ResultRepository()
         self.reporting_check = ReportingCheck(self.total_routes)
-        WorkService.__init__(self, id, group_id, REPORTING_SERVICE_QUEUE)
+        super().__init__(id, group_id, REPORTING_SERVICE_QUEUE)
 
     def work(self, ch, method, properties, body):
         reporting_message = self.middleware_system_client.parse_message(body)
