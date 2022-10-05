@@ -26,3 +26,8 @@ class Video:
 
     def __repr__(self):
        return self.__str__()
+
+    def copy(self):
+        return Video(self.id, self.title, self.published_at, self.channel_id, self.channel_title, self.category_id, self.trending_date,
+                        self.tags, self.view_count, self.likes, self.dislikes, self.comment_count, self.thumbnail_link, self.comments_disabled,
+                        self.ratings_disabled, self.description, self.country)
