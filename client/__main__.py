@@ -25,7 +25,7 @@ def main():
     middleware_client = initialize_middleware_client()
     total_countries = get_total_countries()
     categories = get_categories()
-    request_id = process_videos(middleware_client, total_countries)
+    request_id = process_videos(middleware_client, categories, total_countries)
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
         results = get_results(middleware_client, request_id)
@@ -46,25 +46,37 @@ def get_total_countries():
     return countries
 
 def get_categories():
+    logging.info("Getting categories Videos")
     categories = dict()
     for path in pathlib.Path(CATEGORIES_PATH).iterdir():
         if path.is_file():
             country = extract_country_from_path(path)
-            categories_by_country = json.load(path)
-            categories[country] = categories_by_country
+            with open(path, 'r') as file:
+                categories[country] = create_country_categories(json.load(file))
+    logging.info("Categories [{}]".format(categories))
     return categories
+
+def create_country_categories(json_category):
+    items = json_category['items']
+    country_categories = dict()
+    for item in items:
+        id = item['id']
+        title = item['snippet']['title']
+        country_categories[id] = title
+    return country_categories
 
 def process_videos(middleware_client: MiddlewareClient, categories, total_countries):
     logging.info("Processing Videos")
     print("Processing Videos. Please wait...")
     middleware_client.connect()
-    message: Message = middleware_client.call_start_data_process()
+    message: Message = middleware_client.call_start_data_process(categories)
     request_id = message.body
     for path in pathlib.Path(VIDEOS_PATH).iterdir():
         if path.is_file():
             country = extract_country_from_path(path)
             process_csv(path, middleware_client, request_id, country)
     middleware_client.call_end_data_process(request_id)
+    logging.info("Processing video Request ID [{}]".format(request_id))
     return request_id
 
 def extract_country_from_path(path):
