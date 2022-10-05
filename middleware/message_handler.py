@@ -22,7 +22,7 @@ class MessageHandler:
         self.day_grouper_caller = DayGrouperCaller(config_params)
         self.max_caller = MaxCaller()
         self.storage_service_caller = StorageServiceCaller()
-        self.client_service = ClientService(self.ingestion_service_caller, request_repository)
+        self.client_service = ClientService(self.ingestion_service_caller, self.storage_service_caller, request_repository)
 
     def run(self):
         self.ingestion_service_caller.connect()

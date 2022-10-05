@@ -49,7 +49,7 @@ class MiddlewareClient:
 
     def call_start_data_process(self, categories: dict()):
         logging.info("Calling start data process")
-        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, json.dumps(categories.__dict__))
+        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, json.dumps(categories))
         return self.__request(request)
 
     def call_process_data(self, request_id: int, video: Video):

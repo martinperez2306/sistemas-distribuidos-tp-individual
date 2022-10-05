@@ -6,13 +6,16 @@ from dependencies.commons.message import Message
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.request import Request
 from middleware.request_repository import RequestRepository
+from middleware.storage_service_caller import StorageServiceCaller
 
 ACK_MESSAGE = "ACK"
 
 class ClientService:
-    def __init__(self, ingestion_service_caller: IngestionServiceCaller, request_repository: RequestRepository):
+    def __init__(self, ingestion_service_caller: IngestionServiceCaller, storage_service_caller: StorageServiceCaller, 
+                        request_repository: RequestRepository):
         self.request_count = 0
         self.ingestion_service_caller = ingestion_service_caller
+        self.storage_service_caller = storage_service_caller
         self.request_repository = request_repository
 
     def start_data_process(self, ch, method, props, message: Message):
@@ -24,6 +27,9 @@ class ClientService:
         #Create request and save it to trace client
         request = Request(request_id, message.source_id, props.correlation_id, props.reply_to)
         self.request_repository.add(request_id, request)
+        #Save categories
+        categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, INGEST_DATA_WORKER_ID, message.body)
+        self.storage_service_caller.storage_data(categories_message)
         #Propagate start process data with Request ID
         propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
         self.ingestion_service_caller.connect()
