@@ -12,34 +12,40 @@ ACK_MESSAGE = "ACK"
 class ClientService:
     def __init__(self, ingestion_service_caller: IngestionServiceCaller, request_repository: RequestRepository):
         self.request_count = 0
-        self.ingestion_service = ingestion_service_caller
+        self.ingestion_service_caller = ingestion_service_caller
         self.request_repository = request_repository
 
     def start_data_process(self, ch, method, props, message: Message):
         logging.info("Starting data process")
         self.request_count += 1
         request_id = self.request_count
-        logging.info("Saving request with ID [{}] CLIENT_ID [{}] CORRELATION_ID[{}] CLIENT_QUEUE [{}]"\
+        logging.debug("Saving request with ID [{}] CLIENT_ID [{}] CORRELATION_ID[{}] CLIENT_QUEUE [{}]"\
             .format(request_id, message.source_id, props.correlation_id, props.reply_to))
+        #Create request and save it to trace client
         request = Request(request_id, message.source_id, props.correlation_id, props.reply_to)
         self.request_repository.add(request_id, request)
-        propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
-        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
         #Propagate start process data with Request ID
-        self.ingestion_service.ingest_data(propagate)
+        propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
+        self.ingestion_service_caller.connect()
+        self.ingestion_service_caller.ingest_data(propagate)
+        #Responde to client
+        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
         self.__respond(ch, method, props, message, response)
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
         #Process data with Request ID
-        self.ingestion_service.ingest_data(message)
+        self.ingestion_service_caller.ingest_data(message)
+        #Responde to client
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
         self.__respond(ch, method, props, message, response)
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
         #Propagate end process data with Request ID
-        self.ingestion_service.ingest_data(message)
+        self.ingestion_service_caller.ingest_data(message)
+        self.ingestion_service_caller.close()
+        #Responde to client
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
         self.__respond(ch, method, props, message, response)
 

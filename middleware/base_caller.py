@@ -7,7 +7,7 @@ class BaseCaller:
         self.channel = None
         self.publish_queue_name = publish_queue_name
     
-    def run(self):
+    def connect(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.publish_queue_name, durable=True)
@@ -21,5 +21,5 @@ class BaseCaller:
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))
 
-    def shutdown(self):
+    def close(self):
         self.connection.close()

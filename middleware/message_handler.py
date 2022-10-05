@@ -25,12 +25,12 @@ class MessageHandler:
         self.client_service = ClientService(self.ingestion_service_caller, request_repository)
 
     def run(self):
-        self.ingestion_service_caller.run()
-        self.like_filter_caller.run()
-        self.funny_filter_caller.run()
-        self.day_grouper_caller.run()
-        self.max_caller.run()
-        self.storage_service_caller.run()
+        self.ingestion_service_caller.connect()
+        self.like_filter_caller.connect()
+        self.funny_filter_caller.connect()
+        self.day_grouper_caller.connect()
+        self.max_caller.connect()
+        self.storage_service_caller.connect()
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling message {}".format(body))
@@ -57,19 +57,19 @@ class MessageHandler:
                 logging.info("Client method not found!")
         elif SERVICE_MESSAGE_ID == message.id:
             if LIKE_FILTER_GROUP_ID == message.destination_id:
-                logging.info("Filtering by Likes")
+                logging.info("Handling Filter By Likes")
                 self.like_filter_caller.filter_by_likes(message)
             elif FUNNY_FILTER_GROUP_ID == message.destination_id:
-                logging.info("Filtering by Tag Funny")
+                logging.info("Handling Filter by Tag Funny")
                 self.funny_filter_caller.filter_by_funny_tag(message)
             elif DAY_GROUPER_GROUP_ID == message.destination_id:
-                logging.info("Grouping by day")
+                logging.info("Handling Group by Day")
                 self.day_grouper_caller.group_by_day(message)
             elif MAX_WORKER_ID == message.destination_id:
-                logging.info("Getting Max")
+                logging.info("Handling Max")
                 self.max_caller.get_max(message)
             elif STORAGE_DATA_WORKER_ID == message.destination_id:
-                logging.info("Storaging data")
+                logging.info("Handling Storage data")
                 self.storage_service_caller.storage_data(message)
             else:
                 logging.info("Service method not found!")

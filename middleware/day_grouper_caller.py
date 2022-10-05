@@ -12,12 +12,22 @@ class DayGrouperCaller(RoutingCaller):
 
     def group_by_day(self, message: Message):
         group_by_day_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, DAY_GROUPER_GROUP_ID, message.body)
-        if PROCESS_DATA_OP_ID == message.operation_id:
+        if START_PROCESS_OP_ID == message.operation_id:
+            self.connect()
+            self.__broadcast(group_by_day_message)
+        elif PROCESS_DATA_OP_ID == message.operation_id:
             video = json_to_video(group_by_day_message.body)
             trending_date = video.trending_date
             routing_key = DAY_GROUPER_GROUP_ID + "_" + str((hash(trending_date) % self.total_routes) + 1)
             self.publish_data(group_by_day_message.to_string(), str(routing_key))
+        elif END_PROCESS_OP_ID == message.operation_id:
+            self.__broadcast(group_by_day_message)
+            self.close()
         else:
-            for route in range(self.total_routes):
-                routing_key = DAY_GROUPER_GROUP_ID + "_" + str(route + 1)
-                self.publish_data(group_by_day_message.to_string(), str(routing_key))
+            pass
+            
+
+    def __broadcast(self, message):
+        for route in range(self.total_routes):
+            routing_key = DAY_GROUPER_GROUP_ID + "_" + str(route + 1)
+            self.publish_data(message.to_string(), str(routing_key))

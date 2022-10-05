@@ -8,7 +8,7 @@ class RoutingCaller:
         self.channel = None
         self.publish_exchange_name = publish_exchange_name
 
-    def run(self):
+    def connect(self):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=self.publish_exchange_name, exchange_type='direct')
@@ -23,5 +23,5 @@ class RoutingCaller:
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))
 
-    def shutdown(self):
+    def close(self):
         self.connection.close()
