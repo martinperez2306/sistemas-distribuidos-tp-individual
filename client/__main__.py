@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import csv
+import json
 import logging
 import pathlib
 import os
@@ -23,6 +24,7 @@ def main():
     initialize_log(config_params["logging_level"])
     middleware_client = initialize_middleware_client()
     total_countries = get_total_countries()
+    categories = get_categories()
     request_id = process_videos(middleware_client, total_countries)
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
@@ -43,7 +45,16 @@ def get_total_countries():
     logging.info("Total Countries = {}".format(countries))
     return countries
 
-def process_videos(middleware_client: MiddlewareClient, total_countries):
+def get_categories():
+    categories = dict()
+    for path in pathlib.Path(CATEGORIES_PATH).iterdir():
+        if path.is_file():
+            country = extract_country_from_path(path)
+            categories_by_country = json.load(path)
+            categories[country] = categories_by_country
+    return categories
+
+def process_videos(middleware_client: MiddlewareClient, categories, total_countries):
     logging.info("Processing Videos")
     print("Processing Videos. Please wait...")
     middleware_client.connect()
