@@ -1,7 +1,7 @@
 from dependencies.commons.video import Video
 
 class Results:
-    def __init__(self, filtered_videos: 'list[Video]', most_viewed_day: str):
+    def __init__(self, filtered_videos, most_viewed_day: str):
         self.filtered_videos = filtered_videos
         self.most_viewed_day = most_viewed_day
 

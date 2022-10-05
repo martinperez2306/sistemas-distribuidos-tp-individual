@@ -1,12 +1,12 @@
 from dependencies.commons.utils import unique
-from reporting_service.video_result import VideoResult
+from dependencies.commons.video import Video
 
 class ResultRepository:
     def __init__(self):
         self.filtered_videos = dict()
         self.most_viewed_day = None
 
-    def save_filtered_video(self, request_id: int, video: VideoResult):
+    def save_filtered_video(self, request_id: int, video: Video):
         if self.filtered_videos.get(str(request_id)):
             req_videos: list = self.filtered_videos.get(request_id)
             req_videos.append(video)
@@ -16,10 +16,10 @@ class ResultRepository:
             req_videos.append(video)
             self.filtered_videos[str(request_id)] = req_videos
 
-    def get_filtered_videos(self, request_id: int) -> 'list[VideoResult]':
+    def get_filtered_videos(self, request_id: int) -> 'list[Video]':
         return self.__get_unique_result_videos(self.filtered_videos.get(str(request_id)))
 
-    def __get_unique_result_videos(self, result_videos: 'list[VideoResult]') -> 'list[VideoResult]':
+    def __get_unique_result_videos(self, result_videos: 'list[Video]') -> 'list[Video]':
         return unique(result_videos)
 
     def save_most_viewed_day(self, most_viewed_day):
