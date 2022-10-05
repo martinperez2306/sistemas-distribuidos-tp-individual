@@ -24,7 +24,7 @@ class WorkService(BaseApp):
         super().run()
         while self.running:
             try:
-                self.middleware_system_client.connect()
+                #self.middleware_system_client.connect()
                 self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
                 self.channel = self.connection.channel()
                 self.channel.queue_declare(queue=self.service_queue, durable=True)

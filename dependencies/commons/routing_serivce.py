@@ -24,7 +24,7 @@ class RoutingService(BaseApp):
         super().run()
         while self.running:
             try:
-                self.middleware_system_client.connect()
+                #self.middleware_system_client.connect()
                 self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
                 self.channel = self.connection.channel()
                 self.channel.exchange_declare(exchange=self.exchange, exchange_type='direct')
