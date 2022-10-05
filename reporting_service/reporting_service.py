@@ -1,3 +1,4 @@
+import json
 from dependencies.commons.message import Message
 from dependencies.commons.constants import *
 from dependencies.commons.utils import json_to_video
@@ -14,14 +15,22 @@ class ReportingService(WorkService):
         self.total_routes = int(config_params["service_instances"])
         self.result_repository = ResultRepository()
         self.reporting_check = ReportingCheck(self.total_routes)
+        self.categories_by_country = dict()
         super().__init__(id, group_id, REPORTING_SERVICE_QUEUE)
 
     def work(self, ch, method, properties, body):
         reporting_message = self.middleware_system_client.parse_message(body)
         if PROCESS_DATA_OP_ID == reporting_message.operation_id:
+            self.__storage_categories(reporting_message)
+        elif PROCESS_DATA_OP_ID == reporting_message.operation_id:
             self.__storage_video(reporting_message)
-        if END_PROCESS_OP_ID == reporting_message.operation_id:
+        elif END_PROCESS_OP_ID == reporting_message.operation_id:
             self.__check_end_stage(reporting_message)
+        else:
+            pass
+
+    def __storage_categories(self, reporting_message: Message):
+        self.categories_by_country = json.loads(reporting_message.body)
 
     def __storage_video(self, reporting_message: Message):
         video = json_to_video(reporting_message.body)
