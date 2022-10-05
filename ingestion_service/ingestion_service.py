@@ -1,6 +1,5 @@
 from dependencies.commons.constants import *
 from dependencies.commons.work_service import WorkService
-from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class IngestionService(WorkService):
     def __init__(self, config_params):
@@ -10,6 +9,14 @@ class IngestionService(WorkService):
 
     def work(self, ch, method, properties, body):
         ingestion_message = self.middleware_system_client.parse_message(body)
-        self.middleware_system_client.call_filter_by_likes(ingestion_message)
+        if START_PROCESS_OP_ID == ingestion_message.operation_id:
+            self.middleware_system_client.connect()
+            self.middleware_system_client.call_filter_by_likes(ingestion_message)
+        elif PROCESS_DATA_OP_ID == ingestion_message.operation_id:
+            self.middleware_system_client.call_filter_by_likes(ingestion_message)
+        elif END_PROCESS_OP_ID == ingestion_message.operation_id:
+            self.middleware_system_client.call_filter_by_likes(ingestion_message)
+            self.middleware_system_client.close()
+        
     
     

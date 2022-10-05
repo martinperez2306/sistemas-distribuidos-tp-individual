@@ -19,17 +19,17 @@ class ReportingService(WorkService):
     def work(self, ch, method, properties, body):
         reporting_message = self.middleware_system_client.parse_message(body)
         if PROCESS_DATA_OP_ID == reporting_message.operation_id:
-            self.__storage_video(ch, method, properties, body, reporting_message)
+            self.__storage_video(reporting_message)
         if END_PROCESS_OP_ID == reporting_message.operation_id:
-            self.__handle_end_process(ch, method, properties, body, reporting_message)
+            self.__check_end_stage(reporting_message)
 
-    def __storage_video(self, ch, method, properties, body, reporting_message: Message):
+    def __storage_video(self, reporting_message: Message):
         video = json_to_video(reporting_message.body)
         videoResult = VideoResult(video.id, video.title, video.category_id)
         request_id = reporting_message.request_id
         self.result_repository.save_filtered_video(request_id, videoResult)
 
-    def __handle_end_process(self, ch, method, properties, body, message: Message):
+    def __check_end_stage(self, message: Message):
         if FUNNY_FILTER_GROUP_ID == message.source_id:
             self.reporting_check.check_filter()
         elif MAX_WORKER_ID in message.source_id:
@@ -38,9 +38,13 @@ class ReportingService(WorkService):
         else:
             pass
         if self.reporting_check.check():
-            filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
-            most_viewed_day = self.result_repository.get_most_viewed_day()
-            results = Results(filtered_videos, most_viewed_day)
-            self.middleware_system_client.call_send_results(message.request_id, str(results))
-    
+            self.__end_stage(message)
+        
+    def __end_stage(self, message: Message):
+        self.middleware_system_client.connect()
+        filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
+        most_viewed_day = self.result_repository.get_most_viewed_day()
+        results = Results(filtered_videos, most_viewed_day)
+        self.middleware_system_client.call_send_results(message.request_id, str(results))
+        self.middleware_system_client.close()
     

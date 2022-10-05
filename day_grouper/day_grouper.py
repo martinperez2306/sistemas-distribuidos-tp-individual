@@ -18,15 +18,17 @@ class DayGrouper(RoutingService):
 
     def work(self, ch, method, properties, body):
         grouping_message = self.middleware_system_client.parse_message(body)
-        if PROCESS_DATA_OP_ID == grouping_message.operation_id:
+        if START_PROCESS_OP_ID == grouping_message.operation_id:
+            pass
+        elif PROCESS_DATA_OP_ID == grouping_message.operation_id:
             self.__save_views_by_date(grouping_message)
         elif END_PROCESS_OP_ID == grouping_message.operation_id:
             max_message: Message = Message(grouping_message.id, grouping_message.request_id, 
                                                 grouping_message.source_id, grouping_message.operation_id,
                                                 grouping_message.destination_id, str(self.views_by_date))
-            self.__propagate_message(max_message)
+            self.__check_next_stage(max_message)
         else:
-            self.__propagate_message(grouping_message)
+            pass
 
     def __save_views_by_date(self, gruping_message: Message):
         video = json_to_video(gruping_message.body)
@@ -39,21 +41,19 @@ class DayGrouper(RoutingService):
             self.views_by_date[trending_date] = video.view_count
         logging.info("View Count for date {} is {}".format(trending_date, self.views_by_date[trending_date]))
 
-    def __propagate_message(self, gruping_message: Message):
-        logging.info("Propagating message {}".format(gruping_message.to_string()))
+    def __check_next_stage(self, gruping_message: Message):
+        logging.info("Checking next stage")
         request_id = gruping_message.request_id
         propagation: Propagation = self.propagations.get(str(request_id))
         if not propagation:
             propagation = Propagation()
-        if START_PROCESS_OP_ID == gruping_message.operation_id:
-            propagation.inc_start()
-            if propagation.starts_count == self.total_routes:
-                self.middleware_system_client.call_max(gruping_message)
-        elif END_PROCESS_OP_ID == gruping_message.operation_id:
-            propagation.inc_end()
-            if propagation.ends_count == self.total_routes:
-                self.middleware_system_client.call_max(gruping_message)
-        else:
-            pass
+        propagation.inc_end()
+        if propagation.ends_count == self.total_routes:
+            self.__next_stage(gruping_message)
         self.propagations[str(request_id)] = propagation
+
+    def __next_stage(self, gruping_message: Message):
+        self.middleware_system_client.connect()
+        self.middleware_system_client.call_max(gruping_message)
+        self.middleware_system_client.close()
         

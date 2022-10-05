@@ -15,27 +15,17 @@ class Max(WorkService):
 
     def work(self, ch, method, properties, body):
         max_message = self.middleware_system_client.parse_message(body)
-        self.__propagate_message(ch, method, properties, body, max_message)
+        self.__process_max(max_message)
+        self.__check_next_stage(max_message)
 
-    def __propagate_message(self, ch, method, properties, body, max_message: Message):
+    def __check_next_stage(self, max_message: Message):
         request_id = max_message.request_id
         propagation: Propagation = self.propagations.get(str(request_id))
         if not propagation:
             propagation = Propagation()
-        if START_PROCESS_OP_ID == max_message.operation_id:
-            propagation.inc_start()
-            if propagation.starts_count == self.total_routes:
-                self.middleware_system_client.call_storage_data(max_message)
-        elif END_PROCESS_OP_ID == max_message.operation_id:
-            propagation.inc_end()
-            self.__process_max(max_message)
-            if propagation.ends_count == self.total_routes:
-                result_message: Message = Message(max_message.id, max_message.request_id, 
-                                            max_message.source_id, max_message.operation_id,
-                                            max_message.destination_id, self.trending_date_with_max_views)
-                self.middleware_system_client.call_storage_data(result_message)
-        else:
-            pass
+        propagation.inc_end()
+        if propagation.ends_count == self.total_routes:
+            self.__next_stage(max_message)
         self.propagations[str(request_id)] = propagation
 
     def __process_max(self, max_message: Message):
@@ -44,4 +34,12 @@ class Max(WorkService):
             if self.max_views < views_by_date[trending_date]:
                 self.max_views = views_by_date[trending_date]
                 self.trending_date_with_max_views = trending_date
+    
+    def __next_stage(self, max_message: Message):
+        self.middleware_system_client.connect()
+        result_message: Message = Message(max_message.id, max_message.request_id, 
+                                        max_message.source_id, max_message.operation_id,
+                                        max_message.destination_id, self.trending_date_with_max_views)
+        self.middleware_system_client.call_storage_data(result_message)
+        self.middleware_system_client.close()
         

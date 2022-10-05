@@ -1,3 +1,4 @@
+import json
 import logging
 import pika
 
@@ -6,7 +7,6 @@ from dependencies.commons.message import Message
 from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
 from dependencies.commons.utils import json_to_video
-from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 FUNNY_TAG = "funny"
 
@@ -17,37 +17,50 @@ class FunnyFilter(RoutingService):
         id = config_params["service_id"]
         group_id = config_params["group_id"]
         self.total_routes = int(config_params["service_instances"])
+        self.funny_videos = list()
         self.propagations = dict()
         super().__init__(id, group_id, FUNNY_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         funny_filter_message = self.middleware_system_client.parse_message(body)
-        if PROCESS_DATA_OP_ID == funny_filter_message.operation_id:
-            self.__process_filter_by_funny_tag(ch, method, properties, body, funny_filter_message)
+        if START_PROCESS_OP_ID == funny_filter_message.operation_id:
+            pass 
+        elif PROCESS_DATA_OP_ID == funny_filter_message.operation_id:
+            self.__process_filter_by_funny_tag(funny_filter_message)
+        elif END_PROCESS_OP_ID == funny_filter_message.operation_id:
+            self.__check_next_stage(funny_filter_message)
         else:
-            self.__propagate_message(ch, method, properties, body, funny_filter_message)
+            pass
 
-    def __process_filter_by_funny_tag(self, ch, method, properties, body, funny_filter_message: Message):
+    def __process_filter_by_funny_tag(self, funny_filter_message: Message):
         video = json_to_video(funny_filter_message.body)
         logging.info("Video {}".format(str(video)))
         tags = video.tags.split("|")
         if FUNNY_TAG in tags:
-            self.middleware_system_client.call_storage_data(funny_filter_message)
+            logging.info("Video is funny: [{}]".format(str(video)))
+            self.funny_videos.append(video)
 
-    def __propagate_message(self, ch, method, properties, body, funny_filter_message: Message):
+    def __check_next_stage(self, funny_filter_message: Message):
         request_id = funny_filter_message.request_id
         propagation: Propagation = self.propagations.get(str(request_id))
         if not propagation:
             propagation = Propagation()
-        if START_PROCESS_OP_ID == funny_filter_message.operation_id:
-            propagation.inc_start()
-            if propagation.starts_count == self.total_routes:
-                self.middleware_system_client.call_storage_data(funny_filter_message)
-        elif END_PROCESS_OP_ID == funny_filter_message.operation_id:
-            propagation.inc_end()
-            if propagation.ends_count == self.total_routes:
-                self.middleware_system_client.call_storage_data(funny_filter_message)
-        else:
-            pass
+        propagation.inc_end()
+        if propagation.ends_count == self.total_routes:
+            self.__next_stage(funny_filter_message)
         self.propagations[str(request_id)] = propagation
+
+    def __next_stage(self, funny_filter_message: Message):
+        self.middleware_system_client.connect()
+        init_message = Message(funny_filter_message.id, funny_filter_message.request_id, funny_filter_message.source_id,
+                                        START_PROCESS_OP_ID, funny_filter_message.destination_id, "")
+        self.middleware_system_client.call_storage_data(init_message)
+        for funny_video in self.funny_videos:
+            funny_video_message = Message(funny_filter_message.id, funny_filter_message.request_id, funny_filter_message.source_id,
+                                        PROCESS_DATA_OP_ID, funny_filter_message.destination_id, json.dumps(funny_video.__dict__))
+            self.middleware_system_client.call_storage_data(funny_video_message)
+        end_message = Message(funny_filter_message.id, funny_filter_message.request_id, funny_filter_message.source_id,
+                                        END_PROCESS_OP_ID, funny_filter_message.destination_id, "")
+        self.middleware_system_client.call_storage_data(end_message)
+        self.middleware_system_client.close()
         
