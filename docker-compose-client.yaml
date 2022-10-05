@@ -6,12 +6,12 @@ services:
       dockerfile: client.dockerfile
     image: client
     container_name: client
-    restart: on-failure
     environment:
       - PYTHONUNBUFFERED=1
     volumes:
       - "./config/client:/root/client/config"
       - "./client/videos_dev:/root/client/videos"
+      - "./client/categories:/root/client/categories"
 
 networks:
   default:
