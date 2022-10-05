@@ -3,6 +3,7 @@
 import csv
 import logging
 import pathlib
+import os
 
 from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.commons.constants import *
@@ -11,8 +12,9 @@ from dependencies.commons.video import Video
 from dependencies.middleware_client.middleware_client import MiddlewareClient
 
 CONFIG_PATH = "/root/client/config/config.ini"
-VIDEOS = "/root/client/videos"
-CHUNKSIZE = 1
+VIDEOS_PATH = "/root/client/videos"
+CATEGORIES_PATH = "/root/client/categories"
+FILEPATH_SEPARATOR = "_"
 
 RESULTS_PENDING = "PENDING"
 
@@ -35,7 +37,7 @@ def initialize_middleware_client():
 def get_total_countries():
     logging.info("Getting total countries")
     countries = 0
-    for path in pathlib.Path(VIDEOS).iterdir():
+    for path in pathlib.Path(VIDEOS_PATH).iterdir():
         if path.is_file():
             countries += 1
     logging.info("Total Countries = {}".format(countries))
@@ -47,26 +49,32 @@ def process_videos(middleware_client: MiddlewareClient, total_countries):
     middleware_client.connect()
     message: Message = middleware_client.call_start_data_process()
     request_id = message.body
-    for path in pathlib.Path(VIDEOS).iterdir():
+    for path in pathlib.Path(VIDEOS_PATH).iterdir():
         if path.is_file():
-            process_csv(path, middleware_client, request_id)
+            country = extract_country_from_path(path)
+            process_csv(path, middleware_client, request_id, country)
     middleware_client.call_end_data_process(request_id)
     return request_id
 
-def process_csv(path, middleware_client, request_id):
+def extract_country_from_path(path):
+    basename = str(os.path.basename(path))
+    split = basename.split(FILEPATH_SEPARATOR)
+    return split[0]
+
+def process_csv(path, middleware_client, request_id, country):
     with open(path, 'r') as file:
         csvreader = csv.reader(file)
         header = next(csvreader, None)
         logging.info("CSV Header [{}]".format(header))
         for row in csvreader:
-            process_video(row, middleware_client, request_id)
+            process_video(row, middleware_client, request_id, country)
 
-def process_video(video_str: 'list[str]', middleware_client: MiddlewareClient, request_id:int ):
+def process_video(video_str: 'list[str]', middleware_client: MiddlewareClient, request_id: int, country: str):
     logging.debug("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
-    video = __parse_video_from_csv(video_str)
+    video = __parse_video_from_csv(video_str, country)
     middleware_client.call_process_data(request_id, video)
 
-def __parse_video_from_csv(video_str: 'list[str]'):
+def __parse_video_from_csv(video_str: 'list[str]', country):
     id = video_str[0].strip("''")
     title = video_str[1].strip("''")
     published_at = video_str[2].strip("''")
@@ -100,7 +108,7 @@ def __parse_video_from_csv(video_str: 'list[str]'):
     ratings_disabled = video_str[14].strip("''")
     description = video_str[15].strip("''")
     return Video(id, title, published_at, channel_id, channel_title, category_id, trending_date, tags, view_count, likes, dislikes,
-                    comment_count, thumbnail_link, comments_disabled, ratings_disabled, description)
+                    comment_count, thumbnail_link, comments_disabled, ratings_disabled, description, country)
 
 def get_results(middleware_client: MiddlewareClient, request_id: str):
     logging.info("Getting Results for Request with ID [{}]".format(request_id))
