@@ -4,6 +4,7 @@ from dependencies.commons.VideosQuery import VideosQuery
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.utils import to_json
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.request import Request
 from middleware.request_repository import RequestRepository
@@ -34,7 +35,7 @@ class ClientService:
         request = Request(request_id, message.source_id, props.correlation_id, props.reply_to)
         self.request_repository.add(request_id, request)
         #Save categories
-        categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, STORAGE_DATA_WORKER_ID, query.categories)
+        categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, STORAGE_DATA_WORKER_ID, to_json(query.categories))
         self.storage_service_caller.storage_data(categories_message)
         #Save total countries
         total_countries_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_TOTAL_COUNTRIES, TRENDING_FILTER_GROUP_ID, query.total_countries)

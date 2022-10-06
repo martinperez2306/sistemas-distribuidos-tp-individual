@@ -1,4 +1,5 @@
 import logging
+import traceback
 import pika
 import signal
 import time
@@ -39,7 +40,7 @@ class Middleware(BaseApp):
                 logging.info('Waiting for messages. To exit press CTRL+C')
                 self.channel.start_consuming()
             except Exception as e:
-                logging.error('Error waiting for message: {}'.format(e))
+                traceback.print_exc()
                 if self.first_try:
                     logging.debug('First try to connect rabbit. Waiting {} seconds'.format(WAIT_CONNECTION))
                     self.first_try = False
