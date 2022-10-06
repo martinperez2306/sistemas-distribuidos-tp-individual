@@ -106,7 +106,7 @@ class MiddlewareClient:
             image = Image.open(io.BytesIO(b))
             image.save(path)
         except Exception as e:
-            logging.error("Error downloading thumbnail")
+            logging.error("Error downloading thumbnail [{}]".format(self.response.body))
             traceback.print_exc()
 
     def close(self):
