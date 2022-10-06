@@ -10,6 +10,8 @@ from reporting_service.result_repository import ResultRepository
 from reporting_service.results import Results
 from reporting_service.video_result import VideoResult
 
+THUMBNAILS_STORAGE = "/root/reporting_service/thumbnails"
+
 class ReportingService(WorkService):
     def __init__(self, config_params):
         id = config_params["service_id"]
@@ -40,7 +42,12 @@ class ReportingService(WorkService):
     def __storage_video(self, reporting_message: Message):
         video = json_to_video(reporting_message.body)
         request_id = reporting_message.request_id
-        self.result_repository.save_filtered_video(request_id, video)
+        if FUNNY_FILTER_GROUP_ID == reporting_message.source_id:
+            self.result_repository.save_popular_and_funny_video(request_id, video)
+        elif TRENDING_FILTER_GROUP_ID == reporting_message.source_id:
+            self.result_repository.save_trending_video(request_id, video)
+        else:
+            pass
 
     def __check_end_stage(self, message: Message):
         if FUNNY_FILTER_GROUP_ID == message.source_id:
@@ -57,6 +64,8 @@ class ReportingService(WorkService):
         self.middleware_system_client.connect()
         filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
         categorized_videos = self.__get_categorized_filtered_videos(filtered_videos)
+        trending_videos = self.result_repository.get_trending_videos()
+        self.__download_thumnbails(trending_videos)
         most_viewed_day = self.result_repository.get_most_viewed_day()
         results = Results(categorized_videos, most_viewed_day)
         self.middleware_system_client.call_send_results(message.request_id, str(results))
@@ -69,5 +78,8 @@ class ReportingService(WorkService):
             categorized_video = VideoResult(filtered_video.id, filtered_video.title, category)
             categorized_filtered_videos.append(categorized_video)
         return categorized_filtered_videos
-            
-    
+
+    def __download_thumnbails(self, trending_videos: 'list[Video]'):
+        for trendind_video in trending_videos:
+            url = trendind_video.thumbnail_link
+            logging.info("Download Thumbnail URL [{}]".format(url))
