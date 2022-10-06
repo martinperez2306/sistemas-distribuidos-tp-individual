@@ -12,10 +12,13 @@ class IngestionService(WorkService):
         if START_PROCESS_OP_ID == ingestion_message.operation_id:
             self.middleware_system_client.connect()
             self.middleware_system_client.call_filter_by_likes(ingestion_message)
+            self.middleware_system_client.call_filter_by_trending(ingestion_message)
         elif PROCESS_DATA_OP_ID == ingestion_message.operation_id:
             self.middleware_system_client.call_filter_by_likes(ingestion_message)
+            self.middleware_system_client.call_filter_by_trending(ingestion_message)
         elif END_PROCESS_OP_ID == ingestion_message.operation_id:
             self.middleware_system_client.call_filter_by_likes(ingestion_message)
+            self.middleware_system_client.call_filter_by_trending(ingestion_message)
             self.middleware_system_client.close()
         
     

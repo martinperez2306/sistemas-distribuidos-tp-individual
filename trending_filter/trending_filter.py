@@ -42,15 +42,19 @@ class TrendingFilter(RoutingService):
         if self.trending_dates_by_video.get(video.id):
             trending_dates: list = self.trending_dates_by_video.get(video.id)
             trending_dates.append(video.trending_date)
+            self.trending_dates_by_video[video.id] = trending_dates
         else:
             trending_dates = list()
             trending_dates.append(video.trending_date)
+            self.trending_dates_by_video[video.id] = trending_dates
         if self.countries_by_video.get(video.id):
             countries: list = self.countries_by_video.get(video.id)
             countries.append(video.country)
+            self.countries_by_video[video.id] = countries
         else:
             countries = list()
             countries.append(video.country)
+            self.countries_by_video[video.id] = countries
         if self.__is_trending_video(video) and self.__is_trending_video_in_all_countries(video):
             self.trending_videos.append(video)
 
