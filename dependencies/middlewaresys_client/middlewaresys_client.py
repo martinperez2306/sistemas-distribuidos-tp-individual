@@ -29,6 +29,10 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, LIKE_FILTER_GROUP_ID, request_message.body)
         self.__request(message)
 
+    def call_filter_by_trending(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, TRENDING_FILTER_GROUP_ID, request_message.body)
+        self.__request(message)
+
     def call_filter_by_tag(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, FUNNY_FILTER_GROUP_ID, request_message.body)
         self.__request(message)
