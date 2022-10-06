@@ -91,8 +91,14 @@ def process_csv(path, middleware_client, request_id, country):
         csvreader = csv.reader(file)
         header = next(csvreader, None)
         logging.info("CSV Header [{}]".format(header))
-        for row in csvreader:
-            process_video(row, middleware_client, request_id, country)
+        while True:
+          try:
+               row = next(csvreader)
+               process_video(row, middleware_client, request_id, country)
+          except csv.Error:
+               continue
+          except StopIteration:
+               break
 
 def process_video(video_str: 'list[str]', middleware_client: MiddlewareClient, request_id: int, country: str):
     logging.debug("Processing Video STR: [{}] in Request with ID [{}]".format(video_str, request_id))
