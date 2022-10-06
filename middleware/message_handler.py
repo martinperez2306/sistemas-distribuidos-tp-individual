@@ -50,6 +50,12 @@ class MessageHandler:
             elif (message.operation_id == SEND_RESULTS_OP_ID):
                 logging.info("Sending Results!")
                 self.client_service.send_results(ch, method, props, message)
+            elif (message.operation_id == DOWNLOAD_THUMBNAILS):
+                logging.info("Upload Thumbnails to client")
+                self.client_service.upload_thumbnails(ch, method, props, message)
+            elif (message.operation_id == DOWNLOAD_COMPLETE):
+                logging.info("Upload Thumbnails to client complete")
+                self.client_service.send_upload_complete(ch, method, props, message)
             else:
                 logging.info("Client method not found!")
         elif SERVICE_MESSAGE_ID == message.id:

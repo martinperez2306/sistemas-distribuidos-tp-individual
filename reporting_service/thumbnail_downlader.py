@@ -1,8 +1,8 @@
 import logging
 import requests
+from dependencies.commons.constants import THUMBNAILS_STORAGE
 
 from dependencies.commons.video import Video
-THUMBNAILS_STORAGE = "/root/reporting_service/thumbnails"
 THUMBNAILS_EXTENSION = ".png"
 
 class ThumbnailDownloader:

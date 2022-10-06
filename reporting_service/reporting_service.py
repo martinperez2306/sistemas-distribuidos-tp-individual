@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import pathlib
 from dependencies.commons.message import Message
 from dependencies.commons.constants import *
 from dependencies.commons.utils import json_to_video
@@ -71,6 +73,7 @@ class ReportingService(WorkService):
         most_viewed_day = self.result_repository.get_most_viewed_day()
         results = Results(categorized_videos, most_viewed_day)
         self.middleware_system_client.call_send_results(message.request_id, str(results))
+        self.__upload_thumbnails_to_client(message.request_id)
         self.middleware_system_client.close()
 
     def __get_categorized_filtered_videos(self, filtered_videos: 'list[Video]'):
@@ -85,4 +88,12 @@ class ReportingService(WorkService):
         if trending_videos:
             for trendind_video in trending_videos:
                 self.thumbnail_downloader.download(trendind_video)
-                
+
+    def __upload_thumbnails_to_client(self, request_id):
+        for path in pathlib.Path(THUMBNAILS_STORAGE).iterdir():
+            if path.is_file():
+                basename = str(os.path.basename(path))
+                with open(path, 'rb') as thumbnail:
+                    file = thumbnail.read()
+                    self.middleware_system_client.call_upload_thumbnail(request_id, basename, file)
+        self.middleware_system_client.call_upload_complete(request_id)

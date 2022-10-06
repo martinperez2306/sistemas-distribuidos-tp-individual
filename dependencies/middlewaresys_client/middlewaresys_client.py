@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import base64
 import logging
 import pika
 import re
@@ -49,8 +50,20 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, STORAGE_DATA_WORKER_ID, request_message.body)
         self.__request(message)
 
-    def call_send_results(self, request_id: int, results: str):
+    def call_send_results(self, request_id: str, results: str):
         message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, SEND_RESULTS_OP_ID, MIDDLEWARE_ID, results)
+        self.__request(message)
+
+    def call_upload_thumbnail(self, request_id: str, filename:str, thumbnail: bytes):
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_THUMBNAILS, MIDDLEWARE_ID, base64.b64encode(thumbnail).decode(UTF8_ENCODING))
+        properties=pika.BasicProperties(
+            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE,
+            headers={'filename':filename}
+        )
+        self.__request_prop(message, properties)
+
+    def call_upload_complete(self, request_id: str):
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_COMPLETE, MIDDLEWARE_ID, "")
         self.__request(message)
 
     def __request(self, message: Message):
@@ -62,6 +75,14 @@ class MiddlewareSystemClient:
             properties=pika.BasicProperties(
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))
+
+    def __request_prop(self, message: Message, properties):
+        self.channel.basic_publish(
+            exchange='',
+            routing_key=self.middleware_queue_id,
+            body=message.to_string().encode(UTF8_ENCODING),
+            properties=properties)
+
 
     def close(self):
         self.connection.close()

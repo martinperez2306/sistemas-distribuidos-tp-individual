@@ -71,7 +71,28 @@ class ClientService:
             properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.request_id,)
             response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.source_id, message.operation_id, request.client_id, message.body)
             self.__send(ch, method, properties, response)
-            self.request_repository.delete(message.request_id)
+        else:
+            logging.info("Request with ID[{}] not found".format(message.request_id))
+
+    def upload_thumbnails(self, ch, method, props, message: Message):
+        logging.info("Upload thumbnails")
+        request: Request = self.request_repository.get(message.request_id)
+        if request:
+            logging.info("Uploading thumbnais to request[{}]".format(request))
+            properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.request_id, headers=props.headers)
+            response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.source_id, message.operation_id, request.client_id, message.body)
+            self.__send(ch, method, properties, response)
+        else:
+            logging.info("Request with ID[{}] not found".format(message.request_id))
+
+    def send_upload_complete(self, ch, method, props, message: Message):
+        logging.info("Upload thumbnails")
+        request: Request = self.request_repository.get(message.request_id)
+        if request:
+            logging.info("Uploading thumbnais to request[{}]".format(request))
+            properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.request_id,)
+            response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.source_id, message.operation_id, request.client_id, message.body)
+            self.__send(ch, method, properties, response)
         else:
             logging.info("Request with ID[{}] not found".format(message.request_id))
 
@@ -83,6 +104,6 @@ class ClientService:
         logging.info("Send to [{}] with correlation [{}] message [{}]".format(props.reply_to, props.correlation_id, message.to_string()))
         ch.basic_publish(exchange='',
                         routing_key=props.reply_to,
-                        properties=pika.BasicProperties(correlation_id = props.correlation_id),
+                        properties=pika.BasicProperties(correlation_id = props.correlation_id, headers=props.headers),
                         body=message.to_string().encode(UTF8_ENCODING))
         

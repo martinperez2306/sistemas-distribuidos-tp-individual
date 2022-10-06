@@ -19,6 +19,7 @@ CATEGORIES_PATH = "/root/client/categories"
 FILEPATH_SEPARATOR = "_"
 
 RESULTS_PENDING = "PENDING"
+THUMBNAILS_STORAGE = "/root/client/thumbnails"
 
 def main():
     config_params = initialize_config(CONFIG_PATH)
@@ -31,12 +32,13 @@ def main():
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
         results = get_results(middleware_client, request_id)
+    download_thumbnails(middleware_client, request_id)
     shutdown_middleware_client(middleware_client)
     show_results(results)
 
 def initialize_middleware_client():
     logging.info("Initializing Middleware Client")
-    return MiddlewareClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE)
+    return MiddlewareClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, THUMBNAILS_STORAGE)
     
 def get_total_countries():
     logging.info("Getting total countries")
@@ -146,6 +148,12 @@ def get_results(middleware_client: MiddlewareClient, request_id: str):
     results_message: Message = middleware_client.wait_get_results(request_id)
     logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))
     return results_message
+
+def download_thumbnails(middleware_client: MiddlewareClient, request_id: str):
+    logging.info("Download Thumbnails for Request with ID [{}]".format(request_id))
+    print("Downloading files...")
+    middleware_client.call_download_thumbnails(request_id)
+    middleware_client.wait_get_results(request_id)
 
 def show_results(results):
     print("Processing complete!!")
