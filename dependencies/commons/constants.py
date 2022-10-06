@@ -26,6 +26,7 @@ MAX_QUEUE = "max_queue"
 
 #EXCHANGUES
 LIKE_FILTER_EXCHANGE = "like_filter_exchange"
+TRENDING_FILTER_EXCHANGE = "trending_filter_exchange"
 FUNNY_FILTER_EXCHANGE = "funny_filter_exchange"
 DAY_GROUPER_EXCHANGE = "day_group_exchange"
 
@@ -40,6 +41,7 @@ PROCESS_DATA_OP_ID = 1
 END_PROCESS_OP_ID = 2
 SEND_RESULTS_OP_ID = 3
 LOAD_CATEGORIES_OP_ID = 4
+LOAD_TOTAL_COUNTRIES = 5
 
 #SYSTEM WORKERS IDS
 MIDDLEWARE_ID = "middleware"
@@ -51,3 +53,4 @@ MAX_WORKER_ID = "max"
 LIKE_FILTER_GROUP_ID = "like_filter"
 FUNNY_FILTER_GROUP_ID = "funny_filter"
 DAY_GROUPER_GROUP_ID = "day_grouper"
+TRENDING_FILTER_GROUP_ID = "trending_filter"

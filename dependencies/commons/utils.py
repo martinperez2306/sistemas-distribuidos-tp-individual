@@ -5,6 +5,9 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.video import Video
 
+def to_json(jsoneable):
+    return json.dumps(jsoneable)
+
 def parse_message(body: str) -> Message:
     logging.debug("Parsing message: {}".format(body))
     message_id = -1
