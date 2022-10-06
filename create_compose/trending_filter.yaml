@@ -1,0 +1,17 @@
+  TRENDING_FILTER:
+    build:
+      context: ./trending_filter
+      dockerfile: trending_filter.dockerfile
+    image: trending_filter
+    container_name: TRENDING_FILTER
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=SERV_ID
+      - GROUP_ID=trending_filter
+    volumes:
+      - "./config/trending_filter:/root/trending_filter/config"

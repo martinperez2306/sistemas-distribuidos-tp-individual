@@ -11,6 +11,7 @@ BASE_TEMPLATE="create_compose/base_template.yaml"
 MIDDLEWARE_TEMPLATE="create_compose/middleware_template.yaml"
 INGESTION_TEMPLATE="create_compose/ingestion_service.yaml"
 LIKE_TEMPLATE="create_compose/like_filter.yaml"
+TRENDING_TEMPLATE="create_compose/trending_filter.yaml"
 FUNNY_TEMPLATE="create_compose/funny_filter.yaml"
 DAY_TEMPLATE="create_compose/day_grouper.yaml"
 MAX_TEMPLATE="create_compose/max.yaml"
@@ -41,6 +42,13 @@ do
     LIKE_NAME="like_filter_$i"
     SERVICE_ID="SERV_ID"
     cat $LIKE_TEMPLATE | sed -r "s/$LIKE_FILTER/$LIKE_NAME/g" | sed -r "s/$CONTAINER_NAME/$LIKE_NAME/g" | sed -r "s/$SERVICE_ID/$LIKE_NAME/g" >> $OUTPUT
+    echo -e "\n" >> $OUTPUT
+
+    TRENDING_FILTER="TRENDING_FILTER"
+    CONTAINER_NAME="CONTAINER_NAME"
+    TRENDING_NAME="trending_filter_$i"
+    SERVICE_ID="SERV_ID"
+    cat $TRENDING_TEMPLATE | sed -r "s/$TRENDING_FILTER/$TRENDING_NAME/g" | sed -r "s/$CONTAINER_NAME/$TRENDING_NAME/g" | sed -r "s/$SERVICE_ID/$TRENDING_NAME/g" >> $OUTPUT
     echo -e "\n" >> $OUTPUT
 
     FUNNY_FILTER="FUNNY_FILTER"

@@ -69,6 +69,24 @@ services:
     volumes:
       - "./config/like_filter:/root/like_filter/config"
 
+  trending_filter_1:
+    build:
+      context: ./trending_filter
+      dockerfile: trending_filter.dockerfile
+    image: trending_filter
+    container_name: trending_filter_1
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=trending_filter_1
+      - GROUP_ID=trending_filter
+    volumes:
+      - "./config/trending_filter:/root/trending_filter/config"
+
   funny_filter_1:
     build:
       context: ./funny_filter
@@ -124,6 +142,24 @@ services:
       - GROUP_ID=like_filter
     volumes:
       - "./config/like_filter:/root/like_filter/config"
+
+  trending_filter_2:
+    build:
+      context: ./trending_filter
+      dockerfile: trending_filter.dockerfile
+    image: trending_filter
+    container_name: trending_filter_2
+    networks:
+      - testing_net
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_ID=trending_filter_2
+      - GROUP_ID=trending_filter
+    volumes:
+      - "./config/trending_filter:/root/trending_filter/config"
 
   funny_filter_2:
     build:
