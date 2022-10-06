@@ -47,7 +47,7 @@ def unique(list):
             # check if exists in unique_list or not
             unique = True
             for unique_video in unique_list:    
-                if video.id == unique_video.id and video.title == unique_video.title and video.category == unique_video.category:
+                if video.id == unique_video.id and video.title == unique_video.title and video.category_id == unique_video.category_id:
                     unique = False
             if unique:
                 unique_list.append(video)
