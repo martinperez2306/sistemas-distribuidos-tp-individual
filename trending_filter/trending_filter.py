@@ -55,8 +55,14 @@ class TrendingFilter(RoutingService):
             countries = list()
             countries.append(video.country)
             self.countries_by_video[video.id] = countries
+            
         if self.__is_trending_video(video) and self.__is_trending_video_in_all_countries(video):
-            self.trending_videos.append(video)
+            unique = True
+            for trending_video in self.trending_videos:
+                if video.id == trending_video.id:
+                    unique = False
+            if unique:             
+                self.trending_videos.append(video)
 
     def __is_trending_video(self, video):
          return len(self.trending_dates_by_video.get(video.id)) >= TRENDING_DAYS_COUNT
