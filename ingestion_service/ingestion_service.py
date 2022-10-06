@@ -1,4 +1,7 @@
 from dependencies.commons.constants import *
+from dependencies.commons.utils import to_json
+from dependencies.commons.video import Video
+from dependencies.commons.video_input import VideoInput
 from dependencies.commons.work_service import WorkService
 
 class IngestionService(WorkService):
@@ -14,6 +17,9 @@ class IngestionService(WorkService):
             self.middleware_system_client.call_filter_by_likes(ingestion_message)
             self.middleware_system_client.call_filter_by_trending(ingestion_message)
         elif PROCESS_DATA_OP_ID == ingestion_message.operation_id:
+            video_input = VideoInput.from_json(ingestion_message.body)
+            video = Video.from_input(video_input)
+            ingestion_message.body = to_json(video.__dict__)
             self.middleware_system_client.call_filter_by_likes(ingestion_message)
             self.middleware_system_client.call_filter_by_trending(ingestion_message)
         elif END_PROCESS_OP_ID == ingestion_message.operation_id:

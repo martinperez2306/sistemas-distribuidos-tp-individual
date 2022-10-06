@@ -5,12 +5,12 @@ import json
 import logging
 import pathlib
 import os
-from dependencies.commons.videos_query import VideosQuery
 
-from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.video import Video
+from dependencies.commons.video_input import VideoInput
+from dependencies.commons.videos_query import VideosQuery
+from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.middleware_client.middleware_client import MiddlewareClient
 
 CONFIG_PATH = "/root/client/config/config.ini"
@@ -139,7 +139,7 @@ def __parse_video_from_csv(video_str: 'list[str]', country):
     comments_disabled = video_str[13].strip("''")
     ratings_disabled = video_str[14].strip("''")
     description = video_str[15].strip("''")
-    return Video(id, title, published_at, channel_id, channel_title, category_id, trending_date, tags, view_count, likes, dislikes,
+    return VideoInput(id, title, published_at, channel_id, channel_title, category_id, trending_date, tags, view_count, likes, dislikes,
                     comment_count, thumbnail_link, comments_disabled, ratings_disabled, description, country)
 
 def get_results(middleware_client: MiddlewareClient, request_id: str):
