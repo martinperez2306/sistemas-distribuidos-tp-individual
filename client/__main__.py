@@ -5,6 +5,7 @@ import json
 import logging
 import pathlib
 import os
+from dependencies.commons.VideosQuery import VideosQuery
 
 from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.commons.constants import *
@@ -25,7 +26,8 @@ def main():
     middleware_client = initialize_middleware_client()
     total_countries = get_total_countries()
     categories = get_categories()
-    request_id = process_videos(middleware_client, categories, total_countries)
+    query = VideosQuery(categories, total_countries)
+    request_id = process_videos(middleware_client, query)
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
         results = get_results(middleware_client, request_id)
@@ -65,11 +67,11 @@ def create_country_categories(json_category):
         country_categories[id] = title
     return country_categories
 
-def process_videos(middleware_client: MiddlewareClient, categories, total_countries):
+def process_videos(middleware_client: MiddlewareClient, query: VideosQuery):
     logging.info("Processing Videos")
     print("Processing Videos. Please wait...")
     middleware_client.connect()
-    message: Message = middleware_client.call_start_data_process(categories)
+    message: Message = middleware_client.call_start_data_process(query)
     request_id = message.body
     for path in pathlib.Path(VIDEOS_PATH).iterdir():
         if path.is_file():
