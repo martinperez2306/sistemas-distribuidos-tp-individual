@@ -25,13 +25,18 @@ class MiddlewareSystemClient:
         body = body.decode(UTF8_ENCODING)
         return parse_message(body)
 
-
+    #Deprecated
     def call_filter_by_likes(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, LIKE_FILTER_GROUP_ID, request_message.body)
         self.__request(message)
 
+    #Deprecated
     def call_filter_by_trending(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, TRENDING_FILTER_GROUP_ID, request_message.body)
+        self.__request(message)
+
+    def call_filter_by_likes_and_trending(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, LIKE_FILTER_GROUP_ID + "_" +TRENDING_FILTER_GROUP_ID, request_message.body)
         self.__request(message)
 
     def call_filter_by_tag(self, request_message: Message):
