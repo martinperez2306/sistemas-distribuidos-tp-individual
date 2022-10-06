@@ -1,4 +1,4 @@
-videos
-videos_dev
-categories
-thumbnails
+videos/*.csv
+videos_dev/*.csv
+categories/*.json
+thumbnails/*.png
