@@ -20,7 +20,7 @@ class MiddlewareClient:
         self.channel = None
         self.callback_queue = None
         self.response = None
-        self.corr_id = str(uuid.uuid4())
+        self.corr_id = None
         self.waiting_results = False
 
     def connect(self):
@@ -30,7 +30,7 @@ class MiddlewareClient:
         self.channel.queue_declare(queue=self.middleware_queue_id, durable=True)
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
-        self.corr_id = None
+        self.corr_id = str(uuid.uuid4())
         self.response = None
 
         self.channel.basic_consume(
