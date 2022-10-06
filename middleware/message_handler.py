@@ -59,11 +59,15 @@ class MessageHandler:
             else:
                 logging.info("Client method not found!")
         elif SERVICE_MESSAGE_ID == message.id:
-            if LIKE_FILTER_GROUP_ID == message.destination_id:
+            if LIKE_FILTER_GROUP_ID == message.destination_id:#Deprecated
                 logging.info("Handling Filter By Likes")
                 self.like_filter_caller.filter_by_likes(message)
-            elif TRENDING_FILTER_GROUP_ID == message.destination_id:
+            elif TRENDING_FILTER_GROUP_ID == message.destination_id:#Deprecated
                 logging.info("Handling Filter By Trending")
+                self.trending_filter_caller.filter_by_trending(message)
+            elif INGEST_DATA_WORKER_ID == message.source_id:#Replace of LIKE HANDLING and TRENDING HANDLING
+                logging.info("Handling Filter By Likes and Trending")
+                self.like_filter_caller.filter_by_likes(message)
                 self.trending_filter_caller.filter_by_trending(message)
             elif FUNNY_FILTER_GROUP_ID == message.destination_id:
                 logging.info("Handling Filter by Tag Funny")
