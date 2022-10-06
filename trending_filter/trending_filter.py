@@ -41,7 +41,7 @@ class TrendingFilter(RoutingService):
         logging.debug("Video {}".format(str(video)))
         if self.trending_dates_by_video.get(video.id):
             trending_dates: list = self.trending_dates_by_video.get(video.id)
-            trending_dates.append(video.trending_date)
+            self.__add_unique(trending_dates, video.trending_date)
             self.trending_dates_by_video[video.id] = trending_dates
         else:
             trending_dates = list()
@@ -49,7 +49,7 @@ class TrendingFilter(RoutingService):
             self.trending_dates_by_video[video.id] = trending_dates
         if self.countries_by_video.get(video.id):
             countries: list = self.countries_by_video.get(video.id)
-            countries.append(video.country)
+            self.__add_unique(countries, video.country)
             self.countries_by_video[video.id] = countries
         else:
             countries = list()
@@ -63,6 +63,10 @@ class TrendingFilter(RoutingService):
                     unique = False
             if unique:             
                 self.trending_videos.append(video)
+
+    def __add_unique(self, list: 'list', value):
+        if value not in list:
+            list.append(value)
 
     def __is_trending_video(self, video):
          return len(self.trending_dates_by_video.get(video.id)) >= TRENDING_DAYS_COUNT
