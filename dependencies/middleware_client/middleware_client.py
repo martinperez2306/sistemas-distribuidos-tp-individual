@@ -2,6 +2,7 @@
 import base64
 import io
 import logging
+import traceback
 import uuid
 import pika
 import PIL.Image as Image
@@ -95,14 +96,18 @@ class MiddlewareClient:
             body=message.to_string().encode(UTF8_ENCODING))
 
     def __storage(self, ch, method, props, body):
-        thumbnail = Thumbnail.from_json(self.response.body)
-        filename = thumbnail.filename
-        logging.info("Storaging file with name [{}]".format(filename))
-        path = self.storage_path + "/" + filename
-        b = base64.b64decode(thumbnail.base64)
-        logging.info("b64 [{}]".format(b))
-        image = Image.open(io.BytesIO(b))
-        image.save(path)
+        try:
+            thumbnail = Thumbnail.from_json(self.response.body)
+            filename = thumbnail.filename
+            logging.info("Storaging file with name [{}]".format(filename))
+            path = self.storage_path + "/" + filename
+            b = base64.b64decode(thumbnail.base64)
+            logging.info("b64 [{}]".format(b))
+            image = Image.open(io.BytesIO(b))
+            image.save(path)
+        except Exception as e:
+            logging.error("Error downloading thumbnail")
+            traceback.print_exc()
 
     def close(self):
         logging.info("Closing connection to Middleware")

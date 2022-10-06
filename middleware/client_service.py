@@ -43,25 +43,16 @@ class ClientService:
         #Propagate Start Process data with Request ID
         propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
         self.ingestion_service_caller.ingest_data(propagate)
-        #Responde to client
-        #response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
-        #self.__respond(ch, method, props, message, response)
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
         #Process data with Request ID
         self.ingestion_service_caller.ingest_data(message)
-        #Responde to client
-        #response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
-        #self.__respond(ch, method, props, message, response)
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
         #Propagate End Process data with Request ID
         self.ingestion_service_caller.ingest_data(message)
-        #Responde to client
-        #response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
-        #self.__respond(ch, method, props, message, response)
 
     def send_results(self, ch, method, props, message: Message):
         logging.info("Sending results")
