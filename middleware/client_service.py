@@ -1,6 +1,6 @@
 import logging
 import pika
-from dependencies.commons.VideosQuery import VideosQuery
+from dependencies.commons.videos_query import VideosQuery
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message

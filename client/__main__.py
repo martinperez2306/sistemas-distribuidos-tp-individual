@@ -5,7 +5,7 @@ import json
 import logging
 import pathlib
 import os
-from dependencies.commons.VideosQuery import VideosQuery
+from dependencies.commons.videos_query import VideosQuery
 
 from dependencies.commons.base_app import initialize_config, initialize_log
 from dependencies.commons.constants import *

@@ -5,7 +5,7 @@ import logging
 import uuid
 import pika
 import PIL.Image as Image
-from dependencies.commons.VideosQuery import VideosQuery
+from dependencies.commons.videos_query import VideosQuery
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import parse_message, to_json
