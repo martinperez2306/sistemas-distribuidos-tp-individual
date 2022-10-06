@@ -21,19 +21,13 @@ class MessageHandler:
         self.trending_filter_caller = TrendingFilterCaller(config_params)
         self.funny_filter_caller = FunnyFilterCaller(config_params)
         self.day_grouper_caller = DayGrouperCaller(config_params)
-        self.max_caller = MaxCaller()
-        self.storage_service_caller = StorageServiceCaller()
+        self.max_caller = MaxCaller(config_params)
+        self.storage_service_caller = StorageServiceCaller(config_params)
         self.client_service = ClientService(self.ingestion_service_caller, self.trending_filter_caller, 
                                             self.storage_service_caller, request_repository)
 
     def run(self):
-        self.ingestion_service_caller.connect()
-        self.like_filter_caller.connect()
-        self.trending_filter_caller.connect()
-        self.funny_filter_caller.connect()
-        self.day_grouper_caller.connect()
-        self.max_caller.connect()
-        self.storage_service_caller.connect()
+        pass
 
     def handle_message(self, ch, method, props, body):
         logging.info("Handling message {}".format(body))

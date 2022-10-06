@@ -7,11 +7,13 @@ class FunnyFilterCaller(RoutingCaller):
     def __init__(self, config_params):
         super().__init__(FUNNY_FILTER_EXCHANGE)
         self.total_routes = int(config_params["service_instances"])
+        self.previus_stage_eof = 0
     
     def filter_by_funny_tag(self, message: Message):
         filter_by_tag_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, FUNNY_FILTER_GROUP_ID, message.body)
         if START_PROCESS_OP_ID == message.operation_id:
-            self.connect()
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             self.__broadcast(filter_by_tag_message)
         elif PROCESS_DATA_OP_ID == message.operation_id:
             video = json_to_video(filter_by_tag_message.body)
@@ -19,8 +21,10 @@ class FunnyFilterCaller(RoutingCaller):
             routing_key = FUNNY_FILTER_GROUP_ID + "_" + str((hash(video_id) % self.total_routes) + 1)
             self.publish_data(filter_by_tag_message.to_string(), str(routing_key))
         elif END_PROCESS_OP_ID == message.operation_id:
+            self.previus_stage_eof += 1
             self.__broadcast(filter_by_tag_message)
-            self.close()
+            if self.previus_stage_eof >= self.total_routes:
+                self.close()
         else:
             pass
 

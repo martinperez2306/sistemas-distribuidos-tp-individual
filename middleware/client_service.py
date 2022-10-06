@@ -40,9 +40,8 @@ class ClientService:
         #Save total countries
         total_countries_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_TOTAL_COUNTRIES, TRENDING_FILTER_GROUP_ID, query.total_countries)
         self.trending_filter_caller.filter_by_trending(total_countries_message)
-        #Propagate start process data with Request ID
+        #Propagate Start Process data with Request ID
         propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
-        self.ingestion_service_caller.connect()
         self.ingestion_service_caller.ingest_data(propagate)
         #Responde to client
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
@@ -58,9 +57,8 @@ class ClientService:
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
-        #Propagate end process data with Request ID
+        #Propagate End Process data with Request ID
         self.ingestion_service_caller.ingest_data(message)
-        self.ingestion_service_caller.close()
         #Responde to client
         response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
         self.__respond(ch, method, props, message, response)

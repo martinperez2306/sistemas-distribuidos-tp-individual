@@ -9,11 +9,13 @@ class DayGrouperCaller(RoutingCaller):
     def __init__(self, config_params):
         super().__init__(DAY_GROUPER_EXCHANGE)
         self.total_routes = int(config_params["service_instances"])
+        self.previus_stage_eof = 0
 
     def group_by_day(self, message: Message):
         group_by_day_message = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, DAY_GROUPER_GROUP_ID, message.body)
         if START_PROCESS_OP_ID == message.operation_id:
-            self.connect()
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             self.__broadcast(group_by_day_message)
         elif PROCESS_DATA_OP_ID == message.operation_id:
             video = json_to_video(group_by_day_message.body)
@@ -22,7 +24,8 @@ class DayGrouperCaller(RoutingCaller):
             self.publish_data(group_by_day_message.to_string(), str(routing_key))
         elif END_PROCESS_OP_ID == message.operation_id:
             self.__broadcast(group_by_day_message)
-            self.close()
+            if self.previus_stage_eof >= self.total_routes:
+                self.close()
         else:
             pass
             
