@@ -8,9 +8,8 @@ from dependencies.commons.work_service import WorkService
 from reporting_service.reporting_check import ReportingCheck
 from reporting_service.result_repository import ResultRepository
 from reporting_service.results import Results
+from reporting_service.thumbnail_downlader import ThumbnailDownloader
 from reporting_service.video_result import VideoResult
-
-THUMBNAILS_STORAGE = "/root/reporting_service/thumbnails"
 
 class ReportingService(WorkService):
     def __init__(self, config_params):
@@ -20,6 +19,7 @@ class ReportingService(WorkService):
         self.result_repository = ResultRepository()
         self.reporting_check = ReportingCheck(self.total_routes)
         self.categories_by_country = dict()
+        self.thumbnail_downloader = ThumbnailDownloader()
         super().__init__(id, group_id, REPORTING_SERVICE_QUEUE)
 
     def work(self, ch, method, properties, body):
@@ -82,5 +82,5 @@ class ReportingService(WorkService):
     def __download_thumnbails(self, trending_videos: 'list[Video]'):
         if trending_videos:
             for trendind_video in trending_videos:
-                url = trendind_video.thumbnail_link
-                logging.info("Download Thumbnail URL [{}]".format(url))
+                self.thumbnail_downloader.download(trendind_video)
+                
