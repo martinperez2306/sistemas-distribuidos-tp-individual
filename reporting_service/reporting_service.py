@@ -51,13 +51,15 @@ class ReportingService(WorkService):
 
     def __check_end_stage(self, message: Message):
         if FUNNY_FILTER_GROUP_ID == message.source_id:
-            self.reporting_check.check_filter()
-        elif MAX_WORKER_ID in message.source_id:
+            self.reporting_check.eof_funny()
+        elif TRENDING_FILTER_GROUP_ID == message.source_id:
+            self.reporting_check.eof_trending()
+        elif MAX_WORKER_ID == message.source_id:
             self.result_repository.save_most_viewed_day(message.body)
-            self.reporting_check.check_grouper()
+            self.reporting_check.eof_max()
         else:
             pass
-        if self.reporting_check.check():
+        if self.reporting_check.check_eofs():
             self.__end_stage(message)
         
     def __end_stage(self, message: Message):
