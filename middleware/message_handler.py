@@ -1,4 +1,3 @@
-import re
 import logging
 
 from dependencies.commons.constants import *
@@ -12,21 +11,25 @@ from middleware.like_filter_caller import LikeFilterCaller
 from middleware.max_caller import MaxCaller
 from middleware.request_repository import RequestRepository
 from middleware.storage_service_caller import StorageServiceCaller
+from middleware.trending_filter_caller import TrendingFilterCaller
 
 class MessageHandler:
     def __init__(self, config_params):
         self.ingestion_service_caller = IngestionServiceCaller()
         request_repository = RequestRepository()
         self.like_filter_caller = LikeFilterCaller(config_params)
+        self.trending_filter_caller = TrendingFilterCaller(config_params)
         self.funny_filter_caller = FunnyFilterCaller(config_params)
         self.day_grouper_caller = DayGrouperCaller(config_params)
         self.max_caller = MaxCaller()
         self.storage_service_caller = StorageServiceCaller()
-        self.client_service = ClientService(self.ingestion_service_caller, self.storage_service_caller, request_repository)
+        self.client_service = ClientService(self.ingestion_service_caller, self.trending_filter_caller, 
+                                            self.storage_service_caller, request_repository)
 
     def run(self):
         self.ingestion_service_caller.connect()
         self.like_filter_caller.connect()
+        self.trending_filter_caller.connect()
         self.funny_filter_caller.connect()
         self.day_grouper_caller.connect()
         self.max_caller.connect()
@@ -59,6 +62,9 @@ class MessageHandler:
             if LIKE_FILTER_GROUP_ID == message.destination_id:
                 logging.info("Handling Filter By Likes")
                 self.like_filter_caller.filter_by_likes(message)
+            elif TRENDING_FILTER_GROUP_ID == message.destination_id:
+                logging.info("Handling Filter By Trending")
+                self.trending_filter_caller.filter_by_trending(message)
             elif FUNNY_FILTER_GROUP_ID == message.destination_id:
                 logging.info("Handling Filter by Tag Funny")
                 self.funny_filter_caller.filter_by_funny_tag(message)

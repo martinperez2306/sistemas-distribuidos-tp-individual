@@ -1,5 +1,6 @@
 import logging
 import pika
+from dependencies.commons.VideosQuery import VideosQuery
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
@@ -7,14 +8,18 @@ from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.request import Request
 from middleware.request_repository import RequestRepository
 from middleware.storage_service_caller import StorageServiceCaller
+from middleware.trending_filter_caller import TrendingFilterCaller
 
 ACK_MESSAGE = "ACK"
 
 class ClientService:
-    def __init__(self, ingestion_service_caller: IngestionServiceCaller, storage_service_caller: StorageServiceCaller, 
+    def __init__(self, ingestion_service_caller: IngestionServiceCaller, 
+                        trending_filter_caller: TrendingFilterCaller,
+                        storage_service_caller: StorageServiceCaller, 
                         request_repository: RequestRepository):
         self.request_count = 0
         self.ingestion_service_caller = ingestion_service_caller
+        self.trending_filter_caller = trending_filter_caller
         self.storage_service_caller = storage_service_caller
         self.request_repository = request_repository
 
@@ -22,14 +27,18 @@ class ClientService:
         logging.info("Starting data process")
         self.request_count += 1
         request_id = self.request_count
+        query = VideosQuery.from_json(message.body)
         logging.debug("Saving request with ID [{}] CLIENT_ID [{}] CORRELATION_ID[{}] CLIENT_QUEUE [{}]"\
             .format(request_id, message.source_id, props.correlation_id, props.reply_to))
         #Create request and save it to trace client
         request = Request(request_id, message.source_id, props.correlation_id, props.reply_to)
         self.request_repository.add(request_id, request)
         #Save categories
-        categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, INGEST_DATA_WORKER_ID, message.body)
+        categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, STORAGE_DATA_WORKER_ID, query.categories)
         self.storage_service_caller.storage_data(categories_message)
+        #Save total countries
+        total_countries_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_TOTAL_COUNTRIES, TRENDING_FILTER_GROUP_ID, query.total_countries)
+        self.trending_filter_caller.filter_by_trending(total_countries_message)
         #Propagate start process data with Request ID
         propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
         self.ingestion_service_caller.connect()
