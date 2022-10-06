@@ -5,7 +5,7 @@ from middleware.routing_caller import RoutingCaller
 
 class FunnyFilterCaller(RoutingCaller):
     def __init__(self, config_params):
-        RoutingCaller.__init__(self, FUNNY_FILTER_EXCHANGE)
+        super().__init__(FUNNY_FILTER_EXCHANGE)
         self.total_routes = int(config_params["service_instances"])
     
     def filter_by_funny_tag(self, message: Message):

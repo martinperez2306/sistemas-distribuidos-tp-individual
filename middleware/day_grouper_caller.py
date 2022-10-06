@@ -7,7 +7,7 @@ from middleware.routing_caller import RoutingCaller
 
 class DayGrouperCaller(RoutingCaller):
     def __init__(self, config_params):
-        RoutingCaller.__init__(self, DAY_GROUPER_EXCHANGE)
+        super().__init__(DAY_GROUPER_EXCHANGE)
         self.total_routes = int(config_params["service_instances"])
 
     def group_by_day(self, message: Message):

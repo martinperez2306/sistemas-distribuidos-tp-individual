@@ -4,7 +4,7 @@ from dependencies.commons.message import Message
 
 class MaxCaller(BaseCaller):
     def __init__(self):
-        BaseCaller.__init__(self, MAX_QUEUE)
+        super().__init__(MAX_QUEUE)
     
     def get_max(self, message: Message):
         self.connect()

@@ -6,7 +6,7 @@ from middleware.routing_caller import RoutingCaller
 
 class TrendingFilterCaller(RoutingCaller):
     def __init__(self, config_params):
-        RoutingCaller.__init__(self, TRENDING_FILTER_EXCHANGE)
+        super().__init__(TRENDING_FILTER_EXCHANGE)
         self.total_routes = int(config_params["service_instances"])
     
     def filter_by_trending(self, message: Message):
