@@ -15,23 +15,14 @@ class IngestionService(WorkService):
     def work(self, ch, method, properties, body):
         ingestion_message = self.middleware_system_client.parse_message(body)
         if START_PROCESS_OP_ID == ingestion_message.operation_id:
-            self.middleware_system_client.connect()
-            #self.middleware_system_client.call_filter_by_likes(ingestion_message)
-            #self.middleware_system_client.call_filter_by_trending(ingestion_message)
-            self.middleware_system_client.call_filter_by_likes_and_trending(ingestion_message)
-            self.middleware_system_client.close()
+            pass
         elif PROCESS_DATA_OP_ID == ingestion_message.operation_id:
             video_input = VideoInput.from_json(ingestion_message.body)
             video = Video.from_input(video_input)
-            #ingestion_message.body = to_json(video.__dict__)
-            #self.middleware_system_client.call_filter_by_likes(ingestion_message)
-            #self.middleware_system_client.call_filter_by_trending(ingestion_message)
             self.ingested_videos.append(video)
         elif END_PROCESS_OP_ID == ingestion_message.operation_id:
             self.middleware_system_client.connect()
             self.__process_ingested_videos(ingestion_message)
-            #self.middleware_system_client.call_filter_by_likes(ingestion_message)
-            #self.middleware_system_client.call_filter_by_trending(ingestion_message)
             self.middleware_system_client.call_filter_by_likes_and_trending(ingestion_message)
             self.middleware_system_client.close()
             self.ingested_videos.clear()

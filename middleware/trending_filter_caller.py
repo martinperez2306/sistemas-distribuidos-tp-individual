@@ -17,9 +17,12 @@ class TrendingFilterCaller(RoutingCaller):
             self.__broadcast(filter_by_trending_message)
             self.close()
         elif START_PROCESS_OP_ID == message.operation_id:
-            self.connect()
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             self.__broadcast(filter_by_trending_message)
         elif PROCESS_DATA_OP_ID == message.operation_id:
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             video = json_to_video(filter_by_trending_message.body)
             video_id = video.id
             routing_key = TRENDING_FILTER_GROUP_ID + "_" + str((hash(video_id) % self.total_routes) + 1)
