@@ -4,6 +4,6 @@ echo "Stopping previous environment"
 echo "Initialize new environment"
 ./up.sh
 echo "Waiting for environment start up..."
-sleep 10
+sleep 20
 echo "Query videos!"
 ./run.sh
