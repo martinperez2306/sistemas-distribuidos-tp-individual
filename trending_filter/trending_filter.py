@@ -17,7 +17,7 @@ class TrendingFilter(RoutingService):
         self.trending_dates_by_video = dict()
         self.countries_by_video = dict()
         self.trending_videos = list()
-        super().__init__(id, group_id, LIKE_FILTER_EXCHANGE)
+        super().__init__(id, group_id, TRENDING_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         trending_filter_message = self.middleware_system_client.parse_message(body)

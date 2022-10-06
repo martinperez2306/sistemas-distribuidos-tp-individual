@@ -64,7 +64,7 @@ class ReportingService(WorkService):
         self.middleware_system_client.connect()
         filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
         categorized_videos = self.__get_categorized_filtered_videos(filtered_videos)
-        trending_videos = self.result_repository.get_trending_videos()
+        trending_videos = self.result_repository.get_trending_videos(message.request_id)
         self.__download_thumnbails(trending_videos)
         most_viewed_day = self.result_repository.get_most_viewed_day()
         results = Results(categorized_videos, most_viewed_day)
@@ -80,6 +80,7 @@ class ReportingService(WorkService):
         return categorized_filtered_videos
 
     def __download_thumnbails(self, trending_videos: 'list[Video]'):
-        for trendind_video in trending_videos:
-            url = trendind_video.thumbnail_link
-            logging.info("Download Thumbnail URL [{}]".format(url))
+        if trending_videos:
+            for trendind_video in trending_videos:
+                url = trendind_video.thumbnail_link
+                logging.info("Download Thumbnail URL [{}]".format(url))
