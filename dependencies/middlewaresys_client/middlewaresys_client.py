@@ -6,7 +6,8 @@ import re
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.utils import parse_message
+from dependencies.commons.thumbnail import Thumbnail
+from dependencies.commons.utils import parse_message, to_json
 
 class MiddlewareSystemClient:
     def __init__(self, host, middleware_queue_id, group_id):
@@ -59,11 +60,11 @@ class MiddlewareSystemClient:
         message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, SEND_RESULTS_OP_ID, MIDDLEWARE_ID, results)
         self.__request(message)
 
-    def call_upload_thumbnail(self, request_id: str, filename:str, thumbnail: bytes):
-        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_THUMBNAILS, MIDDLEWARE_ID, base64.b64encode(thumbnail).decode(UTF8_ENCODING))
+    def call_upload_thumbnail(self, request_id: str, filename:str, thumbnailb: bytes):
+        thumbnail = Thumbnail(filename, base64.b64encode(thumbnailb).decode(UTF8_ENCODING))
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_THUMBNAILS, MIDDLEWARE_ID, to_json(thumbnail.__dict__))
         properties=pika.BasicProperties(
-            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE,
-            headers={'filename':filename}
+            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
         )
         self.__request_prop(message, properties)
 

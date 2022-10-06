@@ -5,6 +5,7 @@ import logging
 import uuid
 import pika
 import PIL.Image as Image
+from dependencies.commons.thumbnail import Thumbnail
 from dependencies.commons.videos_query import VideosQuery
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
@@ -94,17 +95,14 @@ class MiddlewareClient:
             body=message.to_string().encode(UTF8_ENCODING))
 
     def __storage(self, ch, method, props, body):
-        filename = props.headers['filename']
+        thumbnail = Thumbnail.from_json(self.response.body)
+        filename = thumbnail.filename
         logging.info("Storaging file with name [{}]".format(filename))
         path = self.storage_path + "/" + filename
-        b = base64.b64decode(self.response.body)
+        b = base64.b64decode(thumbnail.base64)
         logging.info("b64 [{}]".format(b))
         image = Image.open(io.BytesIO(b))
         image.save(path)
-        #with open(path, 'wb') as thumbnails_file:
-        #    thumbnails_file.write(b)
-
-        
 
     def close(self):
         logging.info("Closing connection to Middleware")
