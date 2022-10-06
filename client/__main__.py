@@ -71,8 +71,7 @@ def process_videos(middleware_client: MiddlewareClient, query: VideosQuery):
     logging.info("Processing Videos")
     print("Processing Videos. Please wait...")
     middleware_client.connect()
-    message: Message = middleware_client.call_start_data_process(query)
-    request_id = message.body
+    request_id = middleware_client.call_start_data_process(query)
     for path in pathlib.Path(VIDEOS_PATH).iterdir():
         if path.is_file():
             country = extract_country_from_path(path)

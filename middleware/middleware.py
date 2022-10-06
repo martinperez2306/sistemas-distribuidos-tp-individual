@@ -34,6 +34,7 @@ class Middleware(BaseApp):
                     logging.info("Received {}".format(body))
                     self.message_handler.handle_message(ch, method, props, body)
 
+                self.channel.basic_qos(prefetch_count=1)
                 self.channel.basic_consume(
                     queue=MIDDLEWARE_QUEUE, on_message_callback=handle_message)
 

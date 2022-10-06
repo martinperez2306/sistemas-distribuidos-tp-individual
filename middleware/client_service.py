@@ -27,12 +27,12 @@ class ClientService:
     def start_data_process(self, ch, method, props, message: Message):
         logging.info("Starting data process")
         self.request_count += 1
-        request_id = self.request_count
+        request_id = props.correlation_id
         query = VideosQuery.from_json(message.body)
-        logging.debug("Saving request with ID [{}] CLIENT_ID [{}] CORRELATION_ID[{}] CLIENT_QUEUE [{}]"\
-            .format(request_id, message.source_id, props.correlation_id, props.reply_to))
+        logging.debug("Saving request with ID [{}] CLIENT_ID [{}] CLIENT_QUEUE [{}]"\
+            .format(request_id, message.source_id, props.reply_to))
         #Create request and save it to trace client
-        request = Request(request_id, message.source_id, props.correlation_id, props.reply_to)
+        request = Request(request_id, message.source_id, props.reply_to)
         self.request_repository.add(request_id, request)
         #Save categories
         categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, STORAGE_DATA_WORKER_ID, to_json(query.categories))
@@ -44,31 +44,31 @@ class ClientService:
         propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
         self.ingestion_service_caller.ingest_data(propagate)
         #Responde to client
-        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
-        self.__respond(ch, method, props, message, response)
+        #response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, request_id)
+        #self.__respond(ch, method, props, message, response)
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
         #Process data with Request ID
         self.ingestion_service_caller.ingest_data(message)
         #Responde to client
-        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
-        self.__respond(ch, method, props, message, response)
+        #response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
+        #self.__respond(ch, method, props, message, response)
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
         #Propagate End Process data with Request ID
         self.ingestion_service_caller.ingest_data(message)
         #Responde to client
-        response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
-        self.__respond(ch, method, props, message, response)
+        #response = Message(MIDDLEWARE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, message.source_id, ACK_MESSAGE)
+        #self.__respond(ch, method, props, message, response)
 
     def send_results(self, ch, method, props, message: Message):
         logging.info("Sending results")
         request: Request = self.request_repository.get(message.request_id)
         if request:
             logging.info("Sending results to request[{}]".format(request))
-            properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.correlation_id,)
+            properties = pika.BasicProperties(reply_to=request.client_queue, correlation_id=request.request_id,)
             response = Message(MIDDLEWARE_MESSAGE_ID, request.request_id, message.source_id, message.operation_id, request.client_id, message.body)
             self.__send(ch, method, properties, response)
             self.request_repository.delete(message.request_id)

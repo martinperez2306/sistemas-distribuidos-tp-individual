@@ -25,18 +25,28 @@ class MiddlewareClient:
 
     def connect(self):
         logging.info("Connecting to Middleware")
+        self.corr_id = str(uuid.uuid4())
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.middleware_queue_id, durable=True)
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
-        self.corr_id = str(uuid.uuid4())
-        self.response = None
 
-        self.channel.basic_consume(
-            queue=self.callback_queue,
-            on_message_callback=self.__on_response,
-            auto_ack=True)
+    def call_start_data_process(self, query: VideosQuery):
+        logging.info("Calling start data process")
+        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, to_json(query.__dict__))
+        self.__request(request)
+        return self.corr_id
+
+    def call_process_data(self, request_id: int, video: Video):
+        logging.info("Calling process data")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, to_json(video.__dict__))
+        self.__request(request)
+
+    def call_end_data_process(self, request_id: int):
+        logging.info("Calling end data process")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, MIDDLEWARE_ID, "")
+        self.__request(request)
 
     def __on_response(self, ch, method, props, body):
         if self.corr_id == props.correlation_id:
@@ -47,30 +57,19 @@ class MiddlewareClient:
                 logging.info("Results Recieved. Stop consuming.")
                 self.channel.stop_consuming()
 
-    def call_start_data_process(self, query: VideosQuery):
-        logging.info("Calling start data process")
-        request = Message(CLIENT_MESSAGE_ID, 0, self.client_id, START_PROCESS_OP_ID, MIDDLEWARE_ID, to_json(query.__dict__))
-        return self.__request(request)
-
-    def call_process_data(self, request_id: int, video: Video):
-        logging.info("Calling process data")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, MIDDLEWARE_ID, to_json(video.__dict__))
-        return self.__request(request)
-
-    def call_end_data_process(self, request_id: int):
-        logging.info("Calling end data process")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, MIDDLEWARE_ID, "")
-        return self.__request(request)
-
     def wait_get_results(self, request_id: str):
         logging.info("Waiting for results of request_id [{}]".format(request_id))
+        self.response = None
         self.waiting_results = True
+        self.channel.basic_consume(
+            queue=self.callback_queue,
+            on_message_callback=self.__on_response,
+            auto_ack=True)
         self.channel.start_consuming()
         return self.response
 
     def __request(self, message: Message):
         logging.debug("Send request message: {}".format(message.to_string()))
-        self.response = None
         self.channel.basic_publish(exchange='', 
             routing_key=self.middleware_queue_id, 
             properties=pika.BasicProperties(
@@ -78,8 +77,6 @@ class MiddlewareClient:
                 correlation_id=self.corr_id,
             ),
             body=message.to_string().encode(UTF8_ENCODING))
-        self.connection.process_data_events(time_limit=None)
-        return self.response
 
     def close(self):
         logging.info("Closing connection to Middleware")
