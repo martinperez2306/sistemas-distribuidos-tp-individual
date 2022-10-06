@@ -32,9 +32,9 @@ def parse_message(body: str) -> Message:
 
 def json_to_video(video_json: str):
     parsed = json.loads(video_json)
-    video = Video(parsed["id"], parsed["title"], parsed["published_at"], parsed["channel_id"], parsed["channel_title"], parsed["category_id"], 
-                    parsed["trending_date"], parsed["tags"], parsed["view_count"], parsed["likes"], parsed["dislikes"], parsed["comment_count"], 
-                    parsed["thumbnail_link"], parsed["comments_disabled"], parsed["ratings_disabled"], parsed["description"], parsed["country"])
+    video = Video(parsed["id"], parsed["title"], parsed["category_id"], 
+                    parsed["trending_date"], parsed["tags"], parsed["view_count"], parsed["likes"], 
+                    parsed["thumbnail_link"], parsed["country"])
     return video
 
 def unique(list):
