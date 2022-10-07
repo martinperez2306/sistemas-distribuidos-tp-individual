@@ -55,3 +55,4 @@ def initialize_log(logging_level):
         level=logging_level,
         datefmt='%Y-%m-%d %H:%M:%S',
     )
+    logging.getLogger("pika").setLevel(logging.ERROR)
