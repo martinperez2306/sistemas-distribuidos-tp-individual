@@ -9,7 +9,9 @@ from dependencies.commons.constants import MIDDLEWARE_QUEUE, RABBITMQ_HOST, WAIT
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class WorkService(BaseApp):
-    def __init__(self, service_id, group_id, service_queue):
+    def __init__(self, config_params, service_queue):
+        service_id = config_params["service_id"]
+        group_id = config_params["group_id"]
         super().__init__(service_id)
         self.connection = None
         self.channel = None
@@ -19,13 +21,12 @@ class WorkService(BaseApp):
         self.first_try = True
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, group_id)
+        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, group_id, config_params)
 
     def run(self):
         super().run()
         while self.running:
             try:
-                #self.middleware_system_client.connect()
                 self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
                 self.channel = self.connection.channel()
                 self.channel.queue_declare(queue=self.service_queue, durable=True)
@@ -54,3 +55,4 @@ class WorkService(BaseApp):
     def __exit_gracefully(self, *args):
         super().exit_gracefully(*args)
         self.connection.close()
+        self.middleware_system_client.close()

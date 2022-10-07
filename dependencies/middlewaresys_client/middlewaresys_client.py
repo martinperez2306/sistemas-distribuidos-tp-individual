@@ -2,93 +2,77 @@
 import base64
 import logging
 import pika
-import re
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.thumbnail import Thumbnail
 from dependencies.commons.utils import parse_message, to_json
+from dependencies.middlewaresys_client.like_filter_caller import LikeFilterCaller
+from dependencies.middlewaresys_client.middleware_caller import MiddlewareCaller
+from dependencies.middlewaresys_client.trending_filter_caller import TrendingFilterCaller
+from dependencies.middlewaresys_client.funny_filter_caller import FunnyFilterCaller
+from dependencies.middlewaresys_client.day_grouper_caller import DayGrouperCaller
+from dependencies.middlewaresys_client.max_caller import MaxCaller
+from dependencies.middlewaresys_client.storage_service_caller import StorageServiceCaller
 
 class MiddlewareSystemClient:
-    def __init__(self, host, middleware_queue_id, group_id):
+    def __init__(self, host, group_id, config_params):
         self.host = host
-        self.middleware_queue_id = middleware_queue_id
         self.group_id = group_id
-        self.connection = None
-        self.channel = None
-
-    def connect(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue=self.middleware_queue_id, durable=True)
+        self.like_filter_caller = LikeFilterCaller(config_params)
+        self.trending_filter_caller = TrendingFilterCaller(config_params)
+        self.funny_filter_caller = FunnyFilterCaller(config_params)
+        self.day_grouper_caller = DayGrouperCaller(config_params)
+        self.max_caller = MaxCaller(config_params)
+        self.storage_service_caller = StorageServiceCaller(config_params)
+        self.middleware_caller = MiddlewareCaller(config_params)
 
     def parse_message(self, body) -> Message:
         body = body.decode(UTF8_ENCODING)
         return parse_message(body)
 
-    #Deprecated
     def call_filter_by_likes(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, LIKE_FILTER_GROUP_ID, request_message.body)
-        self.__request(message)
+        self.like_filter_caller.filter_by_likes(message)
 
-    #Deprecated
     def call_filter_by_trending(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, TRENDING_FILTER_GROUP_ID, request_message.body)
-        self.__request(message)
-
-    def call_filter_by_likes_and_trending(self, request_message: Message):
-        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, LIKE_FILTER_GROUP_ID + "_" +TRENDING_FILTER_GROUP_ID, request_message.body)
-        self.__request(message)
+        self.trending_filter_caller.filter_by_trending(message)
 
     def call_filter_by_tag(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, FUNNY_FILTER_GROUP_ID, request_message.body)
-        self.__request(message)
+        self.funny_filter_caller.filter_by_funny_tag(message)
 
     def call_group_by_day(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, DAY_GROUPER_GROUP_ID, request_message.body)
-        self.__request(message)
+        self.day_grouper_caller.group_by_day(message)
 
     def call_max(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, MAX_WORKER_ID, request_message.body)
-        self.__request(message)
+        self.max_caller.get_max(message)
 
     def call_storage_data(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, STORAGE_DATA_WORKER_ID, request_message.body)
-        self.__request(message)
+        self.storage_service_caller.storage_data(message)
 
     def call_send_results(self, request_id: str, results: str):
         message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, SEND_RESULTS_OP_ID, MIDDLEWARE_ID, results)
-        self.__request(message)
+        self.middleware_caller.send_results(message)
 
     def call_upload_thumbnail(self, request_id: str, filename:str, thumbnailb: bytes):
         thumbnail = Thumbnail(filename, base64.b64encode(thumbnailb).decode(UTF8_ENCODING))
         message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_THUMBNAILS, MIDDLEWARE_ID, to_json(thumbnail.__dict__))
-        properties=pika.BasicProperties(
-            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
-        )
-        self.__request_prop(message, properties)
+        self.middleware_caller.upload_thumbnail(message)
 
     def call_upload_complete(self, request_id: str):
         message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_COMPLETE, MIDDLEWARE_ID, "")
-        self.__request(message)
-
-    def __request(self, message: Message):
-        logging.debug("Send request message: {}".format(message.to_string()))
-        self.channel.basic_publish(
-            exchange='',
-            routing_key=self.middleware_queue_id,
-            body=message.to_string().encode(UTF8_ENCODING),
-            properties=pika.BasicProperties(
-                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
-            ))
-
-    def __request_prop(self, message: Message, properties):
-        self.channel.basic_publish(
-            exchange='',
-            routing_key=self.middleware_queue_id,
-            body=message.to_string().encode(UTF8_ENCODING),
-            properties=properties)
-
+        self.middleware_caller.upload_complete(message)
 
     def close(self):
-        self.connection.close()
+        self.like_filter_caller.close()
+        self.trending_filter_caller.close()
+        self.funny_filter_caller.close()
+        self.day_grouper_caller.close()
+        self.max_caller.close()
+        self.storage_service_caller.close()
+        self.middleware_caller.close()
