@@ -11,10 +11,8 @@ MIN_LIKES_COUNT = 5000000
 
 class LikeFilter(RoutingService):
     def __init__(self, config_params):
-        id = config_params["service_id"]
-        group_id = config_params["group_id"]
+        super().__init__(config_params, LIKE_FILTER_EXCHANGE)
         self.popular_videos = list()
-        super().__init__(id, group_id, LIKE_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         like_filter_message = self.middleware_system_client.parse_message(body)
@@ -39,7 +37,6 @@ class LikeFilter(RoutingService):
             pass
 
     def __next_stage(self, like_filter_message: Message):
-        self.middleware_system_client.connect()
         init_message = Message(like_filter_message.id, like_filter_message.request_id, like_filter_message.source_id,
                                         START_PROCESS_OP_ID, like_filter_message.destination_id, "")
         self.middleware_system_client.call_filter_by_tag(init_message)
@@ -53,4 +50,3 @@ class LikeFilter(RoutingService):
                                         END_PROCESS_OP_ID, like_filter_message.destination_id, "")
         self.middleware_system_client.call_filter_by_tag(end_message)
         self.middleware_system_client.call_group_by_day(end_message)
-        self.middleware_system_client.close()

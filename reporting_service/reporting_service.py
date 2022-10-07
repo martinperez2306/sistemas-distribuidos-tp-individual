@@ -15,14 +15,12 @@ from reporting_service.video_result import VideoResult
 
 class ReportingService(WorkService):
     def __init__(self, config_params):
-        id = config_params["service_id"]
-        group_id = config_params["group_id"]
+        super().__init__(config_params, REPORTING_SERVICE_QUEUE)
         self.total_routes = int(config_params["service_instances"])
         self.result_repository = ResultRepository()
         self.reporting_check = ReportingCheck(self.total_routes)
         self.categories_by_country = dict()
         self.thumbnail_downloader = ThumbnailDownloader()
-        super().__init__(id, group_id, REPORTING_SERVICE_QUEUE)
 
     def work(self, ch, method, properties, body):
         reporting_message = self.middleware_system_client.parse_message(body)
@@ -65,7 +63,6 @@ class ReportingService(WorkService):
             self.__end_stage(message)
         
     def __end_stage(self, message: Message):
-        self.middleware_system_client.connect()
         filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
         categorized_videos = self.__get_categorized_filtered_videos(filtered_videos)
         trending_videos = self.result_repository.get_trending_videos(message.request_id)
@@ -74,7 +71,6 @@ class ReportingService(WorkService):
         results = Results(categorized_videos, most_viewed_day)
         self.middleware_system_client.call_send_results(message.request_id, str(results))
         self.__upload_thumbnails_to_client(message.request_id)
-        self.middleware_system_client.close()
 
     def __get_categorized_filtered_videos(self, filtered_videos: 'list[Video]'):
         categorized_filtered_videos = list()

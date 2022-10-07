@@ -9,11 +9,8 @@ from dependencies.commons.utils import json_to_video
 
 class DayGrouper(RoutingService):
     def __init__(self, config_params):
-        id = config_params["service_id"]
-        group_id = config_params["group_id"]
-        self.total_routes = int(config_params["service_instances"])
+        super().__init__(config_params, DAY_GROUPER_EXCHANGE)
         self.propagations = dict()
-        super().__init__(id, group_id, DAY_GROUPER_EXCHANGE)
         self.views_by_date = dict()
 
     def work(self, ch, method, properties, body):
@@ -53,7 +50,5 @@ class DayGrouper(RoutingService):
         self.propagations[str(request_id)] = propagation
 
     def __next_stage(self, gruping_message: Message):
-        self.middleware_system_client.connect()
         self.middleware_system_client.call_max(gruping_message)
-        self.middleware_system_client.close()
         

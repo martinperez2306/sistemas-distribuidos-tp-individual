@@ -12,14 +12,9 @@ FUNNY_TAG = "funny"
 
 class FunnyFilter(RoutingService):
     def __init__(self, config_params):
-        self.connection = None
-        self.channel = None
-        id = config_params["service_id"]
-        group_id = config_params["group_id"]
-        self.total_routes = int(config_params["service_instances"])
+        super().__init__(config_params, FUNNY_FILTER_EXCHANGE)
         self.funny_videos = list()
         self.propagations = dict()
-        super().__init__(id, group_id, FUNNY_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         funny_filter_message = self.middleware_system_client.parse_message(body)
@@ -51,7 +46,6 @@ class FunnyFilter(RoutingService):
         self.propagations[str(request_id)] = propagation
 
     def __next_stage(self, funny_filter_message: Message):
-        self.middleware_system_client.connect()
         init_message = Message(funny_filter_message.id, funny_filter_message.request_id, funny_filter_message.source_id,
                                         START_PROCESS_OP_ID, funny_filter_message.destination_id, "")
         self.middleware_system_client.call_storage_data(init_message)
@@ -62,5 +56,4 @@ class FunnyFilter(RoutingService):
         end_message = Message(funny_filter_message.id, funny_filter_message.request_id, funny_filter_message.source_id,
                                         END_PROCESS_OP_ID, funny_filter_message.destination_id, "")
         self.middleware_system_client.call_storage_data(end_message)
-        self.middleware_system_client.close()
         

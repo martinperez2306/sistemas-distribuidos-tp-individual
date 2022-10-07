@@ -11,13 +11,11 @@ TRENDING_DAYS_COUNT = 21
 
 class TrendingFilter(RoutingService):
     def __init__(self, config_params):
-        id = config_params["service_id"]
-        group_id = config_params["group_id"]
+        super().__init__(config_params, TRENDING_FILTER_EXCHANGE)
         self.total_countries = 0
         self.trending_dates_by_video = dict()
         self.countries_by_video = dict()
         self.trending_videos = list()
-        super().__init__(id, group_id, TRENDING_FILTER_EXCHANGE)
 
     def work(self, ch, method, properties, body):
         trending_filter_message = self.middleware_system_client.parse_message(body)
@@ -76,7 +74,6 @@ class TrendingFilter(RoutingService):
 
 
     def __next_stage(self, trending_filter_message: Message):
-        self.middleware_system_client.connect()
         init_message = Message(trending_filter_message.id, trending_filter_message.request_id, trending_filter_message.source_id,
                                         START_PROCESS_OP_ID, trending_filter_message.destination_id, "")
         self.middleware_system_client.call_storage_data(init_message)
@@ -87,4 +84,3 @@ class TrendingFilter(RoutingService):
         end_message = Message(trending_filter_message.id, trending_filter_message.request_id, trending_filter_message.source_id,
                                         END_PROCESS_OP_ID, trending_filter_message.destination_id, "")
         self.middleware_system_client.call_storage_data(end_message)
-        self.middleware_system_client.close()
