@@ -6,11 +6,8 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import to_json
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
-from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.request import Request
 from middleware.request_repository import RequestRepository
-from middleware.storage_service_caller import StorageServiceCaller
-from middleware.trending_filter_caller import TrendingFilterCaller
 
 ACK_MESSAGE = "ACK"
 
