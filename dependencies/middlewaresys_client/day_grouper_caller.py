@@ -3,7 +3,7 @@ import logging
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import json_to_video
-from dependencies.middlewaresys_client.routing_caller import RoutingCaller
+from dependencies.commons.routing_caller import RoutingCaller
 
 class DayGrouperCaller(RoutingCaller):
     def __init__(self, config_params):

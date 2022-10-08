@@ -1,6 +1,6 @@
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.middlewaresys_client.work_caller import WorkCaller
+from dependencies.commons.work_caller import WorkCaller
 
 class MaxCaller(WorkCaller):
     def __init__(self, config_params):

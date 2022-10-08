@@ -1,7 +1,7 @@
 from dependencies.commons.constants import *
 from dependencies.commons.utils import json_to_video
 from dependencies.commons.message import Message
-from dependencies.middlewaresys_client.routing_caller import RoutingCaller
+from dependencies.commons.routing_caller import RoutingCaller
 
 class FunnyFilterCaller(RoutingCaller):
     def __init__(self, config_params):
