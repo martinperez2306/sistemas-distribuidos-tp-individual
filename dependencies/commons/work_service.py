@@ -5,7 +5,7 @@ import pika
 import signal
 from dependencies.commons.base_app import BaseApp
 
-from dependencies.commons.constants import MIDDLEWARE_QUEUE, RABBITMQ_HOST, WAIT_CONNECTION
+from dependencies.commons.constants import RABBITMQ_HOST, WAIT_CONNECTION
 from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 
 class WorkService(BaseApp):
@@ -21,7 +21,7 @@ class WorkService(BaseApp):
         self.first_try = True
         signal.signal(signal.SIGINT, self.__exit_gracefully)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
-        self.middleware_system_client = MiddlewareSystemClient(RABBITMQ_HOST, group_id, config_params)
+        self.middleware_system_client = MiddlewareSystemClient(group_id, config_params)
 
     def run(self):
         super().run()
