@@ -1,4 +1,4 @@
-FROM commons
+FROM middlewaresys_client
 
 # Install Middleware
 RUN mkdir -p /root/middleware

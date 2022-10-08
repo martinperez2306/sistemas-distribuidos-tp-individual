@@ -5,6 +5,7 @@ from dependencies.commons.videos_query import VideosQuery
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.utils import to_json
+from dependencies.middlewaresys_client.middlewaresys_client import MiddlewareSystemClient
 from middleware.ingestion_service_caller import IngestionServiceCaller
 from middleware.request import Request
 from middleware.request_repository import RequestRepository
@@ -14,14 +15,10 @@ from middleware.trending_filter_caller import TrendingFilterCaller
 ACK_MESSAGE = "ACK"
 
 class ClientService:
-    def __init__(self, ingestion_service_caller: IngestionServiceCaller, 
-                        trending_filter_caller: TrendingFilterCaller,
-                        storage_service_caller: StorageServiceCaller, 
+    def __init__(self, middleware_system_client: MiddlewareSystemClient, 
                         request_repository: RequestRepository):
         self.request_count = 0
-        self.ingestion_service_caller = ingestion_service_caller
-        self.trending_filter_caller = trending_filter_caller
-        self.storage_service_caller = storage_service_caller
+        self.middleware_system_client = middleware_system_client
         self.request_repository = request_repository
 
     def start_data_process(self, ch, method, props, message: Message):
@@ -36,23 +33,23 @@ class ClientService:
         self.request_repository.add(request_id, request)
         #Save categories
         categories_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_CATEGORIES_OP_ID, STORAGE_DATA_WORKER_ID, to_json(query.categories))
-        self.storage_service_caller.storage_data(categories_message)
+        self.middleware_system_client.call_storage_data(categories_message)
         #Save total countries
         total_countries_message = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, LOAD_TOTAL_COUNTRIES, TRENDING_FILTER_GROUP_ID, query.total_countries)
-        self.trending_filter_caller.filter_by_trending(total_countries_message)
+        self.middleware_system_client.call_filter_by_trending(total_countries_message)
         #Propagate Start Process data with Request ID
         propagate = Message(MIDDLEWARE_MESSAGE_ID, request_id, message.source_id, message.operation_id, INGEST_DATA_WORKER_ID, request_id)
-        self.ingestion_service_caller.ingest_data(propagate)
+        self.middleware_system_client.call_ingest_data(propagate)
 
     def process_data(self, ch, method, props, message: Message):
         logging.info("Processing Data [{}]".format(message.to_string()))
         #Process data with Request ID
-        self.ingestion_service_caller.ingest_data(message)
+        self.middleware_system_client.call_ingest_data(message)
 
     def end_data_process(self, ch, method, props, message: Message):
         logging.info("Ending data process")
         #Propagate End Process data with Request ID
-        self.ingestion_service_caller.ingest_data(message)
+        self.middleware_system_client.call_ingest_data(message)
 
     def send_results(self, ch, method, props, message: Message):
         logging.info("Sending results")

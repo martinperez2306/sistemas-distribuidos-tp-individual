@@ -14,17 +14,9 @@ from middleware.storage_service_caller import StorageServiceCaller
 from middleware.trending_filter_caller import TrendingFilterCaller
 
 class MessageHandler:
-    def __init__(self, config_params):
-        self.ingestion_service_caller = IngestionServiceCaller()
+    def __init__(self, middleware_system_client, config_params):
         request_repository = RequestRepository()
-        self.like_filter_caller = LikeFilterCaller(config_params)
-        self.trending_filter_caller = TrendingFilterCaller(config_params)
-        self.funny_filter_caller = FunnyFilterCaller(config_params)
-        self.day_grouper_caller = DayGrouperCaller(config_params)
-        self.max_caller = MaxCaller(config_params)
-        self.storage_service_caller = StorageServiceCaller(config_params)
-        self.client_service = ClientService(self.ingestion_service_caller, self.trending_filter_caller, 
-                                            self.storage_service_caller, request_repository)
+        self.client_service = ClientService(middleware_system_client, request_repository)
 
     def run(self):
         pass
