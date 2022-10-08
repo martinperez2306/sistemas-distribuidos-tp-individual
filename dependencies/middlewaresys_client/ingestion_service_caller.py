@@ -3,7 +3,7 @@ from dependencies.commons.message import Message
 from dependencies.middlewaresys_client.work_caller import WorkCaller
 
 class IngestionServiceCaller(WorkCaller):
-    def __init__(self):
+    def __init__(self, config_params):
         super().__init__(INGESTION_SERVICE_QUEUE)
     
     def ingest_data(self, message: Message):

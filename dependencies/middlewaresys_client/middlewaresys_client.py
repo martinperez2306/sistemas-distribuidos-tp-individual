@@ -7,6 +7,7 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.thumbnail import Thumbnail
 from dependencies.commons.utils import parse_message, to_json
+from dependencies.middlewaresys_client.ingestion_service_caller import IngestionServiceCaller
 from dependencies.middlewaresys_client.like_filter_caller import LikeFilterCaller
 from dependencies.middlewaresys_client.middleware_caller import MiddlewareCaller
 from dependencies.middlewaresys_client.trending_filter_caller import TrendingFilterCaller
@@ -19,6 +20,7 @@ class MiddlewareSystemClient:
     def __init__(self, host, group_id, config_params):
         self.host = host
         self.group_id = group_id
+        self.ingestion_service_caller = IngestionServiceCaller(config_params)
         self.like_filter_caller = LikeFilterCaller(config_params)
         self.trending_filter_caller = TrendingFilterCaller(config_params)
         self.funny_filter_caller = FunnyFilterCaller(config_params)
@@ -30,6 +32,10 @@ class MiddlewareSystemClient:
     def parse_message(self, body) -> Message:
         body = body.decode(UTF8_ENCODING)
         return parse_message(body)
+
+    def call_ingest_data(self, request_message: Message):
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, INGEST_DATA_WORKER_ID, request_message.body)
+        self.ingestion_service_caller.ingest_data(message)
 
     def call_filter_by_likes(self, request_message: Message):
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, LIKE_FILTER_GROUP_ID, request_message.body)
