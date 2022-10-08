@@ -8,10 +8,10 @@ services:
     container_name: client
     environment:
       - PYTHONUNBUFFERED=1
-      - SERVICE_INSTANCES=2
+      - SERVICE_INSTANCES=8
     volumes:
       - "./config/client:/root/client/config"
-      - "./client/videos_dev:/root/client/videos"
+      - "./client/videos:/root/client/videos"
       - "./client/categories:/root/client/categories"
       - "./client/thumbnails:/root/client/thumbnails"
 
