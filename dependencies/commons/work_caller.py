@@ -23,5 +23,13 @@ class WorkCaller:
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ))
 
+    def publish_data_with_props(self, data: str, properties: pika.BasicProperties):
+        logging.debug("Publish data [{}] in queue [{}] with properties [{}]".format(data, self.publish_queue_name, properties))
+        self.channel.basic_publish(
+            exchange='',
+            routing_key=self.publish_queue_name,
+            body=data.encode(UTF8_ENCODING),
+            properties=properties)
+
     def close(self):
         self.connection.close()
