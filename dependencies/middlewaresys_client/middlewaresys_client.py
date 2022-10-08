@@ -7,14 +7,14 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.thumbnail import Thumbnail
 from dependencies.commons.utils import parse_message, to_json
-from dependencies.middlewaresys_client.ingestion_service_caller import IngestionServiceCaller
+from dependencies.commons.ingestion_service_caller import IngestionServiceCaller
+from dependencies.commons.trending_filter_caller import TrendingFilterCaller
+from dependencies.commons.storage_service_caller import StorageServiceCaller
 from dependencies.middlewaresys_client.like_filter_caller import LikeFilterCaller
 from dependencies.middlewaresys_client.middleware_caller import MiddlewareCaller
-from dependencies.middlewaresys_client.trending_filter_caller import TrendingFilterCaller
 from dependencies.middlewaresys_client.funny_filter_caller import FunnyFilterCaller
 from dependencies.middlewaresys_client.day_grouper_caller import DayGrouperCaller
 from dependencies.middlewaresys_client.max_caller import MaxCaller
-from dependencies.middlewaresys_client.storage_service_caller import StorageServiceCaller
 
 class MiddlewareSystemClient:
     def __init__(self, host, group_id, config_params):

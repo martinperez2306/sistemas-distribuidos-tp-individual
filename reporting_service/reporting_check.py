@@ -22,6 +22,6 @@ class ReportingCheck:
         self.max_eof= True
 
     def check_eofs(self):
-        check = ((self.funny_eofs == self.service_instances) and (self.trending_eofs == self.service_instances) and self.max_eof)
+        check = ((self.funny_eofs >= self.service_instances) and (self.trending_eofs >= self.service_instances) and self.max_eof)
         logging.info("Check [{}]".format(check))
         return check
