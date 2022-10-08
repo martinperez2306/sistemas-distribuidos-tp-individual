@@ -33,7 +33,6 @@ def main():
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
         results = get_results(middleware_client, request_id)
-    #download_thumbnails(middleware_client, request_id)
     shutdown_middleware_client(middleware_client)
     show_results(results)
 

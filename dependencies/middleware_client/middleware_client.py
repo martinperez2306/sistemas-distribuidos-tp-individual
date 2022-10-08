@@ -28,7 +28,7 @@ class MiddlewareClient:
         self.callback_queue = None
         self.response = None
         self.corr_id = None
-        self.waiting_results = False
+        self.results = None
         self.ingestion_service_caller = IngestionServiceCaller(config_params)
         self.trending_filter_caller = TrendingFilterCaller(config_params)
         self.storage_service_caller = StorageServiceCaller(config_params)
@@ -80,9 +80,9 @@ class MiddlewareClient:
     def wait_get_results(self, request_id: str):
         logging.info("Waiting for results of request_id [{}]".format(request_id))
         self.response = None
-        self.waiting_results = True
+        self.results = None
         self.channel.start_consuming()
-        return self.response
+        return self.results
 
     def __on_response(self, ch, method, props, body):
         logging.info("Getting response with correlation [{}]".format(props.correlation_id))
@@ -92,7 +92,7 @@ class MiddlewareClient:
             self.response = parse_message(response)
             if self.response.operation_id == SEND_RESULTS_OP_ID:
                 logging.info("Results Recieved.")
-                #self.channel.stop_consuming()
+                self.__save_results()
             elif self.response.operation_id == DOWNLOAD_THUMBNAILS:
                 logging.info("Downloading thumbnail.")
                 self.__storage(ch, method, props, body)
@@ -102,6 +102,9 @@ class MiddlewareClient:
             else:
                 pass
         ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    def __save_results(self):
+        self.results = self.response
 
     def __storage(self, ch, method, props, body):
         try:
