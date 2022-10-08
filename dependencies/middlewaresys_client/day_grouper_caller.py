@@ -18,11 +18,15 @@ class DayGrouperCaller(RoutingCaller):
                 self.connect()
             self.__broadcast(group_by_day_message)
         elif PROCESS_DATA_OP_ID == message.operation_id:
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             video = json_to_video(group_by_day_message.body)
             trending_date = video.trending_date
             routing_key = DAY_GROUPER_GROUP_ID + "_" + str((hash(trending_date) % self.total_routes) + 1)
             self.publish_data(group_by_day_message.to_string(), str(routing_key))
         elif END_PROCESS_OP_ID == message.operation_id:
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             self.__broadcast(group_by_day_message)
             if self.previus_stage_eof >= self.total_routes:
                 self.close()

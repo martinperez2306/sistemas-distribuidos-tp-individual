@@ -28,6 +28,8 @@ class TrendingFilterCaller(RoutingCaller):
             routing_key = TRENDING_FILTER_GROUP_ID + "_" + str((hash(video_id) % self.total_routes) + 1)
             self.publish_data(filter_by_trending_message.to_string(), str(routing_key))
         elif END_PROCESS_OP_ID == message.operation_id:
+            if not self.connection or not self.connection.is_open:
+                self.connect()
             self.__broadcast(filter_by_trending_message)
             self.close()
         else:
