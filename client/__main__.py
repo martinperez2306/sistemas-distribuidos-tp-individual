@@ -29,6 +29,7 @@ def main():
     categories = get_categories()
     query = VideosQuery(categories, total_countries)
     request_id = process_videos(middleware_client, query)
+    middleware_client.connect()
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
         results = get_results(middleware_client, request_id)
@@ -72,7 +73,6 @@ def create_country_categories(json_category):
 def process_videos(middleware_client: MiddlewareClient, query: VideosQuery):
     logging.info("Processing Videos")
     print("Processing Videos. Please wait...")
-    middleware_client.connect()
     request_id = middleware_client.call_start_data_process(query)
     for path in pathlib.Path(VIDEOS_PATH).iterdir():
         if path.is_file():
@@ -144,6 +144,7 @@ def __parse_video_from_csv(video_str: 'list[str]', country):
 
 def get_results(middleware_client: MiddlewareClient, request_id: str):
     logging.info("Getting Results for Request with ID [{}]".format(request_id))
+    middleware_client.call_get_results(request_id)
     print("Waiting for system processing. This may take a few minutes.")
     results_message: Message = middleware_client.wait_get_results(request_id)
     logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))
