@@ -24,59 +24,34 @@ OUTPUT_CLIENT="docker-compose-client.yaml"
 cat /dev/null > $OUTPUT
 cat /dev/null > $OUTPUT_CLIENT
 
+SERVICE_ID="SERV_ID"
 SERVICES_INSTANCES="SERV_INSTANCES"
 SERV_INSTANCES="$INSTANCES"
-SERVICE_ID="SERV_ID"
 
 cat $CLIENT_TEMPLATE | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT_CLIENT
-
 cat $BASE_TEMPLATE >> $OUTPUT
 echo -e "\n" >> $OUTPUT
 
-INGESTION_SERVICE="INGESTION_SERVICE"
-CONTAINER_NAME="CONTAINER_NAME"
-INGESTION_NAME="ingestion_service_1"
-cat $INGESTION_TEMPLATE | sed -r "s/$INGESTION_SERVICE/$INGESTION_NAME/g" | sed -r "s/$CONTAINER_NAME/$INGESTION_NAME/g" | sed -r "s/$SERVICE_ID/$INGESTION_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-echo -e "\n" >> $OUTPUT
+cat_service() {
+  TEMPLATE=$1
+  SERVICE_NAME=$2
+  SERV_NAME=$3
+  cat $TEMPLATE | sed -r "s/$SERVICE_NAME/$SERV_NAME/g" | sed -r "s/$SERVICE_ID/$SERV_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
+  echo -e "\n" >> $OUTPUT
+}
 
 for i in $( seq 1 $INSTANCES )
 do
-    LIKE_FILTER="LIKE_FILTER"
-    CONTAINER_NAME="CONTAINER_NAME"
-    LIKE_NAME="like_filter_$i"
-    SERVICE_ID="SERV_ID"
-    cat $LIKE_TEMPLATE | sed -r "s/$LIKE_FILTER/$LIKE_NAME/g" | sed -r "s/$CONTAINER_NAME/$LIKE_NAME/g" | sed -r "s/$SERVICE_ID/$LIKE_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-    echo -e "\n" >> $OUTPUT
 
-    TRENDING_FILTER="TRENDING_FILTER"
-    CONTAINER_NAME="CONTAINER_NAME"
-    TRENDING_NAME="trending_filter_$i"
-    cat $TRENDING_TEMPLATE | sed -r "s/$TRENDING_FILTER/$TRENDING_NAME/g" | sed -r "s/$CONTAINER_NAME/$TRENDING_NAME/g" | sed -r "s/$SERVICE_ID/$TRENDING_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-    echo -e "\n" >> $OUTPUT
+    cat_service $INGESTION_TEMPLATE "INGESTION_SERVICE" "ingestion_service_$i"
+    cat_service $LIKE_TEMPLATE "LIKE_FILTER" "like_filter_$i"
+    cat_service $TRENDING_TEMPLATE "TRENDING_FILTER" "trending_filter_$i"
+    cat_service $FUNNY_TEMPLATE "FUNNY_FILTER" "funny_filter_$i"
+    cat_service $DAY_TEMPLATE "DAY_GROUPER" "day_grouper_$i"
 
-    FUNNY_FILTER="FUNNY_FILTER"
-    CONTAINER_NAME="CONTAINER_NAME"
-    FUNNY_NAME="funny_filter_$i"
-    cat $FUNNY_TEMPLATE | sed -r "s/$FUNNY_FILTER/$FUNNY_NAME/g" | sed -r "s/$CONTAINER_NAME/$FUNNY_NAME/g" | sed -r "s/$SERVICE_ID/$FUNNY_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-    echo -e "\n" >> $OUTPUT
-
-    DAY_GROUPER="DAY_GROUPER"
-    CONTAINER_NAME="CONTAINER_NAME"
-    DAY_NAME="day_grouper_$i"
-    cat $DAY_TEMPLATE | sed -r "s/$DAY_GROUPER/$DAY_NAME/g" | sed -r "s/$CONTAINER_NAME/$DAY_NAME/g" | sed -r "s/$SERVICE_ID/$DAY_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-    echo -e "\n" >> $OUTPUT
 done
 
-MAX="MAX"
-CONTAINER_NAME="CONTAINER_NAME"
-MAX_NAME="max_1"
-cat $MAX_TEMPLATE | sed -r "s/$MAX/$MAX_NAME/g" | sed -r "s/$CONTAINER_NAME/$MAX_NAME/g" | sed -r "s/$SERVICE_ID/$MAX_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-echo -e "\n" >> $OUTPUT
-
-REPORTING_SERVICE="REPORTING_SERVICE"
-CONTAINER_NAME="CONTAINER_NAME"
-REPORTING_NAME="reporting_service_1"
-cat $REPORTING_TEMPLATE | sed -r "s/$REPORTING_SERVICE/$REPORTING_NAME/g" | sed -r "s/$CONTAINER_NAME/$REPORTING_NAME/g" | sed -r "s/$SERVICE_ID/$REPORTING_NAME/g" | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
-echo -e "\n" >> $OUTPUT
+cat_service $MAX_TEMPLATE "MAX" "max"
+cat_service $REPORTING_TEMPLATE "REPORTING_SERVICE" "reporting_service"
 
 cat $NETWORK_TEMPLATE >> $OUTPUT
