@@ -33,7 +33,7 @@ def main():
     results: Message = get_results(middleware_client, request_id)
     while RESULTS_PENDING == results.body:
         results = get_results(middleware_client, request_id)
-    download_thumbnails(middleware_client, request_id)
+    #download_thumbnails(middleware_client, request_id)
     shutdown_middleware_client(middleware_client)
     show_results(results)
 
@@ -79,7 +79,7 @@ def process_videos(middleware_client: MiddlewareClient, query: VideosQuery):
             country = extract_country_from_path(path)
             process_csv(path, middleware_client, request_id, country)
     middleware_client.call_end_data_process(request_id)
-    logging.info("Processing video Request ID [{}]".format(request_id))
+    logging.info("Processing videos Request ID [{}]".format(request_id))
     return request_id
 
 def extract_country_from_path(path):

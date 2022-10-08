@@ -91,20 +91,20 @@ class MiddlewareClient:
         logging.info("Waiting for results of request_id [{}]".format(request_id))
         self.response = None
         self.waiting_results = True
-
         self.channel.start_consuming()
         return self.response
 
     def __on_response(self, ch, method, props, body):
-        logging.info("Getting response with correlation[{}]".format(props.correlation_id))
+        logging.info("Getting response with correlation [{}]".format(props.correlation_id))
         if self.corr_id == props.correlation_id:
             logging.debug("Recieved: {}".format(body))
             response = body.decode(UTF8_ENCODING)
             self.response = parse_message(response)
             if self.response.operation_id == SEND_RESULTS_OP_ID:
                 logging.info("Results Recieved. Stop consuming.")
-                self.channel.stop_consuming()
+                #self.channel.stop_consuming()
             elif self.response.operation_id == DOWNLOAD_THUMBNAILS:
+                logging.info("Downloading thumbnail.")
                 self.__storage(ch, method, props, body)
             elif self.response.operation_id == DOWNLOAD_COMPLETE:
                 logging.info("Download complete. Stop consuming.")

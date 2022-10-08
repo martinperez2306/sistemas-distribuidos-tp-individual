@@ -79,6 +79,7 @@ class ReportingService(WorkService):
         results = Results(categorized_videos, most_viewed_day)
         self.__download_thumnbails(trending_videos)
         self.middleware_system_client.call_send_results(message.request_id, self.reply_to, str(results))
+        self.__upload_thumbnails_to_client(message)
         
     def __save_reply_to(self, message: Message, properties: pika.BasicProperties):
         logging.info("Saving replying queue for client [{}]".format(properties.reply_to))
