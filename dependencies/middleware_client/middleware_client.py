@@ -77,16 +77,6 @@ class MiddlewareClient:
         result_message = Message(CLIENT_MESSAGE_ID, reques_id, self.client_id, SEND_RESULTS_OP_ID, STORAGE_DATA_WORKER_ID, "")
         self.storage_service_caller.get_results(result_message, properties)
 
-    def call_download_thumbnails(self, request_id: int):
-        logging.info("Calling download thumbnails")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, DOWNLOAD_THUMBNAILS, STORAGE_DATA_WORKER_ID, "")
-        properties=pika.BasicProperties(
-            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE,
-            reply_to=self.callback_queue,
-            correlation_id=self.corr_id,
-        )
-        self.storage_service_caller.download_thumbnail(request, properties)
-
     def wait_get_results(self, request_id: str):
         logging.info("Waiting for results of request_id [{}]".format(request_id))
         self.response = None
@@ -101,7 +91,7 @@ class MiddlewareClient:
             response = body.decode(UTF8_ENCODING)
             self.response = parse_message(response)
             if self.response.operation_id == SEND_RESULTS_OP_ID:
-                logging.info("Results Recieved. Stop consuming.")
+                logging.info("Results Recieved.")
                 #self.channel.stop_consuming()
             elif self.response.operation_id == DOWNLOAD_THUMBNAILS:
                 logging.info("Downloading thumbnail.")

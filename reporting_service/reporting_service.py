@@ -34,10 +34,8 @@ class ReportingService(WorkService):
             self.__storage_video(reporting_message)
         elif END_PROCESS_OP_ID == reporting_message.operation_id:
             self.__check_end_stage(reporting_message)
-        elif SEND_RESULTS_OP_ID == reporting_message.operation_id:\
+        elif SEND_RESULTS_OP_ID == reporting_message.operation_id:
             self.__save_reply_to(reporting_message, properties)
-        elif DOWNLOAD_THUMBNAILS == reporting_message.operation_id:
-            self.__upload_thumbnails_to_client(reporting_message)
         else:
             pass
 

@@ -150,12 +150,6 @@ def get_results(middleware_client: MiddlewareClient, request_id: str):
     logging.info("Results for Request with ID [{}]: [{}]".format(request_id, results_message.to_string()))
     return results_message
 
-def download_thumbnails(middleware_client: MiddlewareClient, request_id: str):
-    logging.info("Download Thumbnails for Request with ID [{}]".format(request_id))
-    print("Downloading files...")
-    middleware_client.call_download_thumbnails(request_id)
-    middleware_client.wait_get_results(request_id)
-
 def show_results(results):
     print("Processing complete!!")
     print(results.to_string())
