@@ -11,12 +11,7 @@ class TrendingFilterCaller(RoutingCaller):
     
     def filter_by_trending(self, message: Message):
         filter_by_trending_message = Message(SERVICE_MESSAGE_ID, message.request_id, message.source_id, message.operation_id, TRENDING_FILTER_GROUP_ID, message.body)
-        if LOAD_TOTAL_COUNTRIES == message.operation_id:
-            if not self.connection or not self.connection.is_open:
-                self.connect()
-            self.__broadcast(filter_by_trending_message)
-            self.close()
-        elif START_PROCESS_OP_ID == message.operation_id:
+        if START_PROCESS_OP_ID == message.operation_id:
             if not self.connection or not self.connection.is_open:
                 self.connect()
             self.__broadcast(filter_by_trending_message)
@@ -34,6 +29,13 @@ class TrendingFilterCaller(RoutingCaller):
             self.close()
         else:
             pass
+
+    def load_total_countries(self, countries_message: Message):
+        if not self.connection or not self.connection.is_open:
+            self.connect()
+        self.__broadcast(countries_message)
+        self.close()
+
 
     def __broadcast(self, message):
         for route in range(self.total_routes):
