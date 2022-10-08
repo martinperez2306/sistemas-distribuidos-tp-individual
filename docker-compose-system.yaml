@@ -29,6 +29,8 @@ services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
+      - SERVICE_ID=middleware
+      - GROUP_ID=middleware
       - SERVICE_INSTANCES=2
     volumes:
       - "./config/middleware:/root/middleware/config"
