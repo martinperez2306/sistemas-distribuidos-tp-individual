@@ -32,4 +32,7 @@ class StorageServiceCaller(WorkCaller):
             pass
 
     def download_thumbnail(self, download_message: Message, props: pika.BasicProperties):
+        if not self.connection or not self.connection.is_open:
+                self.connect()
         self.publish_data_with_props(download_message.to_string(), props)
+        self.close()

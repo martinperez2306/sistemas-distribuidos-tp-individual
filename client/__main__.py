@@ -24,7 +24,7 @@ THUMBNAILS_STORAGE = "/root/client/thumbnails"
 def main():
     config_params = initialize_config(CONFIG_PATH)
     initialize_log(config_params["logging_level"])
-    middleware_client = initialize_middleware_client()
+    middleware_client = initialize_middleware_client(config_params)
     total_countries = get_total_countries()
     categories = get_categories()
     query = VideosQuery(categories, total_countries)
@@ -36,9 +36,9 @@ def main():
     shutdown_middleware_client(middleware_client)
     show_results(results)
 
-def initialize_middleware_client():
+def initialize_middleware_client(config_params):
     logging.info("Initializing Middleware Client")
-    return MiddlewareClient(RABBITMQ_HOST, MIDDLEWARE_QUEUE, THUMBNAILS_STORAGE)
+    return MiddlewareClient(THUMBNAILS_STORAGE, config_params)
     
 def get_total_countries():
     logging.info("Getting total countries")
