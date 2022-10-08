@@ -21,4 +21,4 @@ do
 done
 
 docker logs "max" >& "$LOGS_DIR/max.log"
-docker logs "reporting_service_1" >& "$LOGS_DIR/reporting_service.log"
+docker logs "reporting_service" >& "$LOGS_DIR/reporting_service.log"
