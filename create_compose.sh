@@ -8,6 +8,7 @@ fi
 
 INSTANCES=$1
 BASE_TEMPLATE="create_compose/base_template.yaml"
+CLIENT_TEMPLATE="create_compose/client_template.yaml"
 MIDDLEWARE_TEMPLATE="create_compose/middleware_template.yaml"
 INGESTION_TEMPLATE="create_compose/ingestion_service.yaml"
 LIKE_TEMPLATE="create_compose/like_filter.yaml"
@@ -18,13 +19,19 @@ MAX_TEMPLATE="create_compose/max.yaml"
 REPORTING_TEMPLATE="create_compose/reporting_service.yaml"
 NETWORK_TEMPLATE="create_compose/network_template.yaml"
 OUTPUT="docker-compose-system.yaml"
+OUTPUT_CLIENT="docker-compose-client.yaml"
 
 cat /dev/null > $OUTPUT
-cat $BASE_TEMPLATE >> $OUTPUT
-echo -e "\n" >> $OUTPUT
+cat /dev/null > $OUTPUT_CLIENT
 
 SERVICES_INSTANCES="SERV_INSTANCES"
 SERV_INSTANCES="$INSTANCES"
+
+cat $CLIENT_TEMPLATE | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT_CLIENT
+
+cat $BASE_TEMPLATE >> $OUTPUT
+echo -e "\n" >> $OUTPUT
+
 SERVICE_ID="SERV_ID"
 cat $MIDDLEWARE_TEMPLATE | sed -r "s/$SERVICES_INSTANCES/$SERV_INSTANCES/g" >> $OUTPUT
 echo -e "\n" >> $OUTPUT

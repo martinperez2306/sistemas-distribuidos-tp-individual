@@ -1,0 +1,21 @@
+version: '3'
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: client.dockerfile
+    image: client
+    container_name: client
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_INSTANCES=SERV_INSTANCES
+    volumes:
+      - "./config/client:/root/client/config"
+      - "./client/videos_dev:/root/client/videos"
+      - "./client/categories:/root/client/categories"
+      - "./client/thumbnails:/root/client/thumbnails"
+
+networks:
+  default:
+    name: sistemas-distribuidos-tp-individual_testing_net
+    external: true
