@@ -24,4 +24,5 @@ class RoutingCaller:
             ))
 
     def close(self):
-        self.connection.close()
+        if self.connection and self.connection.is_open:
+            self.connection.close()

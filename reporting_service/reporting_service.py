@@ -34,6 +34,8 @@ class ReportingService(WorkService):
             self.__storage_video(reporting_message)
         elif END_PROCESS_OP_ID == reporting_message.operation_id:
             self.__check_end_stage(reporting_message)
+        elif SEND_RESULTS_OP_ID == reporting_message.operation_id:\
+            self.__save_reply_to(reporting_message, properties)
         elif DOWNLOAD_THUMBNAILS == reporting_message.operation_id:
             self.__upload_thumbnails_to_client(reporting_message)
         else:
@@ -41,7 +43,6 @@ class ReportingService(WorkService):
 
     def __storage_categories(self, reporting_message: Message, properties: pika.BasicProperties):
         self.categories_by_country = json.loads(reporting_message.body)
-        self.reply_to = properties.reply_to
         logging.info("Categories by Country [{}] for reply to queue [{}]".format(self.categories_by_country, self.reply_to))
 
     def __storage_video(self, reporting_message: Message):
@@ -70,15 +71,19 @@ class ReportingService(WorkService):
             self.__end_stage(message)
         
     def __end_stage(self, message: Message):
-        logging.info("Ending stage and sending results to client")
+        logging.info("Ending stage and sending results for client")
+        trending_videos = self.result_repository.get_trending_videos(message.request_id)
         filtered_videos = self.result_repository.get_filtered_videos(message.request_id)
         categorized_videos = self.__get_categorized_filtered_videos(filtered_videos)
-        trending_videos = self.result_repository.get_trending_videos(message.request_id)
-        self.__download_thumnbails(trending_videos)
         most_viewed_day = self.result_repository.get_most_viewed_day()
         results = Results(categorized_videos, most_viewed_day)
+        self.__download_thumnbails(trending_videos)
         self.middleware_system_client.call_send_results(message.request_id, self.reply_to, str(results))
-
+        
+    def __save_reply_to(self, message: Message, properties: pika.BasicProperties):
+        logging.info("Saving replying queue for client [{}]".format(properties.reply_to))
+        self.reply_to = properties.reply_to
+         
     def __get_categorized_filtered_videos(self, filtered_videos: 'list[Video]'):
         categorized_filtered_videos = list()
         for filtered_video in filtered_videos:

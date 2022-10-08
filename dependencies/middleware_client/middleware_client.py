@@ -34,23 +34,21 @@ class MiddlewareClient:
         self.storage_service_caller = StorageServiceCaller(config_params)
 
     def connect(self):
-        logging.info("Connecting to System")
-        self.corr_id = str(uuid.uuid4())
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST))
         self.channel = self.connection.channel()
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
+        self.channel.basic_consume(
+            queue=self.callback_queue, on_message_callback=self.__on_response)
+        logging.info("Connecting to broker and listening in queue [{}]".format(self.callback_queue))
 
     def call_start_data_process(self, query: VideosQuery):
         logging.info("Calling start data process")
+        self.corr_id = str(uuid.uuid4())
+        logging.info("Request ID [{}]".format(self.corr_id))
         #Send categories
-        properties=pika.BasicProperties(
-            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE,
-            reply_to=self.callback_queue,
-            correlation_id=self.corr_id,
-        )
         categories_message = Message(CLIENT_MESSAGE_ID, self.corr_id, self.client_id, LOAD_CATEGORIES_OP_ID, STORAGE_DATA_WORKER_ID, to_json(query.categories))
-        self.storage_service_caller.storage_categories(categories_message, properties)
+        self.storage_service_caller.storage_categories(categories_message)
         #Send total countries
         total_countries_message = Message(CLIENT_MESSAGE_ID, self.corr_id, self.client_id, LOAD_TOTAL_COUNTRIES, TRENDING_FILTER_GROUP_ID, query.total_countries)
         self.trending_filter_caller.load_total_countries(total_countries_message)
@@ -69,6 +67,16 @@ class MiddlewareClient:
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, INGEST_DATA_WORKER_ID, "")
         self.ingestion_service_caller.ingest_data(request)
 
+    def call_get_results(self, reques_id: int):
+        logging.info("Calling get results")
+        properties=pika.BasicProperties(
+            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE,
+            reply_to=self.callback_queue,
+            correlation_id=self.corr_id,
+        )
+        result_message = Message(CLIENT_MESSAGE_ID, reques_id, self.client_id, SEND_RESULTS_OP_ID, STORAGE_DATA_WORKER_ID, "")
+        self.storage_service_caller.get_results(result_message, properties)
+
     def call_download_thumbnails(self, request_id: int):
         logging.info("Calling download thumbnails")
         request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, DOWNLOAD_THUMBNAILS, STORAGE_DATA_WORKER_ID, "")
@@ -83,8 +91,6 @@ class MiddlewareClient:
         logging.info("Waiting for results of request_id [{}]".format(request_id))
         self.response = None
         self.waiting_results = True
-        self.channel.basic_consume(
-            queue=self.callback_queue, on_message_callback=self.__on_response)
 
         self.channel.start_consuming()
         return self.response
@@ -122,5 +128,8 @@ class MiddlewareClient:
             traceback.print_exc()
 
     def close(self):
-        logging.info("Closing connection to Middleware")
+        logging.info("Closing connections to Middleware")
         self.connection.close()
+        self.ingestion_service_caller.close()
+        self.trending_filter_caller.close()
+        self.storage_service_caller.close()

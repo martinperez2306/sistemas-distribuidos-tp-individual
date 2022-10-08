@@ -54,5 +54,6 @@ class WorkService(BaseApp):
 
     def __exit_gracefully(self, *args):
         super().exit_gracefully(*args)
-        self.connection.close()
+        if self.connection and self.connection.is_open:
+            self.connection.close()
         self.middleware_system_client.close()

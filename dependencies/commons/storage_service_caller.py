@@ -8,10 +8,10 @@ class StorageServiceCaller(WorkCaller):
         super().__init__(REPORTING_SERVICE_QUEUE)
         self.total_routes = int(config_params["service_instances"])
 
-    def storage_categories(self, categories_message: Message, properties:pika.BasicProperties):
+    def storage_categories(self, categories_message: Message):
         if not self.connection or not self.connection.is_open:
             self.connect()
-        self.publish_data_with_props(categories_message.to_string(), properties)
+        self.publish_data(categories_message.to_string())
         self.close()
     
     def storage_data(self, message: Message):
@@ -30,6 +30,12 @@ class StorageServiceCaller(WorkCaller):
             self.close()
         else:
             pass
+
+    def get_results(self, result_message: Message, properties:pika.BasicProperties):
+        if not self.connection or not self.connection.is_open:
+            self.connect()
+        self.publish_data_with_props(result_message.to_string(), properties)
+        self.close()
 
     def download_thumbnail(self, download_message: Message, props: pika.BasicProperties):
         if not self.connection or not self.connection.is_open:
