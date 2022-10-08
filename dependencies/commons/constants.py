@@ -20,11 +20,11 @@ RABBITMQ_HOST = "rabbitmq"
 
 #QUEUES
 MIDDLEWARE_QUEUE = "middleware"
-INGESTION_SERVICE_QUEUE = "ingestion_service_queue"
 REPORTING_SERVICE_QUEUE = "reporting_service_queue"
 MAX_QUEUE = "max_queue"
 
 #EXCHANGUES
+INGESTION_SERVICE_EXCHANGE = "ingestion_service_exchange"
 LIKE_FILTER_EXCHANGE = "like_filter_exchange"
 TRENDING_FILTER_EXCHANGE = "trending_filter_exchange"
 FUNNY_FILTER_EXCHANGE = "funny_filter_exchange"
@@ -47,11 +47,11 @@ DOWNLOAD_COMPLETE = 7
 
 #SYSTEM WORKERS IDS
 MIDDLEWARE_ID = "middleware"
-INGEST_DATA_WORKER_ID = "ingestion_service"
 STORAGE_DATA_WORKER_ID = "reporting_service"
 MAX_WORKER_ID = "max"
 
 #SYSTEM GROUPS IDS
+INGEST_DATA_GROUP_ID = "ingestion_service"
 LIKE_FILTER_GROUP_ID = "like_filter"
 FUNNY_FILTER_GROUP_ID = "funny_filter"
 DAY_GROUPER_GROUP_ID = "day_grouper"

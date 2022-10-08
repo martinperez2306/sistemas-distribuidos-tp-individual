@@ -1,5 +1,4 @@
 import logging
-import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message

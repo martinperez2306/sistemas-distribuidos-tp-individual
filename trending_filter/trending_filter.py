@@ -1,9 +1,9 @@
 import json
 import logging
-import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
 from dependencies.commons.utils import json_to_video
 
@@ -16,6 +16,7 @@ class TrendingFilter(RoutingService):
         self.trending_dates_by_video = dict()
         self.countries_by_video = dict()
         self.trending_videos = list()
+        self.propagations = dict()
 
     def work(self, ch, method, properties, body):
         trending_filter_message = self.middleware_system_client.parse_message(body)
@@ -24,7 +25,7 @@ class TrendingFilter(RoutingService):
         elif PROCESS_DATA_OP_ID == trending_filter_message.operation_id:
             self.__process_trending(trending_filter_message)
         elif END_PROCESS_OP_ID == trending_filter_message.operation_id:
-            self.__next_stage(trending_filter_message)
+            self.__check_next_stage(trending_filter_message)
         elif LOAD_TOTAL_COUNTRIES == trending_filter_message.operation_id:
             self.__storage_total_countries(trending_filter_message)
         else:
@@ -72,7 +73,16 @@ class TrendingFilter(RoutingService):
     def __is_trending_video_in_all_countries(self, video):
         return len(self.countries_by_video.get(video.id)) >= self.total_countries
 
-
+    def __check_next_stage(self, trending_filter_message: Message):
+        request_id = trending_filter_message.request_id
+        propagation: Propagation = self.propagations.get(str(request_id))
+        if not propagation:
+            propagation = Propagation()
+        propagation.inc_end()
+        if propagation.ends_count == self.total_routes:
+            self.__next_stage(trending_filter_message)
+        self.propagations[str(request_id)] = propagation
+    
     def __next_stage(self, trending_filter_message: Message):
         init_message = Message(trending_filter_message.id, trending_filter_message.request_id, trending_filter_message.source_id,
                                         START_PROCESS_OP_ID, trending_filter_message.destination_id, "")

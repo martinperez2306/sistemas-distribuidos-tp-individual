@@ -33,7 +33,7 @@ class MiddlewareSystemClient:
         return parse_message(body)
 
     def call_ingest_data(self, request_message: Message):
-        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, INGEST_DATA_WORKER_ID, request_message.body)
+        message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, INGEST_DATA_GROUP_ID, request_message.body)
         self.ingestion_service_caller.ingest_data(message)
 
     def call_filter_by_likes(self, request_message: Message):

@@ -1,9 +1,9 @@
 import json
 import logging
-import pika
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
 from dependencies.commons.utils import json_to_video
 
@@ -13,6 +13,7 @@ class LikeFilter(RoutingService):
     def __init__(self, config_params):
         super().__init__(config_params, LIKE_FILTER_EXCHANGE)
         self.popular_videos = list()
+        self.propagations = dict()
 
     def work(self, ch, method, properties, body):
         like_filter_message = self.middleware_system_client.parse_message(body)
@@ -21,7 +22,7 @@ class LikeFilter(RoutingService):
         elif PROCESS_DATA_OP_ID == like_filter_message.operation_id:
             self.__process_filter_by_like(like_filter_message)
         elif END_PROCESS_OP_ID == like_filter_message.operation_id:
-            self.__next_stage(like_filter_message)
+            self.__check_next_stage(like_filter_message)
         else:
             pass
 
@@ -35,6 +36,16 @@ class LikeFilter(RoutingService):
                 self.popular_videos.append(video)
         except ValueError:
             pass
+
+    def __check_next_stage(self, like_filter_message: Message):
+        request_id = like_filter_message.request_id
+        propagation: Propagation = self.propagations.get(str(request_id))
+        if not propagation:
+            propagation = Propagation()
+        propagation.inc_end()
+        if propagation.ends_count == self.total_routes:
+            self.__next_stage(like_filter_message)
+        self.propagations[str(request_id)] = propagation
 
     def __next_stage(self, like_filter_message: Message):
         init_message = Message(like_filter_message.id, like_filter_message.request_id, like_filter_message.source_id,

@@ -3,11 +3,11 @@ from dependencies.commons.message import Message
 from dependencies.commons.utils import to_json
 from dependencies.commons.video import Video
 from dependencies.commons.video_input import VideoInput
-from dependencies.commons.work_service import WorkService
+from dependencies.commons.routing_serivce import RoutingService
 
-class IngestionService(WorkService):
+class IngestionService(RoutingService):
     def __init__(self, config_params):
-        super().__init__(config_params, INGESTION_SERVICE_QUEUE)
+        super().__init__(config_params, INGESTION_SERVICE_EXCHANGE)
         self.ingested_videos = list()
 
     def work(self, ch, method, properties, body):

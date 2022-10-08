@@ -53,18 +53,18 @@ class MiddlewareClient:
         total_countries_message = Message(CLIENT_MESSAGE_ID, self.corr_id, self.client_id, LOAD_TOTAL_COUNTRIES, TRENDING_FILTER_GROUP_ID, query.total_countries)
         self.trending_filter_caller.load_total_countries(total_countries_message)
         #Send start data ingest
-        request = Message(CLIENT_MESSAGE_ID, self.corr_id, self.client_id, START_PROCESS_OP_ID, INGEST_DATA_WORKER_ID, to_json(query.__dict__))
+        request = Message(CLIENT_MESSAGE_ID, self.corr_id, self.client_id, START_PROCESS_OP_ID, INGEST_DATA_GROUP_ID, to_json(query.__dict__))
         self.ingestion_service_caller.ingest_data(request)
         return self.corr_id
 
     def call_process_data(self, request_id: int, video: Video):
         logging.info("Calling process data")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, INGEST_DATA_WORKER_ID, to_json(video.__dict__))
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, PROCESS_DATA_OP_ID, INGEST_DATA_GROUP_ID, to_json(video.__dict__))
         self.ingestion_service_caller.ingest_data(request)
 
     def call_end_data_process(self, request_id: int):
         logging.info("Calling end data process")
-        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, INGEST_DATA_WORKER_ID, "")
+        request = Message(CLIENT_MESSAGE_ID, request_id, self.client_id, END_PROCESS_OP_ID, INGEST_DATA_GROUP_ID, "")
         self.ingestion_service_caller.ingest_data(request)
 
     def call_get_results(self, reques_id: int):
