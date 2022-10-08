@@ -11,14 +11,13 @@ from dependencies.commons.ingestion_service_caller import IngestionServiceCaller
 from dependencies.commons.trending_filter_caller import TrendingFilterCaller
 from dependencies.commons.storage_service_caller import StorageServiceCaller
 from dependencies.middlewaresys_client.like_filter_caller import LikeFilterCaller
-from dependencies.middlewaresys_client.middleware_caller import MiddlewareCaller
+from dependencies.middlewaresys_client.client_caller import ClientCaller
 from dependencies.middlewaresys_client.funny_filter_caller import FunnyFilterCaller
 from dependencies.middlewaresys_client.day_grouper_caller import DayGrouperCaller
 from dependencies.middlewaresys_client.max_caller import MaxCaller
 
 class MiddlewareSystemClient:
-    def __init__(self, host, group_id, config_params):
-        self.host = host
+    def __init__(self, group_id, config_params):
         self.group_id = group_id
         self.ingestion_service_caller = IngestionServiceCaller(config_params)
         self.like_filter_caller = LikeFilterCaller(config_params)
@@ -27,7 +26,7 @@ class MiddlewareSystemClient:
         self.day_grouper_caller = DayGrouperCaller(config_params)
         self.max_caller = MaxCaller(config_params)
         self.storage_service_caller = StorageServiceCaller(config_params)
-        self.middleware_caller = MiddlewareCaller(config_params)
+        self.client_caller = ClientCaller()
 
     def parse_message(self, body) -> Message:
         body = body.decode(UTF8_ENCODING)
@@ -61,18 +60,18 @@ class MiddlewareSystemClient:
         message = Message(SERVICE_MESSAGE_ID, request_message.request_id, self.group_id, request_message.operation_id, STORAGE_DATA_WORKER_ID, request_message.body)
         self.storage_service_caller.storage_data(message)
 
-    def call_send_results(self, request_id: str, results: str):
-        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, SEND_RESULTS_OP_ID, MIDDLEWARE_ID, results)
-        self.middleware_caller.send_results(message)
+    def call_send_results(self, request_id: str, reply_to: str, results: str):
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, SEND_RESULTS_OP_ID, reply_to, results)
+        self.client_caller.send_results(message)
 
-    def call_upload_thumbnail(self, request_id: str, filename:str, thumbnailb: bytes):
+    def call_upload_thumbnail(self, request_id: str, reply_to: str, filename: str, thumbnailb: bytes):
         thumbnail = Thumbnail(filename, base64.b64encode(thumbnailb).decode(UTF8_ENCODING))
-        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_THUMBNAILS, MIDDLEWARE_ID, to_json(thumbnail.__dict__))
-        self.middleware_caller.upload_thumbnail(message)
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_THUMBNAILS, reply_to, to_json(thumbnail.__dict__))
+        self.client_caller.upload_thumbnail(message)
 
-    def call_upload_complete(self, request_id: str):
-        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_COMPLETE, MIDDLEWARE_ID, "")
-        self.middleware_caller.upload_complete(message)
+    def call_upload_complete(self, request_id: str, reply_to: str):
+        message = Message(CLIENT_MESSAGE_ID, request_id, self.group_id, DOWNLOAD_COMPLETE, reply_to, "")
+        self.client_caller.upload_complete(message)
 
     def close(self):
         self.like_filter_caller.close()
@@ -81,4 +80,4 @@ class MiddlewareSystemClient:
         self.day_grouper_caller.close()
         self.max_caller.close()
         self.storage_service_caller.close()
-        self.middleware_caller.close()
+        self.client_caller.close()
