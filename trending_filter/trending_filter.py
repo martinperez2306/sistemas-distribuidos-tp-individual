@@ -3,9 +3,9 @@ import logging
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
+from dependencies.commons.video import Video
 from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
-from dependencies.commons.utils import json_to_video
 
 TRENDING_DAYS_COUNT = 21
 
@@ -32,11 +32,11 @@ class TrendingFilter(RoutingService):
             pass
 
     def __storage_total_countries(self, trending_filter_message: Message):
-        self.categories_by_country = trending_filter_message.body
-        logging.info("Total Countries [{}]".format(self.categories_by_country))
+        logging.info("Total Countries [{}]".format(trending_filter_message.body))
+        self.total_countries = int(trending_filter_message.body)
 
     def __process_trending(self, like_filter_message: Message):
-        video = json_to_video(like_filter_message.body)
+        video = Video.from_json(like_filter_message.body)
         logging.debug("Video {}".format(str(video)))
         if self.trending_dates_by_video.get(video.id):
             trending_dates: list = self.trending_dates_by_video.get(video.id)
@@ -46,6 +46,7 @@ class TrendingFilter(RoutingService):
             trending_dates = list()
             trending_dates.append(video.trending_date)
             self.trending_dates_by_video[video.id] = trending_dates
+
         if self.countries_by_video.get(video.id):
             countries: list = self.countries_by_video.get(video.id)
             self.__add_unique(countries, video.country)
@@ -54,8 +55,9 @@ class TrendingFilter(RoutingService):
             countries = list()
             countries.append(video.country)
             self.countries_by_video[video.id] = countries
-            
+  
         if self.__is_trending_video(video) and self.__is_trending_video_in_all_countries(video):
+            logging.info("Video is trending in all countries: [{}]".format(str(video)))
             unique = True
             for trending_video in self.trending_videos:
                 if video.id == trending_video.id:
@@ -67,10 +69,10 @@ class TrendingFilter(RoutingService):
         if value not in list:
             list.append(value)
 
-    def __is_trending_video(self, video):
+    def __is_trending_video(self, video: Video):
          return len(self.trending_dates_by_video.get(video.id)) >= TRENDING_DAYS_COUNT
 
-    def __is_trending_video_in_all_countries(self, video):
+    def __is_trending_video_in_all_countries(self, video: Video):
         return len(self.countries_by_video.get(video.id)) >= self.total_countries
 
     def __check_next_stage(self, trending_filter_message: Message):
