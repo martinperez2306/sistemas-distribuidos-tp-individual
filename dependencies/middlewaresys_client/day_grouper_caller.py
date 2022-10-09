@@ -2,8 +2,8 @@ import logging
 
 from dependencies.commons.constants import *
 from dependencies.commons.message import Message
-from dependencies.commons.utils import json_to_video
 from dependencies.commons.routing_caller import RoutingCaller
+from dependencies.commons.video import Video
 
 class DayGrouperCaller(RoutingCaller):
     def __init__(self, config_params):
@@ -20,7 +20,7 @@ class DayGrouperCaller(RoutingCaller):
         elif PROCESS_DATA_OP_ID == message.operation_id:
             if not self.connection or not self.connection.is_open:
                 self.connect()
-            video = json_to_video(group_by_day_message.body)
+            video = Video.from_json(group_by_day_message.body)
             trending_date = video.trending_date
             routing_key = DAY_GROUPER_GROUP_ID + "_" + str((hash(trending_date) % self.total_routes) + 1)
             self.publish_data(group_by_day_message.to_string(), str(routing_key))

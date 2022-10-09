@@ -5,7 +5,7 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
-from dependencies.commons.utils import json_to_video
+from dependencies.commons.video import Video
 
 FUNNY_TAG = "funny"
 
@@ -27,7 +27,7 @@ class FunnyFilter(RoutingService):
             pass
 
     def __process_filter_by_funny_tag(self, funny_filter_message: Message):
-        video = json_to_video(funny_filter_message.body)
+        video = Video.from_json(funny_filter_message.body)
         logging.info("Video {}".format(str(video)))
         tags = video.tags.split("|")
         if FUNNY_TAG in tags:

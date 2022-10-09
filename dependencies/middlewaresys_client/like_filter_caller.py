@@ -1,7 +1,7 @@
 from dependencies.commons.constants import *
-from dependencies.commons.utils import json_to_video
 from dependencies.commons.message import Message
 from dependencies.commons.routing_caller import RoutingCaller
+from dependencies.commons.video import Video
 
 class LikeFilterCaller(RoutingCaller):
     def __init__(self, config_params):
@@ -17,7 +17,7 @@ class LikeFilterCaller(RoutingCaller):
         elif PROCESS_DATA_OP_ID == message.operation_id:
             if not self.connection or not self.connection.is_open:
                 self.connect()
-            video = json_to_video(filter_by_like_message.body)
+            video = Video.from_json(filter_by_like_message.body)
             video_id = video.id
             routing_key = LIKE_FILTER_GROUP_ID + "_" + str((hash(video_id) % self.total_routes) + 1)
             self.publish_data(filter_by_like_message.to_string(), str(routing_key))

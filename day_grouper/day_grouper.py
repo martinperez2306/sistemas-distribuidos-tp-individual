@@ -4,7 +4,7 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
-from dependencies.commons.utils import json_to_video
+from dependencies.commons.video import Video
 
 class DayGrouper(RoutingService):
     def __init__(self, config_params):
@@ -27,7 +27,7 @@ class DayGrouper(RoutingService):
             pass
 
     def __save_views_by_date(self, gruping_message: Message):
-        video = json_to_video(gruping_message.body)
+        video = Video.from_json(gruping_message.body)
         logging.info("Saving views by date for Video {}".format(str(video)))
         trending_date = video.trending_date
         logging.info("Trending date {}".format(trending_date))

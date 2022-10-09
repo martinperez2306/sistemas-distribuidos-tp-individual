@@ -5,7 +5,6 @@ import pathlib
 import pika
 from dependencies.commons.message import Message
 from dependencies.commons.constants import *
-from dependencies.commons.utils import json_to_video
 from dependencies.commons.video import Video
 from dependencies.commons.work_service import WorkService
 from reporting_service.reporting_check import ReportingCheck
@@ -45,7 +44,7 @@ class ReportingService(WorkService):
 
     def __storage_video(self, reporting_message: Message):
         logging.info("Storaging video")
-        video = json_to_video(reporting_message.body)
+        video = Video.from_json(reporting_message.body)
         request_id = reporting_message.request_id
         if FUNNY_FILTER_GROUP_ID == reporting_message.source_id:
             self.result_repository.save_popular_and_funny_video(request_id, video)

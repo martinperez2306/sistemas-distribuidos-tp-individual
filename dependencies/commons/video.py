@@ -1,3 +1,4 @@
+import json
 from dependencies.commons.video_input import VideoInput
 
 
@@ -32,4 +33,12 @@ class Video:
         video = Video(video_input.id, video_input.title, video_input.category_id, video_input.trending_date,
                         video_input.tags, video_input.view_count, video_input.likes, video_input.thumbnail_link,
                         video_input.country)
+        return video
+
+    @staticmethod
+    def from_json(json_str: str):
+        parsed = json.loads(json_str)
+        video = Video(parsed["id"], parsed["title"], parsed["category_id"], 
+                        parsed["trending_date"], parsed["tags"], parsed["view_count"], parsed["likes"],
+                        parsed["thumbnail_link"], parsed["country"])
         return video

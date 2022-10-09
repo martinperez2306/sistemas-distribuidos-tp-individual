@@ -5,7 +5,7 @@ from dependencies.commons.constants import *
 from dependencies.commons.message import Message
 from dependencies.commons.propagation import Propagation
 from dependencies.commons.routing_serivce import RoutingService
-from dependencies.commons.utils import json_to_video
+from dependencies.commons.video import Video
 
 MIN_LIKES_COUNT = 5000000
 
@@ -27,7 +27,7 @@ class LikeFilter(RoutingService):
             pass
 
     def __process_filter_by_like(self, like_filter_message: Message):
-        video = json_to_video(like_filter_message.body)
+        video = Video.from_json(like_filter_message.body)
         logging.debug("Video {}".format(str(video)))
         try:
             likes_count = int(video.likes)
